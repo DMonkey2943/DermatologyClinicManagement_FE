@@ -3,18 +3,16 @@
 import React, { useEffect, useState } from 'react';
 import PageBreadcrumb from '@/components/common/PageBreadCrumb';
 import ComponentCard from '@/components/common/ComponentCard';
-import UserTable from '@/components/tables/UserTable';
+import UserTable from '@/components/users/UserTable';
 import Button from '@/components/ui/button/Button';
-import { Modal } from '@/components/ui/modal/index';
-import { getUsers } from '@/services/users';
-import { UserResponse, UserUpdate } from '@/types/user';
+import UserFormModal, { UserFormData } from '@/components/users/UserFormModal';
+import { getUsers, createUser, updateUser, deleteUser } from '@/services/users';
+import { User, UserResponse } from '@/types/user';
 
 export default function UserListPage() {
   const [users, setUsers] = useState<UserResponse[]>([]);
-
+  const [editingUser, setEditingUser] = useState<User | null>(null);
   const [modalType, setModalType] = useState<'add' | 'edit' | null>(null);
-  const [username, setName] = useState('');
-  const [password, setPassword] = useState('');
 
   useEffect(() => {
     fetchUsers();
@@ -30,72 +28,82 @@ export default function UserListPage() {
     }
   };
 
-  const handleEdit = (user: UserUpdate) => {
-    const newUsername = prompt('Nhập username mới:', user.username);
-    if (newUsername) {
-      return getUsers();
+  const handleEdit = (user: User) => {
+    setEditingUser(user);
+    setModalType('edit');
+  };
+
+  const handleDelete = async (id: string) => {
+    if (confirm('Bạn có chắc chắn xoá user này?')) {
+      try {
+        await deleteUser(id);
+        fetchUsers();
+      } catch (error) {
+        console.error('Lỗi xóa user: ', error);
+      }
     }
   };
 
-  const handleDelete = (id: string) => {
-    // if (confirm('Bạn có chắc chắn xoá user này?')) {
-    //   axiosInstance.delete(`/users/${id}`)
-    //     .then(() => fetchUsers())
-    //     .catch(err => console.error('Lỗi xoá user:', err));
-    // }
+  const handleModalSubmit = async (formData: UserFormData) => {
+    try {
+      if (modalType === 'add') {
+        const newUser = await createUser({
+          username: formData.username,
+          password: formData.password!,
+          full_name: formData.full_name,
+          email: formData.email,
+          phone_number: formData.phone_number,
+          role: 'STAFF', // Mặc định là STAFF khi tạo mới
+        });
+        console.log("Created new user: ", newUser);
+        setUsers([...users, newUser]);
+      } else if (modalType === 'edit' && editingUser) {
+        const updatedUser = await updateUser(editingUser.id, {
+          username: formData.username,
+          full_name: formData.full_name,
+          email: formData.email,
+          phone_number: formData.phone_number
+        });
+        console.log("Updated user: ", updatedUser);
+        fetchUsers(); // Refresh the list
+      }
+      closeModal();
+    } catch (error) {
+      console.error('Error submitting user:', error);
+      throw error; // Re-throw to let modal handle the error state
+    }
   };
 
-  const handleSubmit = () => {    
-    // if (username && password) {
-    //   axiosInstance.post('/users', { username, password })
-    //     .then(() => fetchUsers())
-    //     .catch(err => console.error('Lỗi thêm user:', err));
-    //     closeModal();
-    // } else {
-    //   alert('Vui lòng nhập đầy đủ thông tin');
-    // }
-  };
-  const openAddModal = () =>{
-    setName('');
-    setPassword('');
+  const openAddModal = () => {
+    setEditingUser(null);
     setModalType('add');
-  }
+  };
+
   const closeModal = () => {
+    setEditingUser(null);
     setModalType(null);
   };
+
   return (
     <div>
-      <Modal isOpen={!!modalType} onClose={closeModal}>
-        <div className="p-6 space-y-4">
-          <h2 className="text-xl font-bold">
-            {modalType === 'add' ? 'Thêm Platform mới' : 'Chỉnh sửa Platform'}
-          </h2>
-          <input
-            className="w-full border px-4 py-2 rounded"
-            placeholder="Tên tài khoản"
-            value={username}
-            onChange={(e) => setName(e.target.value)}
-          />
-          <input
-            className="w-full border px-4 py-2 rounded"
-            placeholder="Mật khẩu"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          />
-          <div className="flex justify-end gap-2">
-            <Button variant="outline" onClick={closeModal}>Huỷ</Button>
-            <Button onClick={handleSubmit}>Lưu</Button>
-          </div>
-        </div>
-      </Modal>
+      <UserFormModal
+        isOpen={!!modalType}
+        onClose={closeModal}
+        onSubmit={handleModalSubmit}
+        editingUser={editingUser}
+        modalType={modalType}
+      />
+      
       <PageBreadcrumb pageTitle="Danh sách Users" />
+      
       <div className="space-y-6">
-        <ComponentCard 
-          title="Danh sách Users" 
-        >
+        <ComponentCard title="Danh sách Users">
           <Button onClick={openAddModal}>+ Add User</Button>
-
-          <UserTable users={users} onEdit={handleEdit} onDelete={handleDelete} />
+          <UserTable 
+            users={users} 
+            onEdit={handleEdit} 
+            onDelete={handleDelete} 
+          />
         </ComponentCard>
       </div>
     </div>

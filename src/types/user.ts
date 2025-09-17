@@ -7,6 +7,7 @@ export interface User {
     id: string;
     username: string;
     full_name: string;
+    phone_number: string;
     email: string;
     role: string;
 }
@@ -22,6 +23,7 @@ export interface UserResponse {
 
 export interface UserCreate {
     username: string;
+    full_name: string;
     email: string;
     phone_number: string;
     password: string;

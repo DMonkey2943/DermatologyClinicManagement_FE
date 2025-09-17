@@ -61,7 +61,7 @@ export default function UserTable({ users, onEdit, onDelete }: UserTableProps) {
                   isHeader
                   className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
                 >
-                  Actions
+                  Tùy chọn
                 </TableCell>
               </TableRow>
             </TableHeader>
@@ -83,7 +83,7 @@ export default function UserTable({ users, onEdit, onDelete }: UserTableProps) {
                     {user.phone_number}
                   </TableCell>
                   <TableCell className="px-5 py-4 text-start text-theme-sm text-gray-500 dark:text-gray-400">
-                    <Badge size="sm" color="success">{user.role}</Badge>
+                    <Badge size="sm" color="info">{user.role}</Badge>
                   </TableCell>
                   <TableCell className="px-5 py-4 text-start text-theme-xs text-gray-500 dark:text-gray-400">
                     <div className="flex gap-2">
