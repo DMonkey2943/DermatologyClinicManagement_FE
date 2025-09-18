@@ -94,6 +94,13 @@ export default function UserFormModal({
     if (!isSubmitting) {
       onClose();
     }
+    setFormData({
+      username: '',
+      password: '',
+      full_name: '',
+      email: '',
+      phone_number: '',
+    });
   };
 
   return (
