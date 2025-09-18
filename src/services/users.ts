@@ -8,7 +8,7 @@ export async function getUsers(skip: number = 0, limit: number = 100): Promise<U
             params: { skip, limit },
         });
         console.log("Fetched users:", response.data);
-        return response.data;
+        return response.data.data;
     } catch (error) {
         throw new Error('Failed to fetch users');
     }
@@ -18,7 +18,7 @@ export async function getUsers(skip: number = 0, limit: number = 100): Promise<U
 export async function getUserById(userId: string): Promise<UserResponse> {
     try {
         const response = await api.get(`/users/${userId}`);
-        return response.data;
+        return response.data.data;
     } catch (error: any) {
         if (error.response?.status === 404) {
             throw new Error('User not found');
@@ -31,7 +31,7 @@ export async function getUserById(userId: string): Promise<UserResponse> {
 export async function createUser(userData: UserCreate): Promise<UserResponse> {
     try {
         const response = await api.post('/users/', userData);
-        return response.data;
+        return response.data.data;
     } catch (error: any) {
         if (error.response?.status === 400) {
             throw new Error(error.response.data.detail || 'Invalid user data');
@@ -44,7 +44,7 @@ export async function createUser(userData: UserCreate): Promise<UserResponse> {
 export async function updateUser(userId: string, userData: UserUpdate): Promise<UserResponse> {
     try {
         const response = await api.put(`/users/${userId}`, userData);
-        return response.data;
+        return response.data.data;
     } catch (error: any) {
         if (error.response?.status === 404) {
             throw new Error('User not found');
