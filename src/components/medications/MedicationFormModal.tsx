@@ -41,8 +41,7 @@ export default function MedicationFormModal({
 
   useEffect(() => {
     if (modalType === 'edit' && editingMedication) {
-      console.log(editingMedication);
-      console.log(typeof(editingMedication.price));
+      // console.log(editingMedication);
       setFormData({
         name: editingMedication.name || '',
         dosage_form: editingMedication.dosage_form || '',
@@ -149,7 +148,7 @@ export default function MedicationFormModal({
             <Label>Giá bán</Label>
             <Input
               type="number"
-              defaultValue={formData.price}
+              value={formData.price}
               onChange={(e) => handleInputChange('price', e.target.value)}
               disabled={isSubmitting}
             />
@@ -158,7 +157,7 @@ export default function MedicationFormModal({
             <Label>Số lượng tồn kho</Label>
             <Input
               type="number"
-              defaultValue={formData.stock_quantity}
+              value={formData.stock_quantity}
               onChange={(e) => handleInputChange('stock_quantity', e.target.value)}
               disabled={isSubmitting}
             />

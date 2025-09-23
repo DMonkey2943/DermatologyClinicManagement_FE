@@ -65,6 +65,7 @@ export default function MedicationListPage() {
           name: formData.name,
           dosage_form: formData.dosage_form,
           price: formData.price,
+          stock_quantity: formData.stock_quantity,
           description: formData.description
         });
         console.log("Updated medication: ", updatedMedication);
