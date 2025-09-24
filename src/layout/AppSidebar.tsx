@@ -17,6 +17,8 @@ import {
   TableIcon,
   UserCircleIcon,
   UserIcon,
+  MedicationIcon,
+  StethoscopeIcon,
 } from "../icons/index";
 import SidebarWidget from "./SidebarWidget";
 
@@ -39,9 +41,14 @@ const navItems: NavItem[] = [
     path: "/users",
   },
   {
-    icon: <UserIcon />,
+    icon: <MedicationIcon />,
     name: "Thuốc",
     path: "/medications",
+  },
+  {
+    icon: <StethoscopeIcon />,
+    name: "Dịch vụ y tế",
+    path: "/services",
   },
   {
     icon: <CalenderIcon />,
