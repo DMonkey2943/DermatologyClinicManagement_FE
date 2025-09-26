@@ -53,6 +53,9 @@ import MoreDotIcon from "./more-dot.svg";
 import BellIcon from "./bell.svg";
 import MedicationIcon from "./capsule-pill.svg";
 import StethoscopeIcon from "./stethoscope.svg";
+import UsersGearIcon from "./users-gear.svg";
+import HospitalUserIcon from "./hospital-user.svg";
+import UserDoctorIcon from "./user-doctor.svg";
 
 export {
   DownloadIcon,
@@ -110,4 +113,7 @@ export {
   ChatIcon,
   MedicationIcon,
   StethoscopeIcon,
+  UsersGearIcon,
+  HospitalUserIcon,
+  UserDoctorIcon,
 };
