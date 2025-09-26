@@ -48,6 +48,11 @@ const navItems: NavItem[] = [
     path: "/patients",
   },
   {
+    icon: <CalenderIcon />,
+    name: "Lịch hẹn",
+    path: "/appointments",
+  },
+  {
     icon: <MedicationIcon />,
     name: "Thuốc",
     path: "/medications",

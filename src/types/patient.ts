@@ -35,3 +35,8 @@ export interface PatientUpdate {
     email?: string;
     address?: string;
 }
+
+export interface PatientFK {
+    id: string;
+    full_name: string;
+}

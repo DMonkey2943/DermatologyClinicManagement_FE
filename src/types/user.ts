@@ -38,3 +38,8 @@ export interface UserUpdate {
     role?: 'ADMIN' | 'DOCTOR' | 'STAFF';
     is_active?: boolean;
 }
+
+export interface UserFK {
+    id: string;
+    full_name: string;
+}
