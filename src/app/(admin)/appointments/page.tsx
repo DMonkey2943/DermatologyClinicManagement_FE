@@ -8,8 +8,11 @@ import AppointmentTable from '@/components/appointments/AppointmentTable';
 import AppointmentFormModal, { AppointmentFormData } from '@/components/appointments/AppointmentFormModal';
 import { getAppointments, createAppointment, updateAppointment } from '@/services/appointments';
 import { Appointment, AppointmentResponse } from '@/types/appointment';
+import { useAuth } from "@/context/AuthContext";
 
 export default function AppointmentListPage() {
+    const { user } = useAuth();
+    
   const [appointments, setAppointments] = useState<AppointmentResponse[]>([]);
   const [editingAppointment, setEditingAppointment] = useState<Appointment | null>(null);
   const [modalType, setModalType] = useState<'add' | 'edit' | null>(null);
@@ -21,7 +24,7 @@ export default function AppointmentListPage() {
   const fetchAppointments = async () => {
     try {
       const res = await getAppointments();
-      console.log(res);
+    //   console.log(res);
       setAppointments(res);
     } catch (error) {
       console.error('Lỗi lấy danh sách Appointments:', error);
@@ -50,7 +53,7 @@ export default function AppointmentListPage() {
         const newAppointment = await createAppointment({
           patient_id: formData.patient_id,
           doctor_id: formData.doctor_id,
-          created_by: formData.created_by,
+          created_by: user!.id,
           appointment_date: formData.appointment_date!,
           time_slot: formData.time_slot,
           status: formData.status || 'SCHEDULED',
@@ -61,7 +64,6 @@ export default function AppointmentListPage() {
         const updatedAppointment = await updateAppointment(editingAppointment.id, {
         //   patient_id: formData.patient_id,
           doctor_id: formData.doctor_id,
-        //   created_by: formData.created_by,
           appointment_date: formData.appointment_date!,
           time_slot: formData.time_slot,
           status: formData.status,

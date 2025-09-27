@@ -16,7 +16,7 @@ export async function login(userData: UserLogin): Promise<User> {
 export async function getCurrentUser(): Promise<User | null> {
     try {
         const { data } = await api.get('/auth/me');
-        return data;
+        return data.data;
     } catch (error) {
         return null;
     }
