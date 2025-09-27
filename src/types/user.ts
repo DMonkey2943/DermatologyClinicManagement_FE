@@ -43,3 +43,10 @@ export interface UserFK {
     id: string;
     full_name: string;
 }
+
+export interface DoctorResponse {
+    id: string;
+    user_id: string;
+    specialization: string;
+    user: UserFK;
+}

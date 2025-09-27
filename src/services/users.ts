@@ -1,5 +1,5 @@
 import api from '@/lib/axios';
-import { UserCreate, UserUpdate, UserResponse } from '@/types/user';
+import { UserCreate, UserUpdate, UserResponse, DoctorResponse } from '@/types/user';
 
 // Lấy danh sách người dùng (phân trang)
 export async function getUsers(skip: number = 0, limit: number = 100): Promise<UserResponse[]> {
@@ -62,5 +62,21 @@ export async function deleteUser(userId: string): Promise<void> {
             throw new Error('User not found');
         }
         throw new Error('Failed to delete user');
+    }
+}
+
+
+/* DOCTORS */
+
+// Lấy danh sách bác sĩ (phân trang)
+export async function getDoctors(skip: number = 0, limit: number = 100): Promise<DoctorResponse[]> {
+    try {
+        const response = await api.get('/doctors', {
+            params: { skip, limit },
+        });
+        console.log("Fetched doctors:", response.data);
+        return response.data.data;
+    } catch (error) {
+        throw new Error('Failed to fetch doctors');
     }
 }
