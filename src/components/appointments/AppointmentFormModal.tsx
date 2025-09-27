@@ -4,8 +4,13 @@ import Label from '@/components/form/Label';
 import Input from '@/components/form/input/InputField';
 import DatePicker from '@/components/form/date-picker';
 import Radio from '../form/input/Radio';
+import Combobox from '../form/Combobox';
 import { Modal } from '@/components/ui/modal/index';
 import { Appointment } from '@/types/appointment';
+import { getPatients } from '@/services/patients';
+import { PatientResponse } from '@/types/patient';
+import { getDoctors } from '@/services/users';
+import { DoctorResponse } from '@/types/user';
 
 interface AppointmentFormModalProps {
   isOpen: boolean;
@@ -18,7 +23,7 @@ interface AppointmentFormModalProps {
 export interface AppointmentFormData {
   patient_id: string;
   doctor_id: string;
-  created_by: string;
+  // created_by?: string;
   appointment_date: string | null;
   time_slot: string;
   status: 'SCHEDULED' | 'WAITING' | 'COMPLETED' | 'CANCELLED' | null;
@@ -34,49 +39,60 @@ export default function AppointmentFormModal({
   const [formData, setFormData] = useState<AppointmentFormData>({
     patient_id: '',
     doctor_id: '',
-    created_by: '',
     appointment_date: null,
     time_slot: '',
     status: null,
   });
 
-  
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [patients, setPatients] = useState<PatientResponse[]>([]);
+  const [doctors, setDoctors] = useState<DoctorResponse[]>([]);
 
   useEffect(() => {
-    if (modalType === 'edit' && editingAppointment) {
-      console.log("Editing appointment", editingAppointment);
-      setFormData({
-        patient_id: editingAppointment.patient_id || '',
-        doctor_id: editingAppointment.doctor_id || '',
-        created_by: editingAppointment.created_by || '',
-        appointment_date: editingAppointment.appointment_date || null,
-        time_slot: editingAppointment.time_slot || '',
-        status: editingAppointment.status || null,
-      });
-    } else if (modalType === 'add') {
-      setFormData({
-        patient_id: '',
-        doctor_id: '',
-        created_by: '',
-        appointment_date: null,
-        time_slot: '',
-        status: null,
-      });
-    }
+    const fetchData = async () => {
+      try {
+        const [patientsData, doctorsData] = await Promise.all([
+          getPatients(),
+          getDoctors(),
+        ]);
+        // console.log('Patients:', patientsData);
+        // console.log('Doctors:', doctorsData);
+        setPatients(patientsData);
+        setDoctors(doctorsData);
+
+        // Cập nhật formData sau khi dữ liệu đã tải
+        if (modalType === 'edit' && editingAppointment) {
+          // console.log("Editing appointment", editingAppointment);
+          setFormData({
+            patient_id: editingAppointment.patient_id || '',
+            doctor_id: editingAppointment.doctor_id || '',
+            // created_by: editingAppointment.created_by || '',
+            appointment_date: editingAppointment.appointment_date || null,
+            time_slot: editingAppointment.time_slot || '',
+            status: editingAppointment.status || null,
+          });
+        }
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
+    };
+    fetchData();
   }, [modalType, editingAppointment]);
+
+  // useEffect(() => {
+  //   console.log("formData appointment", formData);
+  // }, [formData]);
 
   const handleInputChange = (field: keyof AppointmentFormData, value: string | null) => {
     setFormData(prev => ({
       ...prev,
-      [field]: value
+      [field]: value,
     }));
   };
 
   const validateForm = (): boolean => {
-    const { patient_id, doctor_id, created_by, appointment_date, time_slot, status } = formData;
-    
-    return !!(patient_id && doctor_id && created_by && appointment_date && time_slot && status);
+    const { patient_id, doctor_id, appointment_date, time_slot, status } = formData;
+    return !!(patient_id && doctor_id && appointment_date && time_slot && status);
   };
 
   const handleSubmit = async () => {
@@ -102,12 +118,23 @@ export default function AppointmentFormModal({
     setFormData({
       patient_id: '',
       doctor_id: '',
-      created_by: '',
+      // created_by: '',
       appointment_date: null,
       time_slot: '',
       status: null,
     });
   };
+
+  // Convert fetched data to Combobox options
+  const patientOptions = patients.map(patient => ({
+    value: patient.id,
+    label: patient.full_name,
+  }));
+
+  const doctorOptions = doctors.map(doctor => ({
+    value: doctor.user.id,
+    label: doctor.user.full_name,
+  }));
 
   return (
     <Modal
@@ -117,35 +144,26 @@ export default function AppointmentFormModal({
     >
       <div className="p-6 space-y-4">
         <h2 className="text-xl font-bold">
-          {modalType === 'add' ? 'Thêm bệnh nhân mới' : 'Chỉnh sửa bệnh nhân'}
+          {modalType === 'add' ? 'Thêm lịch hẹn mới' : 'Chỉnh sửa lịch hẹn'}
         </h2>
         <div className="grid grid-cols-1 gap-x-6 gap-y-5 sm:grid-cols-2">
-          <div className="col-span-1 sm:col-span-2">
+          <div className="col-span-1">
             <Label>Bệnh nhân</Label>
-            <Input
-              type="text"
-              value={formData.patient_id}
-              onChange={(e) => handleInputChange('patient_id', e.target.value)}
-              disabled={isSubmitting}
+            <Combobox
+              options={patientOptions}
+              placeholder="Chọn bệnh nhân..."
+              onChange={(value) => handleInputChange('patient_id', value)}
+              defaultValue={formData.patient_id}
             />
           </div>
 
-          <div className="col-span-1 sm:col-span-2">
+          <div className="col-span-1">
             <Label>Bác sĩ</Label>
-            <Input
-              type="text"
-              value={formData.doctor_id}
-              onChange={(e) => handleInputChange('doctor_id', e.target.value)}
-              disabled={isSubmitting}
-            />
-          </div>
-          <div className="col-span-1 sm:col-span-2">
-            <Label>Nhân viên tạo</Label>
-            <Input
-              type="text"
-              value={formData.created_by}
-              onChange={(e) => handleInputChange('created_by', e.target.value)}
-              disabled={isSubmitting}
+            <Combobox
+              options={doctorOptions}
+              placeholder="Chọn bác sĩ..."
+              onChange={(value) => handleInputChange('doctor_id', value)}
+              defaultValue={formData.doctor_id}
             />
           </div>
           <div className="col-span-1">
@@ -171,7 +189,7 @@ export default function AppointmentFormModal({
             <div className="flex gap-4">
               <Radio
                 id="status-scheduled"
-                name="gender"
+                name="status"
                 value="SCHEDULED"
                 checked={formData.status === 'SCHEDULED'}
                 label="Đã lên lịch"
@@ -223,7 +241,7 @@ export default function AppointmentFormModal({
             {isSubmitting ? 'Đang lưu...' : 'Lưu'}
           </Button>
         </div>
-        </div>
+      </div>
     </Modal>
   );
 }
