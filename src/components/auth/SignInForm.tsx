@@ -8,31 +8,53 @@ import { login } from '@/services/auth';
 import { useRouter } from "next/navigation";
 import React, { useState } from "react";
 import { useAuth } from '@/context/AuthContext';
+import { EntityError, UnauthorizedError } from '@/lib/axios';
 
 export default function SignInForm() {
   const [showPassword, setShowPassword] = useState(false);
-  const [isChecked, setIsChecked] = useState(false);
+  // const [isChecked, setIsChecked] = useState(false);
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [errors, setErrors] = useState<{ username?: string; password?: string }>({}); // State để lưu lỗi 422
+  const [unauthorizedErrors, setUnauthorizedErrors] = useState(""); // State để lưu lỗi 422
   const router = useRouter();
   const { setUser } = useAuth(); // Lấy setUser từ useAuth
 
-  // const { user, isAuthenticated, login, logout } = useAuth();
-
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    try {
-      const currentUser = await login({ username, password });
-      // console.log('Logged in user:', currentUser);
 
+     // Reset lỗi trước khi gọi API
+    setErrors({});
+    setUnauthorizedErrors("");
+
+    try {
+      const res = await login({ username, password });
+      
+      const currentUser = res.data.user;
+      // console.log('Logged in user:', currentUser);
       setUser(currentUser); // Cập nhật user trong AuthContext
       // Nếu login thành công
       if (currentUser.id) {
         router.push("/"); // Redirect về trang home
       }
     } catch (err) {
-      console.error("Login failed", err);
-      alert("Sai tài khoản hoặc mật khẩu!");
+      if (err instanceof EntityError) {
+        // Xử lý lỗi 422
+        const errorPayload = err.payload.details;
+        const newErrors: { username?: string; password?: string } = {};
+        errorPayload.forEach(({ field, msg }) => {
+          if (field === 'username' || field === 'password') {
+            newErrors[field] = msg; // Lưu lỗi theo field
+          }
+        });
+        setErrors(newErrors); // Cập nhật state errors
+      }else if (err instanceof UnauthorizedError) {
+        // Xử lý lỗi 401
+        setUnauthorizedErrors(err.payload.message)
+      } else {
+        console.error("Login failed", err);
+        alert("Sai tài khoản hoặc mật khẩu!");
+      }
     }
   };
 
@@ -47,6 +69,13 @@ export default function SignInForm() {
             <p className="text-sm text-gray-500 dark:text-gray-400">
               Enter your username and password to sign in!
             </p>
+            {unauthorizedErrors && (
+              <p
+                className="mt-1.5 text-sm text-error-500"
+              >
+                {unauthorizedErrors}
+              </p>
+            )}
           </div>
           <form onSubmit={handleLogin}>
             <div className="space-y-6">
@@ -59,6 +88,8 @@ export default function SignInForm() {
                   type="text"
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
+                  error={!!errors.username} // Hiển thị trạng thái lỗi
+                  hint={errors.username} // Hiển thị message lỗi
                 />
               </div>
               <div>
@@ -70,7 +101,8 @@ export default function SignInForm() {
                     type={showPassword ? "text" : "password"}
                     placeholder="Enter your password"
                     value={password}
-                    onChange={(e) => setPassword(e.target.value)}
+                    onChange={(e) => setPassword(e.target.value)}error={!!errors.password} // Hiển thị trạng thái lỗi
+                    hint={errors.password} // Hiển thị message lỗi
                   />
                   <span
                     onClick={() => setShowPassword(!showPassword)}
@@ -84,13 +116,13 @@ export default function SignInForm() {
                   </span>
                 </div>
               </div>
-              <div className="flex items-center gap-3">
+              {/* <div className="flex items-center gap-3">
                 <Checkbox checked={isChecked} onChange={setIsChecked} />
                 <span className="block font-normal text-gray-700 text-theme-sm dark:text-gray-400">
                   Keep me logged in
                 </span>
-              </div>
-              <Button className="w-full" size="sm" type="submit">
+              </div> */}
+              <Button className="w-full" size="sm">
                 Sign in
               </Button>
             </div>
