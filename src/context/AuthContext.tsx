@@ -1,21 +1,21 @@
 'use client';
 
 import { createContext, useContext, useState, useEffect } from 'react';
-import { getCurrentUser, logout } from '@/services/auth';
-import { User } from '@/types/user';
+import { UserDataType } from '@/schemaValidations/user.schema';
+import authApiRequest from '@/apiRequests/auth';
 
 interface AuthContextType {
-  user: User | null;
+  user: UserDataType | null;
   isLoading: boolean;
   isAuthenticated: boolean;
-  setUser: (user: User | null) => void; // Thêm setUser
+  setUser: (user: UserDataType | null) => void; // Thêm setUser
   signout: () => void;  // Thêm signout vào context
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<UserDataType | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const isAuthenticated = !!user;
 
@@ -23,11 +23,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     async function fetchCurrentUser() {
       try {
-        const currentUser = await getCurrentUser();
+        const res = await authApiRequest.getCurrentUser();
+        const currentUser = res.payload.data;
         console.log('Fetched current user:', currentUser);
         setUser(currentUser);
       } catch (error) {
-        console.error('Failed to fetch current user', error);
+        console.error('Failed to fetch current user: ', error);
         setUser(null);
       } finally {
         setIsLoading(false);
@@ -36,8 +37,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     fetchCurrentUser();
   }, []);
     
-  const signout = () => {
-    logout();  // Gọi hàm xóa cookie và redirect từ auth.ts
+  const signout = async () => {
+    await authApiRequest.logout();  // Gọi hàm xóa cookie và redirect từ auth.ts
     setUser(null);    // Cập nhật context ngay lập tức
   };
     
