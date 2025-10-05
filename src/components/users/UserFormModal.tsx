@@ -4,11 +4,13 @@ import Label from '@/components/form/Label';
 import Input from '@/components/form/input/InputField';
 import { Modal } from '@/components/ui/modal/index';
 import { User } from '@/types/user';
+import userApiRequest from '@/apiRequests/user';
+import { EntityError } from '@/lib/axios';
 
 interface UserFormModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSubmit: (userData: UserFormData) => Promise<void>;
+  onSuccess: () => void;
   editingUser: User | null;
   modalType: 'add' | 'edit' | null;
 }
@@ -21,10 +23,19 @@ export interface UserFormData {
   phone_number: string;
 }
 
+export interface ValidationErrors {
+  username?: string;
+  password?: string;
+  full_name?: string;
+  email?: string;
+  phone_number?: string;
+  _form?: string;
+}
+
 export default function UserFormModal({ 
   isOpen, 
   onClose, 
-  onSubmit, 
+  onSuccess, 
   editingUser, 
   modalType 
 }: UserFormModalProps) {
@@ -37,6 +48,7 @@ export default function UserFormModal({
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [errors, setErrors] = useState<ValidationErrors>({}); // State để lưu lỗi 422
 
   useEffect(() => {
     if (modalType === 'edit' && editingUser) {
@@ -55,6 +67,7 @@ export default function UserFormModal({
         phone_number: '',
       });
     }
+    setErrors({});
   }, [modalType, editingUser]);
 
   const handleInputChange = (field: keyof UserFormData, value: string) => {
@@ -64,27 +77,51 @@ export default function UserFormModal({
     }));
   };
 
-  const validateForm = (): boolean => {
-    const { username, full_name, email, phone_number, password } = formData;
-    
-    if (modalType === 'add') {
-      return !!(username && password && full_name && email && phone_number);
-    } else {
-      return !!(username && full_name && email && phone_number);
-    }
-  };
-
-  const handleSubmit = async () => {
-    if (!validateForm()) {
-      alert('Vui lòng nhập đầy đủ thông tin');
-      return;
-    }
-
+   const handleSubmit = async () => {
+    setErrors({});
     setIsSubmitting(true);
+
     try {
-      await onSubmit(formData);
-    } catch (error) {
-      console.error('Error submitting form:', error);
+      if (modalType === 'edit' && editingUser) {
+        // Sửa user - không gửi password nếu rỗng
+        const updateData = {
+          email: formData.email,
+          username: formData.username,
+          full_name: formData.full_name,
+          phone_number: formData.phone_number,
+        };
+        await userApiRequest.update(editingUser.id, updateData);
+      } else if(modalType === 'add') {
+        // Thêm mới user - bắt buộc phải có password
+        await userApiRequest.create({
+          email: formData.email,
+          username: formData.username,
+          full_name: formData.full_name,
+          phone_number: formData.phone_number,
+          password: formData.password,
+          role: "STAFF",
+        });
+      }
+
+      // Thành công
+      onSuccess();
+    } catch (err: any) {
+      console.error('Submit error:', err);
+      
+      // Xử lý lỗi 422 (validation error)
+      if (err instanceof EntityError) {
+        const errorPayload = err.payload.details;
+        const validationErrors: ValidationErrors = {};
+        errorPayload.forEach(({ field, msg }) => {
+          validationErrors[field] = msg;
+        });
+        setErrors(validationErrors);
+      } else {
+        // Lỗi khác
+        setErrors({ 
+          _form: err.payload?.message || 'Có lỗi xảy ra, vui lòng thử lại' 
+        });
+      }
     } finally {
       setIsSubmitting(false);
     }
@@ -113,6 +150,14 @@ export default function UserFormModal({
         <h2 className="text-xl font-bold">
           {modalType === 'add' ? 'Thêm User mới' : 'Chỉnh sửa User'}
         </h2>
+
+        {/* Form-level error */}
+        {errors._form && (
+          <div>
+            <p className="mt-1 text-md text-error-500">{errors._form}</p>
+          </div>
+        )}
+
         <div className="grid grid-cols-1 gap-x-6 gap-y-5 sm:grid-cols-2">
           <div className="col-span-1 sm:col-span-2">
             <Label>Họ tên</Label>
@@ -121,6 +166,8 @@ export default function UserFormModal({
               defaultValue={formData.full_name}
               onChange={(e) => handleInputChange('full_name', e.target.value)}
               disabled={isSubmitting}
+              error={!!errors.full_name}
+              hint={errors.full_name}
             />
           </div>
           <div className="col-span-1 sm:col-span-2">
@@ -130,6 +177,8 @@ export default function UserFormModal({
               defaultValue={formData.email}
               onChange={(e) => handleInputChange('email', e.target.value)}
               disabled={isSubmitting}
+              error={!!errors.email}
+              hint={errors.email}
             />
           </div>
           <div className="col-span-1 sm:col-span-2">
@@ -139,6 +188,8 @@ export default function UserFormModal({
               defaultValue={formData.phone_number}
               onChange={(e) => handleInputChange('phone_number', e.target.value)}
               disabled={isSubmitting}
+              error={!!errors.phone_number}
+              hint={errors.phone_number}
             />
           </div>
           <div className="col-span-1">
@@ -148,6 +199,8 @@ export default function UserFormModal({
               defaultValue={formData.username}
               onChange={(e) => handleInputChange('username', e.target.value)}
               disabled={isSubmitting}
+              error={!!errors.username}
+              hint={errors.username}
             />
           </div>
           {modalType === 'add' && (
@@ -158,10 +211,13 @@ export default function UserFormModal({
                 defaultValue={formData.password || ''}
                 onChange={(e) => handleInputChange('password', e.target.value)}
                 disabled={isSubmitting}
+                error={!!errors.password}
+                hint={errors.password}
               />
             </div>
           )}
         </div>
+        
         <div className="flex justify-end gap-2">
           <Button 
             variant="outline" 

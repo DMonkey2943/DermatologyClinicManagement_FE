@@ -5,26 +5,33 @@ import PageBreadcrumb from '@/components/common/PageBreadCrumb';
 import ComponentCard from '@/components/common/ComponentCard';
 import UserTable from '@/components/users/UserTable';
 import Button from '@/components/ui/button/Button';
-import UserFormModal, { UserFormData } from '@/components/users/UserFormModal';
-import { getUsers, createUser, updateUser, deleteUser } from '@/services/users';
-import { User, UserResponse } from '@/types/user';
+import UserFormModal from '@/components/users/UserFormModal';
+import { User } from '@/types/user';
+import userApiRequest from '@/apiRequests/user';
+import { UserDataType } from '@/schemaValidations/user.schema';
 
 export default function UserListPage() {
-  const [users, setUsers] = useState<UserResponse[]>([]);
+  const [users, setUsers] = useState<UserDataType[]>([]);
   const [editingUser, setEditingUser] = useState<User | null>(null);
   const [modalType, setModalType] = useState<'add' | 'edit' | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     fetchUsers();
   }, []);
 
   const fetchUsers = async () => {
+    setIsLoading(true);
     try {
-      const res = await getUsers();
-      console.log(res);
-      setUsers(res);
+      const {payload} = await userApiRequest.getList();
+      const userList = payload.data;
+      console.log(userList);
+      setUsers(userList);
     } catch (error) {
       console.error('Lỗi lấy danh sách users:', error);
+    }
+    finally {
+      setIsLoading(false);
     }
   };
 
@@ -35,43 +42,25 @@ export default function UserListPage() {
 
   const handleDelete = async (id: string) => {
     if (confirm('Bạn có chắc chắn xoá user này?')) {
+      setIsLoading(true);
       try {
-        await deleteUser(id);
+        await userApiRequest.delete(id);
         fetchUsers();
       } catch (error) {
         console.error('Lỗi xóa user: ', error);
+      } finally {
+        setIsLoading(false);
       }
     }
   };
 
-  const handleModalSubmit = async (formData: UserFormData) => {
-    try {
-      if (modalType === 'add') {
-        const newUser = await createUser({
-          username: formData.username,
-          password: formData.password!,
-          full_name: formData.full_name,
-          email: formData.email,
-          phone_number: formData.phone_number,
-          role: 'STAFF', // Mặc định là STAFF khi tạo mới
-        });
-        console.log("Created new user: ", newUser);
-        setUsers([...users, newUser]);
-      } else if (modalType === 'edit' && editingUser) {
-        const updatedUser = await updateUser(editingUser.id, {
-          username: formData.username,
-          full_name: formData.full_name,
-          email: formData.email,
-          phone_number: formData.phone_number
-        });
-        console.log("Updated user: ", updatedUser);
-        fetchUsers(); // Refresh the list
-      }
-      closeModal();
-    } catch (error) {
-      console.error('Error submitting user:', error);
-      throw error; // Re-throw to let modal handle the error state
-    }
+  const handleFormSubmit = async () => {
+    // Form đã submit thành công
+    // toast.success(editingUser ? 'Cập nhật user thành công' : 'Thêm user thành công');
+    
+    // Đóng modal và refresh
+    closeModal();
+    await fetchUsers(); // Refresh the list
   };
 
   const openAddModal = () => {
@@ -89,7 +78,7 @@ export default function UserListPage() {
       <UserFormModal
         isOpen={!!modalType}
         onClose={closeModal}
-        onSubmit={handleModalSubmit}
+        onSuccess={handleFormSubmit}
         editingUser={editingUser}
         modalType={modalType}
       />
