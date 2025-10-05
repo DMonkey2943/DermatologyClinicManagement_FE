@@ -1,17 +1,18 @@
 "use client";
-import Checkbox from "@/components/form/input/Checkbox";
+// import Checkbox from "@/components/form/input/Checkbox";
 import Input from "@/components/form/input/InputField";
 import Label from "@/components/form/Label";
 import Button from "@/components/ui/button/Button";
 import { EyeCloseIcon, EyeIcon } from "@/icons";
-import { login } from '@/services/auth';
 import { useRouter } from "next/navigation";
 import React, { useState } from "react";
 import { useAuth } from '@/context/AuthContext';
 import { EntityError, UnauthorizedError } from '@/lib/axios';
+import authApiRequest from "@/apiRequests/auth";
 
 export default function SignInForm() {
   const [showPassword, setShowPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   // const [isChecked, setIsChecked] = useState(false);
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -23,14 +24,18 @@ export default function SignInForm() {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    if (isLoading)
+      return;
+    setIsLoading(true);
+
      // Reset lỗi trước khi gọi API
     setErrors({});
     setUnauthorizedErrors("");
 
     try {
-      const res = await login({ username, password });
+      const res = await authApiRequest.login({username, password})
       
-      const currentUser = res.data.user;
+      const currentUser = res.payload.data.user;
       // console.log('Logged in user:', currentUser);
       setUser(currentUser); // Cập nhật user trong AuthContext
       // Nếu login thành công
@@ -55,6 +60,8 @@ export default function SignInForm() {
         console.error("Login failed", err);
         alert("Sai tài khoản hoặc mật khẩu!");
       }
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -122,7 +129,7 @@ export default function SignInForm() {
                   Keep me logged in
                 </span>
               </div> */}
-              <Button className="w-full" size="sm">
+              <Button className="w-full" size="sm" disabled={isLoading}>
                 Sign in
               </Button>
             </div>
