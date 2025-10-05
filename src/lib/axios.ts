@@ -1,15 +1,16 @@
 import axios from 'axios';
 import Cookies from 'js-cookie';
 import { normalizePath } from '@/lib/utils';
+import { LoginResType } from '@/schemaValidations/auth.schema'
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8000';  // Thay bằng URL backend FastAPI
 
-// type CustomOptions = {
-//   baseUrl?: string | undefined
-//   params?: Record<string, string | number>
-//   headers?: Record<string, string>
-//   body?: any
-// }
+type CustomOptions = {
+  baseUrl?: string | undefined
+  params?: Record<string, string | number>
+  headers?: Record<string, string>
+  body?: any
+}
 
 const ENTITY_ERROR_STATUS = 422
 const AUTHENTICATION_ERROR_STATUS = 401
@@ -118,7 +119,7 @@ api.interceptors.response.use(
     const url = normalizePath(response.config.url || '')
     if (isClient()) {
       if (url === 'auth/login'){
-        const { access_token, refresh_token } = response.data.data
+        const { access_token, refresh_token } = response.data.data as LoginResType['data']
         Cookies.set('access_token', access_token,
             // { expires: new Date(expiresAt) }
         )
@@ -128,8 +129,8 @@ api.interceptors.response.use(
       }
     }
 
-    console.log("response from axios.ts: ", response.data);
-    return response.data
+    console.log("response from axios.ts: ", response);
+    return response
   },
 
   async (error) => {
@@ -184,4 +185,44 @@ api.interceptors.response.use(
   }
 )
 
-export default api;
+// Object http với các method, hỗ trợ options (baseUrl, params, body)
+const http = {
+  get<Response>(url: string, options?: CustomOptions) {
+    const fullUrl = options?.baseUrl
+      ? (url.startsWith('/') ? `${options.baseUrl}${url}` : `${options.baseUrl}/${url}`)
+      : url
+    return api.get(fullUrl, { params: options?.params, headers: options?.headers }).then((res) => ({
+      status: res.status,
+      payload: res.data as Response
+    }))
+  },
+  post<Response>(url: string, body: any, options?: CustomOptions) {
+    const fullUrl = options?.baseUrl
+      ? (url.startsWith('/') ? `${options.baseUrl}${url}` : `${options.baseUrl}/${url}`)
+      : url
+    return api.post(fullUrl, body, { params: options?.params, headers: options?.headers }).then((res) => ({
+      status: res.status,
+      payload: res.data as Response
+    }))
+  },
+  put<Response>(url: string, body: any, options?: CustomOptions) {
+    const fullUrl = options?.baseUrl
+      ? (url.startsWith('/') ? `${options.baseUrl}${url}` : `${options.baseUrl}/${url}`)
+      : url
+    return api.put(fullUrl, body, { params: options?.params, headers: options?.headers }).then((res) => ({
+      status: res.status,
+      payload: res.data as Response
+    }))
+  },
+  delete<Response>(url: string, options?: CustomOptions) {
+    const fullUrl = options?.baseUrl
+      ? (url.startsWith('/') ? `${options.baseUrl}${url}` : `${options.baseUrl}/${url}`)
+      : url
+    return api.delete(fullUrl, { params: options?.params, headers: options?.headers }).then((res) => ({
+      status: res.status,
+      payload: res.data as Response
+    }))
+  }
+}
+
+export default http;
