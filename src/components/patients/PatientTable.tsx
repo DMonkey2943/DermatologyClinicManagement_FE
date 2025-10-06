@@ -10,11 +10,11 @@ import {
 } from '@/components/ui/table';
 // import Badge from '@/components/ui/badge/Badge';
 import Button from '@/components/ui/button/Button';
-import { Patient, PatientResponse } from '@/types/patient';
+import { PatientDataType } from '@/schemaValidations/patient.schema';
 
 interface PatientTableProps {
-  patients: PatientResponse[];
-  onEdit: (patient: Patient) => void;
+  patients: PatientDataType[];
+  onEdit: (patient: PatientDataType) => void;
   onDelete: (id: string) => void;
 }
 

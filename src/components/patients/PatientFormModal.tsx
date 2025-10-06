@@ -5,13 +5,15 @@ import Input from '@/components/form/input/InputField';
 import DatePicker from '@/components/form/date-picker';
 import Radio from '../form/input/Radio';
 import { Modal } from '@/components/ui/modal/index';
-import { Patient } from '@/types/patient';
+import { PatientDataType } from '@/schemaValidations/patient.schema';
+import patientApiRequest from '@/apiRequests/patient';
+import { EntityError } from '@/lib/axios';
 
 interface PatientFormModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSubmit: (userData: PatientFormData) => Promise<void>;
-  editingPatient: Patient | null;
+  onSuccess: () => void;
+  editingPatient: PatientDataType | null;
   modalType: 'add' | 'edit' | null;
 }
 
@@ -24,10 +26,20 @@ export interface PatientFormData {
   address?: string;
 }
 
+export interface ValidationErrors {
+  full_name?: string;
+  phone_number?: string;
+  email?: string;
+  dob?: string;
+  gender?: string;
+  address?: string;
+  _form?: string;
+}
+
 export default function PatientFormModal({ 
   isOpen, 
   onClose, 
-  onSubmit, 
+  onSuccess, 
   editingPatient, 
   modalType 
 }: PatientFormModalProps) {
@@ -41,6 +53,7 @@ export default function PatientFormModal({
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
+    const [errors, setErrors] = useState<ValidationErrors>({}); // State để lưu lỗi 422
 
   useEffect(() => {
     if (modalType === 'edit' && editingPatient) {
@@ -58,11 +71,12 @@ export default function PatientFormModal({
         full_name: '',
         phone_number: '',
         dob: null,
-        gender: null,
+        gender: 'MALE',
         email: '',
         address: '',
       });
     }
+    setErrors({});
   }, [modalType, editingPatient]);
 
   const handleInputChange = (field: keyof PatientFormData, value: string | null) => {
@@ -72,27 +86,52 @@ export default function PatientFormModal({
     }));
   };
 
-  const validateForm = (): boolean => {
-    const { full_name, phone_number } = formData;
-    
-    if (modalType === 'add') {
-      return !!(full_name && phone_number);
-    } else {
-      return !!(full_name && phone_number);
-    }
-  };
-
-  const handleSubmit = async () => {
-    if (!validateForm()) {
-      alert('Vui lòng nhập đầy đủ thông tin');
-      return;
-    }
-
+   const handleSubmit = async () => {
+    setErrors({});
     setIsSubmitting(true);
+
     try {
-      await onSubmit(formData);
-    } catch (error) {
-      console.error('Error submitting form:', error);
+      if (modalType === 'edit' && editingPatient) {
+        const updateData = {
+          full_name: formData.full_name,
+          phone_number: formData.phone_number,
+          gender: formData.gender,
+          dob: formData.dob,
+          address: formData.address,
+          ...(formData.email && { email: formData.email })
+        };
+        await patientApiRequest.update(editingPatient.id, updateData);
+      } else if(modalType === 'add') {
+        const newData = {
+          full_name: formData.full_name,
+          phone_number: formData.phone_number,
+          gender: formData.gender,
+          dob: formData.dob,
+          address: formData.address,
+          ...(formData.email && { email: formData.email })
+        };
+        await patientApiRequest.create(newData);
+      }
+
+      // Thành công
+      onSuccess();
+    } catch (err: any) {
+      console.error('Submit error:', err);
+      
+      // Xử lý lỗi 422 (validation error)
+      if (err instanceof EntityError) {
+        const errorPayload = err.payload.details;
+        const validationErrors: ValidationErrors = {};
+        errorPayload.forEach(({ field, msg }) => {
+          validationErrors[field] = msg;
+        });
+        setErrors(validationErrors);
+      } else {
+        // Lỗi khác
+        setErrors({ 
+          _form: err.payload?.message || 'Có lỗi xảy ra, vui lòng thử lại' 
+        });
+      }
     } finally {
       setIsSubmitting(false);
     }
@@ -130,6 +169,8 @@ export default function PatientFormModal({
               value={formData.full_name}
               onChange={(e) => handleInputChange('full_name', e.target.value)}
               disabled={isSubmitting}
+              error={!!errors.full_name}
+              hint={errors.full_name}
             />
           </div>
           <div className="col-span-1 sm:col-span-2">
@@ -139,6 +180,8 @@ export default function PatientFormModal({
               value={formData.phone_number}
               onChange={(e) => handleInputChange('phone_number', e.target.value)}
               disabled={isSubmitting}
+              error={!!errors.phone_number}
+              hint={errors.phone_number}
             />
           </div>
           <div className="col-span-1">
@@ -148,6 +191,8 @@ export default function PatientFormModal({
               defaultDate={formData.dob}
               onChange={(dates, currentDateString) => handleInputChange('dob', currentDateString)}
               placeholder="Chọn ngày sinh"
+              error={!!errors.dob}
+              hint={errors.dob}
             />
           </div>
           <div className="col-span-1">
@@ -180,6 +225,8 @@ export default function PatientFormModal({
               value={formData.email}
               onChange={(e) => handleInputChange('email', e.target.value)}
               disabled={isSubmitting}
+              error={!!errors.email}
+              hint={errors.email}
             />
           </div>
           <div className="col-span-1 sm:col-span-2">
@@ -189,6 +236,8 @@ export default function PatientFormModal({
               value={formData.address}
               onChange={(e) => handleInputChange('address', e.target.value)}
               disabled={isSubmitting}
+              error={!!errors.address}
+              hint={errors.address}
             />
           </div>
         </div>
