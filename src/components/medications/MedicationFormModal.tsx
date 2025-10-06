@@ -3,14 +3,15 @@ import Button from '@/components/ui/button/Button';
 import Label from '@/components/form/Label';
 import Input from '@/components/form/input/InputField';
 import { Modal } from '@/components/ui/modal/index';
-// import { User } from '@/types/user';
-import { Medication } from '@/types/medication';
+import { MedicationDataType } from '@/schemaValidations/medication.schema';
+import medicationApiRequest from '@/apiRequests/medication';
+import { EntityError } from '@/lib/axios';
 
 interface MedicationFormModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSubmit: (userData: MedicationFormData) => Promise<void>;
-  editingMedication: Medication | null;
+  onSuccess: () => void;
+  editingMedication: MedicationDataType | null;
   modalType: 'add' | 'edit' | null;
 }
 
@@ -22,10 +23,19 @@ export interface MedicationFormData {
   description?: string;
 }
 
+export interface ValidationErrors {
+  name?: string;
+  dosage_form?: string;
+  price?: string;
+  stock_quantity?: string;
+  description?: string;
+  _form?: string;
+}
+
 export default function MedicationFormModal({ 
   isOpen, 
   onClose, 
-  onSubmit, 
+  onSuccess, 
   editingMedication, 
   modalType 
 }: MedicationFormModalProps) {
@@ -38,6 +48,7 @@ export default function MedicationFormModal({
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [errors, setErrors] = useState<ValidationErrors>({}); // State để lưu lỗi 422
 
   useEffect(() => {
     if (modalType === 'edit' && editingMedication) {
@@ -58,6 +69,7 @@ export default function MedicationFormModal({
         description: '',
       });
     }
+    setErrors({});
   }, [modalType, editingMedication]);
 
   const handleInputChange = (field: keyof MedicationFormData, value: string|number) => {
@@ -67,27 +79,59 @@ export default function MedicationFormModal({
     }));
   };
 
-  const validateForm = (): boolean => {
-    const { name, dosage_form, price, stock_quantity } = formData;
+  // const validateForm = (): boolean => {
+  //   const { name, dosage_form, price, stock_quantity } = formData;
     
-    if (modalType === 'add') {
-      return !!(name && dosage_form && price && stock_quantity);
-    } else {
-      return !!(name && dosage_form && price && stock_quantity);
-    }
-  };
+  //   if (modalType === 'add') {
+  //     return !!(name && dosage_form && price && stock_quantity);
+  //   } else {
+  //     return !!(name && dosage_form && price && stock_quantity);
+  //   }
+  // };
 
   const handleSubmit = async () => {
-    if (!validateForm()) {
-      alert('Vui lòng nhập đầy đủ thông tin');
-      return;
-    }
-
+    setErrors({});
     setIsSubmitting(true);
+
     try {
-      await onSubmit(formData);
-    } catch (error) {
-      console.error('Error submitting form:', error);
+      if (modalType === 'edit' && editingMedication) {
+        const updateData = {
+          name: formData.name,
+          dosage_form: formData.dosage_form,
+          price: formData.price,
+          stock_quantity: formData.stock_quantity,
+          description: formData.description,
+        }
+        await medicationApiRequest.update(editingMedication.id, updateData);
+      } else if (modalType === 'add') {
+        const newData = {
+          name: formData.name,
+          dosage_form: formData.dosage_form,
+          price: formData.price,
+          stock_quantity: formData.stock_quantity,
+          description: formData.description,
+        }
+        await medicationApiRequest.create(newData);
+      }
+
+      // Thành công
+      onSuccess();
+    } catch (err: any) {
+      console.error('Error submitting form:', err);
+
+      if (err instanceof EntityError) {
+        const errorPayload = err.payload.details;
+        const validationErrors: ValidationErrors = {};
+        errorPayload.forEach(({ field, msg }) => {
+          validationErrors[field] = msg;
+        });
+        setErrors(validationErrors);
+      } else {
+        // Lỗi khác
+        setErrors({ 
+          _form: err.payload?.message || 'Có lỗi xảy ra, vui lòng thử lại' 
+        });
+      }
     } finally {
       setIsSubmitting(false);
     }
@@ -116,6 +160,14 @@ export default function MedicationFormModal({
         <h2 className="text-xl font-bold">
           {modalType === 'add' ? 'Thêm thuốc mới' : 'Chỉnh sửa thuốc'}
         </h2>
+
+        {/* Form-level error */}
+        {errors._form && (
+          <div>
+            <p className="mt-1 text-md text-error-500">{errors._form}</p>
+          </div>
+        )}
+
         <div className="grid grid-cols-1 gap-x-6 gap-y-5 sm:grid-cols-2">
           <div className="col-span-1 sm:col-span-2">
             <Label>Tên thuốc</Label>
@@ -124,6 +176,8 @@ export default function MedicationFormModal({
               defaultValue={formData.name}
               onChange={(e) => handleInputChange('name', e.target.value)}
               disabled={isSubmitting}
+              error={!!errors.name}
+              hint={errors.name}
             />
           </div>
           <div className="col-span-1 sm:col-span-2">
@@ -133,6 +187,8 @@ export default function MedicationFormModal({
               defaultValue={formData.dosage_form}
               onChange={(e) => handleInputChange('dosage_form', e.target.value)}
               disabled={isSubmitting}
+              error={!!errors.dosage_form}
+              hint={errors.dosage_form}
             />
           </div>
           <div className="col-span-1 sm:col-span-2">
@@ -142,6 +198,8 @@ export default function MedicationFormModal({
               defaultValue={formData.description}
               onChange={(e) => handleInputChange('description', e.target.value)}
               disabled={isSubmitting}
+              error={!!errors.description}
+              hint={errors.description}
             />
           </div>
           <div className="col-span-1">
@@ -151,6 +209,8 @@ export default function MedicationFormModal({
               value={formData.price}
               onChange={(e) => handleInputChange('price', e.target.value)}
               disabled={isSubmitting}
+              error={!!errors.price}
+              hint={errors.price}
             />
           </div>
           <div className="col-span-1">
@@ -160,6 +220,8 @@ export default function MedicationFormModal({
               value={formData.stock_quantity}
               onChange={(e) => handleInputChange('stock_quantity', e.target.value)}
               disabled={isSubmitting}
+              error={!!errors.stock_quantity}
+              hint={errors.stock_quantity}
             />
           </div>
         </div>

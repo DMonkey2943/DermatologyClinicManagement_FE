@@ -4,79 +4,93 @@ import React, { useEffect, useState } from 'react';
 import PageBreadcrumb from '@/components/common/PageBreadCrumb';
 import ComponentCard from '@/components/common/ComponentCard';
 import Button from '@/components/ui/button/Button';
-// import UserTable from '@/components/users/UserTable';
 import MedicationTable from '@/components/medications/MedicationTable';
-// import UserFormModal, { UserFormData } from '@/components/users/UserFormModal';
-import MedicationFormModal, { MedicationFormData } from '@/components/medications/MedicationFormModal';
-// import { getUsers, createUser, updateUser, deleteUser } from '@/services/users';
-import { getMedications, createMedication, updateMedication, deleteMedication } from '@/services/medications';
-// import { User, UserResponse } from '@/types/user';
-import { Medication, MedicationResponse } from '@/types/medication';
+import MedicationFormModal from '@/components/medications/MedicationFormModal';
+import medicationApiRequest from '@/apiRequests/medication';
+import { MedicationDataType } from '@/schemaValidations/medication.schema';
 
 export default function MedicationListPage() {
-  const [medications, setMedications] = useState<MedicationResponse[]>([]);
-  const [editingMedication, setEditingMedication] = useState<Medication | null>(null);
+  const [medications, setMedications] = useState<MedicationDataType[]>([]);
+  const [editingMedication, setEditingMedication] = useState<MedicationDataType | null>(null);
   const [modalType, setModalType] = useState<'add' | 'edit' | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     fetchMedications();
   }, []);
 
   const fetchMedications = async () => {
+    setIsLoading(true);
     try {
-      const res = await getMedications();
-      console.log(res);
-      setMedications(res);
+      const { payload } = await medicationApiRequest.getList();
+      const medicationList = payload.data
+      console.log(medicationList);
+      setMedications(medicationList);
     } catch (error) {
       console.error('Lỗi lấy danh sách Medications:', error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  const handleEdit = (medication: Medication) => {
+  const handleEdit = (medication: MedicationDataType) => {
     setEditingMedication(medication);
     setModalType('edit');
   };
 
   const handleDelete = async (id: string) => {
     if (confirm('Bạn có chắc chắn xoá Medication này?')) {
+      setIsLoading(true);
       try {
-        await deleteMedication(id);
+        await medicationApiRequest.delete(id);
         fetchMedications();
       } catch (error) {
         console.error('Lỗi xóa Medication: ', error);
+      } finally {
+        setIsLoading(false);
       }
     }
   };
 
-  const handleModalSubmit = async (formData: MedicationFormData) => {
-    try {
-      if (modalType === 'add') {
-        const newMedication = await createMedication({
-          name: formData.name,
-          dosage_form: formData.dosage_form,
-          price: formData.price,
-          stock_quantity: formData.stock_quantity,
-          description: formData.description
-        });
-        console.log("Created new medication: ", newMedication);
-        setMedications([...medications, newMedication]);
-      } else if (modalType === 'edit' && editingMedication) {
-        const updatedMedication = await updateMedication(editingMedication.id, {
-          name: formData.name,
-          dosage_form: formData.dosage_form,
-          price: formData.price,
-          stock_quantity: formData.stock_quantity,
-          description: formData.description
-        });
-        console.log("Updated medication: ", updatedMedication);
-        fetchMedications(); // Refresh the list
-      }
-      closeModal();
-    } catch (error) {
-      console.error('Error submitting medication:', error);
-      throw error; // Re-throw to let modal handle the error state
-    }
+  // const handleModalSubmit = async (formData: MedicationFormData) => {
+  //   try {
+  //     if (modalType === 'add') {
+  //       const newMedication = await createMedication({
+  //         name: formData.name,
+  //         dosage_form: formData.dosage_form,
+  //         price: formData.price,
+  //         stock_quantity: formData.stock_quantity,
+  //         description: formData.description
+  //       });
+  //       console.log("Created new medication: ", newMedication);
+  //       setMedications([...medications, newMedication]);
+  //     } else if (modalType === 'edit' && editingMedication) {
+  //       const updatedMedication = await updateMedication(editingMedication.id, {
+  //         name: formData.name,
+  //         dosage_form: formData.dosage_form,
+  //         price: formData.price,
+  //         stock_quantity: formData.stock_quantity,
+  //         description: formData.description
+  //       });
+  //       console.log("Updated medication: ", updatedMedication);
+  //       fetchMedications(); // Refresh the list
+  //     }
+  //     closeModal();
+  //   } catch (error) {
+  //     console.error('Error submitting medication:', error);
+  //     throw error; // Re-throw to let modal handle the error state
+  //   }
+  // };
+
+  const handleFormSubmit = async () => {
+    // Form đã submit thành công
+    // toast.success(editingUser ? 'Cập nhật user thành công' : 'Thêm user thành công');
+    
+    // Đóng modal và refresh
+    closeModal();
+    await fetchMedications(); // Refresh the list
   };
+
 
   const openAddModal = () => {
     setEditingMedication(null);
@@ -93,7 +107,8 @@ export default function MedicationListPage() {
       <MedicationFormModal
         isOpen={!!modalType}
         onClose={closeModal}
-        onSubmit={handleModalSubmit}
+        onSuccess={handleFormSubmit}
+        // onSubmit={handleModalSubmit}
         editingMedication={editingMedication}
         modalType={modalType}
       />

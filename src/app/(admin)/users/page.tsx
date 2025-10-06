@@ -6,13 +6,13 @@ import ComponentCard from '@/components/common/ComponentCard';
 import UserTable from '@/components/users/UserTable';
 import Button from '@/components/ui/button/Button';
 import UserFormModal from '@/components/users/UserFormModal';
-import { User } from '@/types/user';
+// import { User } from '@/types/user';
 import userApiRequest from '@/apiRequests/user';
 import { UserDataType } from '@/schemaValidations/user.schema';
 
 export default function UserListPage() {
   const [users, setUsers] = useState<UserDataType[]>([]);
-  const [editingUser, setEditingUser] = useState<User | null>(null);
+  const [editingUser, setEditingUser] = useState<UserDataType | null>(null);
   const [modalType, setModalType] = useState<'add' | 'edit' | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -35,7 +35,7 @@ export default function UserListPage() {
     }
   };
 
-  const handleEdit = (user: User) => {
+  const handleEdit = (user: UserDataType) => {
     setEditingUser(user);
     setModalType('edit');
   };
@@ -87,7 +87,7 @@ export default function UserListPage() {
       
       <div className="space-y-6">
         <ComponentCard title="Danh sách Users">
-          <Button onClick={openAddModal}>+ Add User</Button>
+          <Button onClick={openAddModal}>+ Thêm người dùng</Button>
           <UserTable 
             users={users} 
             onEdit={handleEdit} 
