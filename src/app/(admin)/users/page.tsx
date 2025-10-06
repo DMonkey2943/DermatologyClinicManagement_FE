@@ -6,7 +6,6 @@ import ComponentCard from '@/components/common/ComponentCard';
 import UserTable from '@/components/users/UserTable';
 import Button from '@/components/ui/button/Button';
 import UserFormModal from '@/components/users/UserFormModal';
-// import { User } from '@/types/user';
 import userApiRequest from '@/apiRequests/user';
 import { UserDataType } from '@/schemaValidations/user.schema';
 

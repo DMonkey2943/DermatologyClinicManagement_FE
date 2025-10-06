@@ -3,7 +3,7 @@ import Button from '@/components/ui/button/Button';
 import Label from '@/components/form/Label';
 import Input from '@/components/form/input/InputField';
 import { Modal } from '@/components/ui/modal/index';
-import { User } from '@/types/user';
+import { UserDataType } from '@/schemaValidations/user.schema';
 import userApiRequest from '@/apiRequests/user';
 import { EntityError } from '@/lib/axios';
 
@@ -11,7 +11,7 @@ interface UserFormModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSuccess: () => void;
-  editingUser: User | null;
+  editingUser: UserDataType | null;
   modalType: 'add' | 'edit' | null;
 }
 

@@ -10,11 +10,11 @@ import {
 } from '@/components/ui/table';
 import Badge from '@/components/ui/badge/Badge';
 import Button from '@/components/ui/button/Button';
-import { User, UserResponse } from '@/types/user';
+import { UserDataType } from '@/schemaValidations/user.schema';
 
 interface UserTableProps {
-  users: UserResponse[];
-  onEdit: (user: User) => void;
+  users: UserDataType[];
+  onEdit: (user: UserDataType) => void;
   onDelete: (id: string) => void;
 }
 
