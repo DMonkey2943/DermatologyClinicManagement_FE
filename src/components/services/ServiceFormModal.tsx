@@ -3,13 +3,16 @@ import Button from '@/components/ui/button/Button';
 import Label from '@/components/form/Label';
 import Input from '@/components/form/input/InputField';
 import { Modal } from '@/components/ui/modal/index';
-import { Service } from '@/types/service';
+// import { Service } from '@/types/service';
+import { ServiceDataType } from '@/schemaValidations/service.schema';
+import serviceApiRequest from '@/apiRequests/service';
+import { EntityError } from '@/lib/axios';
 
 interface ServiceFormModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSubmit: (userData: ServiceFormData) => Promise<void>;
-  editingService: Service | null;
+  onSuccess: () => void;
+  editingService: ServiceDataType | null;
   modalType: 'add' | 'edit' | null;
 }
 
@@ -19,10 +22,17 @@ export interface ServiceFormData {
   description?: string;
 }
 
+export interface ValidationErrors {
+  name?: string;
+  price?: string;
+  description?: string;
+  _form?: string;
+}
+
 export default function ServiceFormModal({ 
   isOpen, 
   onClose, 
-  onSubmit, 
+  onSuccess, 
   editingService, 
   modalType 
 }: ServiceFormModalProps) {
@@ -33,6 +43,7 @@ export default function ServiceFormModal({
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [errors, setErrors] = useState<ValidationErrors>({}); // State để lưu lỗi 422
 
   useEffect(() => {
     if (modalType === 'edit' && editingService) {
@@ -49,6 +60,7 @@ export default function ServiceFormModal({
         description: '',
       });
     }
+    setErrors({});
   }, [modalType, editingService]);
 
   const handleInputChange = (field: keyof ServiceFormData, value: string|number) => {
@@ -58,27 +70,45 @@ export default function ServiceFormModal({
     }));
   };
 
-  const validateForm = (): boolean => {
-    const { name, price } = formData;
-    
-    if (modalType === 'add') {
-      return !!(name && price);
-    } else {
-      return !!(name && price);
-    }
-  };
-
   const handleSubmit = async () => {
-    if (!validateForm()) {
-      alert('Vui lòng nhập đầy đủ thông tin');
-      return;
-    }
-
+    setErrors({});
     setIsSubmitting(true);
+
     try {
-      await onSubmit(formData);
-    } catch (error) {
-      console.error('Error submitting form:', error);
+      if (modalType === 'edit' && editingService) {
+        const updateData = {
+          name: formData.name,
+          price: formData.price,
+          description: formData.description,
+        }
+        await serviceApiRequest.update(editingService.id, updateData);
+      } else if (modalType === 'add') {
+        const newData = {
+          name: formData.name,
+          price: formData.price,
+          description: formData.description,
+        }
+        await serviceApiRequest.create(newData);
+      }
+
+      // Thành công
+      onSuccess();
+    } catch (err: any) {
+      console.error('Error submitting form:', err);
+
+      if (err instanceof EntityError) {
+        const errorPayload = err.payload.details;
+        const validationErrors: ValidationErrors = {};
+        errorPayload.forEach(({ field, msg }) => {
+          validationErrors[field] = msg;
+        });
+        setErrors(validationErrors);
+      } else {
+        // Lỗi khác
+        setErrors({ 
+          _form: err.payload?.message || 'Có lỗi xảy ra, vui lòng thử lại' 
+        });
+      }
     } finally {
       setIsSubmitting(false);
     }
@@ -105,6 +135,14 @@ export default function ServiceFormModal({
         <h2 className="text-xl font-bold">
           {modalType === 'add' ? 'Thêm dịch vụ mới' : 'Chỉnh sửa dịch vụ'}
         </h2>
+
+        {/* Form-level error */}
+        {errors._form && (
+          <div>
+            <p className="mt-1 text-md text-error-500">{errors._form}</p>
+          </div>
+        )}
+
         <div className="grid grid-cols-1 gap-x-6 gap-y-5 sm:grid-cols-2">
           <div className="col-span-1 sm:col-span-2">
             <Label>Tên dịch vụ</Label>
@@ -113,6 +151,8 @@ export default function ServiceFormModal({
               defaultValue={formData.name}
               onChange={(e) => handleInputChange('name', e.target.value)}
               disabled={isSubmitting}
+              error={!!errors.name}
+              hint={errors.name}
             />
           </div>
           <div className="col-span-1 sm:col-span-2">
@@ -122,6 +162,8 @@ export default function ServiceFormModal({
               value={formData.price}
               onChange={(e) => handleInputChange('price', e.target.value)}
               disabled={isSubmitting}
+              error={!!errors.price}
+              hint={errors.price}
             />
           </div>
           <div className="col-span-1 sm:col-span-2">
@@ -131,6 +173,8 @@ export default function ServiceFormModal({
               defaultValue={formData.description}
               onChange={(e) => handleInputChange('description', e.target.value)}
               disabled={isSubmitting}
+              error={!!errors.description}
+              hint={errors.description}
             />
           </div>
         </div>

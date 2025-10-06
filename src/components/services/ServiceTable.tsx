@@ -10,11 +10,11 @@ import {
 } from '@/components/ui/table';
 // import Badge from '@/components/ui/badge/Badge';
 import Button from '@/components/ui/button/Button';
-import { Service, ServiceResponse } from '@/types/service';
+import { ServiceDataType } from '@/schemaValidations/service.schema';
 
 interface ServiceTableProps {
-  services: ServiceResponse[];
-  onEdit: (service: Service) => void;
+  services: ServiceDataType[];
+  onEdit: (service: ServiceDataType) => void;
   onDelete: (id: string) => void;
 }
 
