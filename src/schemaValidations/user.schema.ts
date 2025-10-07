@@ -62,3 +62,28 @@ export const UpdateUserBody = z.object({
 })
 
 export type UpdateUserBodyType = z.TypeOf<typeof UpdateUserBody>
+
+export const UserFKData = z.object({
+    id: z.string(),
+    full_name: z.string(),
+})
+
+export type UserFKDataType = z.TypeOf<typeof UserFKData>
+
+
+
+export const DoctorData = z.object({
+    id: z.string(),
+    user_id: z.string(),
+    specialization: z.string(),
+    user: UserFKData,
+})
+export type DoctorDataType = z.TypeOf<typeof DoctorData>
+
+export const DoctorListRes = z.object({
+    data: z.array(DoctorData),
+    message: z.string(),
+    success: z.boolean()
+})
+
+export type DoctorListResType = z.TypeOf<typeof DoctorListRes>
