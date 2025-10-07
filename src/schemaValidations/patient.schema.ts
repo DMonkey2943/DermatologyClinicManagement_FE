@@ -56,3 +56,10 @@ export const UpdatePatientBody = z.object({
 })
 
 export type UpdatePatientBodyType = z.TypeOf<typeof UpdatePatientBody>
+
+export const PatientFKData = z.object({
+    id: z.string(),
+    full_name: z.string(),
+})
+
+export type PatientFKDataType = z.TypeOf<typeof PatientFKData>
