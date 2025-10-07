@@ -10,11 +10,11 @@ import {
 } from '@/components/ui/table';
 import Badge from '@/components/ui/badge/Badge';
 import Button from '@/components/ui/button/Button';
-import { Appointment, AppointmentResponse } from '@/types/appointment';
+import { AppointmentDataType } from '@/schemaValidations/appointment.schema';
 
 interface AppointmentTableProps {
-  appointments: AppointmentResponse[];
-  onEdit: (appointment: Appointment) => void;
+  appointments: AppointmentDataType[];
+  onEdit: (appointment: AppointmentDataType) => void;
   // onDelete: (id: string) => void;
 }
 
@@ -96,7 +96,7 @@ export default function AppointmentTable({ appointments, onEdit }: AppointmentTa
                     {appointment.appointment_date}
                   </TableCell>
                   <TableCell className="px-5 py-4 text-start text-theme-sm text-gray-800 dark:text-white/90">
-                    {appointment.time_slot}
+                    {appointment.appointment_time}
                   </TableCell>
                   <TableCell className="px-5 py-4 text-start text-theme-sm text-gray-800 dark:text-white/90">
                     <Badge size="sm" color={getStatusColor(appointment.status)}>{appointment.status}</Badge>

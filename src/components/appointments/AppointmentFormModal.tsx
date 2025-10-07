@@ -6,17 +6,20 @@ import DatePicker from '@/components/form/date-picker';
 import Radio from '../form/input/Radio';
 import Combobox from '../form/Combobox';
 import { Modal } from '@/components/ui/modal/index';
-import { Appointment } from '@/types/appointment';
-import { getPatients } from '@/services/patients';
-import { PatientResponse } from '@/types/patient';
-import { getDoctors } from '@/services/users';
-import { DoctorResponse } from '@/types/user';
+import { AppointmentDataType } from '@/schemaValidations/appointment.schema';
+import appointmentApiRequest from '@/apiRequests/appointment';
+import userApiRequest from '@/apiRequests/user';
+import patientApiRequest from '@/apiRequests/patient';
+import { EntityError } from '@/lib/axios';
+import { DoctorDataType } from '@/schemaValidations/user.schema';
+import { PatientDataType } from '@/schemaValidations/patient.schema';
+import { useAuth } from '@/context/AuthContext';
 
 interface AppointmentFormModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSubmit: (userData: AppointmentFormData) => Promise<void>;
-  editingAppointment: Appointment | null;
+  onSuccess: () => void;
+  editingAppointment: AppointmentDataType | null;
   modalType: 'add' | 'edit' | null;
 }
 
@@ -25,14 +28,25 @@ export interface AppointmentFormData {
   doctor_id: string;
   // created_by?: string;
   appointment_date: string | null;
-  time_slot: string;
+  appointment_time: string | null;
+  // time_slot: string;
   status: 'SCHEDULED' | 'WAITING' | 'COMPLETED' | 'CANCELLED' | null;
+}
+
+export interface ValidationErrors {
+  patient_id?: string;
+  doctor_id?: string;
+  appointment_date?: string;
+  appointment_time?: string;
+  time_slot?: string;
+  status?: string;
+  _form?: string;
 }
 
 export default function AppointmentFormModal({ 
   isOpen, 
   onClose, 
-  onSubmit, 
+  onSuccess, 
   editingAppointment, 
   modalType 
 }: AppointmentFormModalProps) {
@@ -40,25 +54,31 @@ export default function AppointmentFormModal({
     patient_id: '',
     doctor_id: '',
     appointment_date: null,
-    time_slot: '',
+    appointment_time: null,
+    // time_slot: '',
     status: null,
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [patients, setPatients] = useState<PatientResponse[]>([]);
-  const [doctors, setDoctors] = useState<DoctorResponse[]>([]);
+  const [patients, setPatients] = useState<PatientDataType[]>([]);
+  const [doctors, setDoctors] = useState<DoctorDataType[]>([]);
+  const { user } = useAuth();
+  const [errors, setErrors] = useState<ValidationErrors>({}); // State để lưu lỗi 422
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [patientsData, doctorsData] = await Promise.all([
-          getPatients(),
-          getDoctors(),
+        const [patientsRes, doctorsRes] = await Promise.all([
+          patientApiRequest.getList(),
+          userApiRequest.getDoctorList(),
         ]);
-        // console.log('Patients:', patientsData);
-        // console.log('Doctors:', doctorsData);
-        setPatients(patientsData);
-        setDoctors(doctorsData);
+
+        const patientList = patientsRes.payload.data;
+        const doctorList = doctorsRes.payload.data;
+        // console.log('Patients:', patientList);
+        // console.log('Doctors:', doctorList);
+        setPatients(patientList);
+        setDoctors(doctorList);
 
         // Cập nhật formData sau khi dữ liệu đã tải
         if (modalType === 'edit' && editingAppointment) {
@@ -68,8 +88,19 @@ export default function AppointmentFormModal({
             doctor_id: editingAppointment.doctor_id || '',
             // created_by: editingAppointment.created_by || '',
             appointment_date: editingAppointment.appointment_date || null,
-            time_slot: editingAppointment.time_slot || '',
-            status: editingAppointment.status || null,
+            appointment_time: editingAppointment.appointment_time || null,
+            // time_slot: editingAppointment.time_slot || '',
+            status: editingAppointment.status || 'SCHEDULED',
+          });
+        } else if (modalType === 'add') {
+          setFormData({
+            patient_id:'',
+            doctor_id: '',
+            // created_by: editingAppointment.created_by || '',
+            appointment_date: null,
+            appointment_time: '11:00',
+            // time_slot: '',
+            status: 'SCHEDULED',
           });
         }
       } catch (error) {
@@ -77,6 +108,7 @@ export default function AppointmentFormModal({
       }
     };
     fetchData();
+    setErrors({});
   }, [modalType, editingAppointment]);
 
   // useEffect(() => {
@@ -90,22 +122,68 @@ export default function AppointmentFormModal({
     }));
   };
 
-  const validateForm = (): boolean => {
-    const { patient_id, doctor_id, appointment_date, time_slot, status } = formData;
-    return !!(patient_id && doctor_id && appointment_date && time_slot && status);
-  };
-
   const handleSubmit = async () => {
-    if (!validateForm()) {
-      alert('Vui lòng nhập đầy đủ thông tin');
+    setErrors({});
+
+    const validationErrors: ValidationErrors = {};
+
+    // Validate formData
+    (Object.keys(formData) as (keyof AppointmentFormData)[]).forEach((field) => {
+      const value = formData[field];
+      if (value === null || value === '') {
+        validationErrors[field] = 'Không được để trống';
+      }
+    });
+
+    // Nếu có lỗi validate, setErrors và dừng submit
+    if (Object.keys(validationErrors).length > 0) {
+      setErrors(validationErrors);
       return;
     }
 
-    setIsSubmitting(true);
+    setIsSubmitting(true);    
+
     try {
-      await onSubmit(formData);
-    } catch (error) {
-      console.error('Error submitting form:', error);
+      if (modalType === 'edit' && editingAppointment) {
+        const updateData = {
+          doctor_id: formData.doctor_id,
+          appointment_date: formData.appointment_date!,
+          appointment_time: formData.appointment_time!,
+          time_slot: "30 phút",
+          status: formData.status!,
+        }
+        await appointmentApiRequest.update(editingAppointment.id, updateData);
+      } else if (modalType === 'add') {
+        const newData = {
+          patient_id: formData.patient_id,
+          doctor_id: formData.doctor_id,
+          created_by: user!.id,
+          appointment_date: formData.appointment_date!,
+          appointment_time: formData.appointment_time!,
+          time_slot: "30 phút",
+          status: formData.status || 'SCHEDULED',
+        }
+        await appointmentApiRequest.create(newData);
+      }
+
+      // Thành công
+      onSuccess();
+    } catch (err: any) {
+      console.error('Error submitting form:', err);
+
+      if (err instanceof EntityError) {
+        const errorPayload = err.payload.details;
+        const validationErrors: ValidationErrors = {};
+        errorPayload.forEach(({ field, msg }) => {
+          validationErrors[field] = msg;
+        });
+        setErrors(validationErrors);
+      } else {
+        // Lỗi khác
+        setErrors({ 
+          _form: err.payload?.message || 'Có lỗi xảy ra, vui lòng thử lại' 
+        });
+      }
     } finally {
       setIsSubmitting(false);
     }
@@ -120,7 +198,8 @@ export default function AppointmentFormModal({
       doctor_id: '',
       // created_by: '',
       appointment_date: null,
-      time_slot: '',
+      appointment_time: null,
+      // time_slot: '',
       status: null,
     });
   };
@@ -154,6 +233,8 @@ export default function AppointmentFormModal({
               placeholder="Chọn bệnh nhân..."
               onChange={(value) => handleInputChange('patient_id', value)}
               defaultValue={formData.patient_id}
+              error={!!errors.patient_id}
+              hint={errors.patient_id}
             />
           </div>
 
@@ -164,6 +245,8 @@ export default function AppointmentFormModal({
               placeholder="Chọn bác sĩ..."
               onChange={(value) => handleInputChange('doctor_id', value)}
               defaultValue={formData.doctor_id}
+              error={!!errors.doctor_id}
+              hint={errors.doctor_id}
             />
           </div>
           <div className="col-span-1">
@@ -173,17 +256,32 @@ export default function AppointmentFormModal({
               defaultDate={formData.appointment_date}
               onChange={(dates, currentDateString) => handleInputChange('appointment_date', currentDateString)}
               placeholder="Chọn ngày hẹn"
+              error={!!errors.appointment_date}
+              hint={errors.appointment_date}
             />
           </div>
           <div className="col-span-1">
+            <Label>Thời gian khám</Label>
+            <Input
+              type="time"
+              value={formData.appointment_time}
+              onChange={(e) => handleInputChange('appointment_time', e.target.value)}
+              disabled={isSubmitting}
+              error={!!errors.appointment_time}
+              hint={errors.appointment_time}
+            />
+          </div>
+          {/* <div className="col-span-1">
             <Label>Thời gian khám</Label>
             <Input
               type="text"
               value={formData.time_slot}
               onChange={(e) => handleInputChange('time_slot', e.target.value)}
               disabled={isSubmitting}
+              error={!!errors.time_slot}
+              hint={errors.time_slot}
             />
-          </div>
+          </div> */}
           <div className="col-span-1 sm:col-span-2">
             <Label>Trạng thái</Label>
             <div className="flex gap-4">
