@@ -10,6 +10,7 @@ import {
 } from '@/components/ui/table';
 // import Badge from '@/components/ui/badge/Badge';
 import Button from '@/components/ui/button/Button';
+import Link from 'next/link'
 import { PatientDataType } from '@/schemaValidations/patient.schema';
 
 interface PatientTableProps {
@@ -60,7 +61,10 @@ export default function PatientTable({ patients, onEdit, onDelete }: PatientTabl
                   </TableCell>
                   <TableCell className="px-5 py-4 text-start text-theme-xs text-gray-500 dark:text-gray-400">
                     <div className="flex gap-2">
-                      <Button size="sm" onClick={() =>alert('Chuyển trang chi tiết thông tin bệnh nhân')}>Xem</Button>
+                      {/* <Button size="sm" onClick={() =>alert('Chuyển trang chi tiết thông tin bệnh nhân')}>Xem</Button> */}
+                      <Link href={`/patients/${patient.id}`}>
+                        <Button size="sm">Xem</Button>
+                      </Link>
                       <Button size="sm" onClick={() => onEdit(patient)}>Sửa</Button>
                       <Button size="sm" variant="destructive" onClick={() => onDelete(patient.id)}>Xóa</Button>
                     </div>
