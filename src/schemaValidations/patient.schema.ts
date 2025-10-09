@@ -27,6 +27,30 @@ export const PatientData = z.object({
 })
 export type PatientDataType = z.TypeOf<typeof PatientData>
 
+export const PatientFullData = z.object({
+    id: z.string(),
+    full_name: z.string(),
+    dob: z.string().date().nullable().optional(),
+    gender: z.enum(["MALE", "FEMALE"]).nullable().optional(),
+    phone_number: z.string(),
+    email: z.string().nullable().optional(),
+    address: z.string().nullable().optional(),
+    medical_history: z.string().nullable().optional(),
+    allergies: z.string().nullable().optional(),
+    current_medications: z.string().nullable().optional(),
+    current_condition: z.string().nullable().optional(),
+    notes: z.string().nullable().optional(),
+})
+export type PatientFullDataType = z.TypeOf<typeof PatientFullData>
+
+export const PatientRes = z.object({
+    data: PatientFullData,
+    message: z.string(),
+    success: z.boolean()
+})
+
+export type PatientResType = z.TypeOf<typeof PatientRes>
+
 export const PatientListRes = z.object({
     data: z.array(PatientData),
     message: z.string(),
