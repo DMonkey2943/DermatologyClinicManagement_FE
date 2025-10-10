@@ -66,6 +66,8 @@ export const CreatePatientBody = z.object({
     phone_number: z.string(),
     email: z.string().nullable().optional(),
     address: z.string().nullable().optional(),
+    medical_history: z.string().nullable().optional(),
+    allergies: z.string().nullable().optional(),
 })
 
 export type CreatePatientBodyType = z.TypeOf<typeof CreatePatientBody>
@@ -77,6 +79,8 @@ export const UpdatePatientBody = z.object({
     phone_number: z.string().nullable(),
     email: z.string().nullable().optional(),
     address: z.string().nullable().optional(),
+    medical_history: z.string().nullable().optional(),
+    allergies: z.string().nullable().optional(),
 })
 
 export type UpdatePatientBodyType = z.TypeOf<typeof UpdatePatientBody>

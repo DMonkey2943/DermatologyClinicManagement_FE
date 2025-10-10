@@ -29,7 +29,9 @@ export default function PatientListPage() {
     }
   };
 
-  const handleEdit = (patient: PatientDataType) => {
+  const handleEdit = async (patient_id: string) => {
+    const { payload } = await patientApiRequest.getDetail(patient_id);
+    const patient = payload.data;
     setEditingPatient(patient);
     setModalType('edit');
   };

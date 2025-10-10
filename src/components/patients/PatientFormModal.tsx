@@ -5,7 +5,7 @@ import Input from '@/components/form/input/InputField';
 import DatePicker from '@/components/form/date-picker';
 import Radio from '../form/input/Radio';
 import { Modal } from '@/components/ui/modal/index';
-import { PatientDataType } from '@/schemaValidations/patient.schema';
+import { PatientFullDataType } from '@/schemaValidations/patient.schema';
 import patientApiRequest from '@/apiRequests/patient';
 import { EntityError } from '@/lib/axios';
 
@@ -13,7 +13,7 @@ interface PatientFormModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSuccess: () => void;
-  editingPatient: PatientDataType | null;
+  editingPatient: PatientFullDataType | null;
   modalType: 'add' | 'edit' | null;
 }
 
@@ -24,6 +24,8 @@ export interface PatientFormData {
   gender?: 'MALE' | 'FEMALE' | null;
   email?: string;
   address?: string;
+  medical_history?: string;
+  allergies?: string;
 }
 
 export interface ValidationErrors {
@@ -33,6 +35,8 @@ export interface ValidationErrors {
   dob?: string;
   gender?: string;
   address?: string;
+  medical_history?: string;
+  allergies?: string;
   _form?: string;
 }
 
@@ -65,6 +69,8 @@ export default function PatientFormModal({
         dob: editingPatient.dob || null,
         email: editingPatient.email || '',
         address: editingPatient.address || '',
+        medical_history: editingPatient.medical_history || '',
+        allergies: editingPatient.allergies || '',
       });
     } else if (modalType === 'add') {
       setFormData({
@@ -74,6 +80,8 @@ export default function PatientFormModal({
         gender: 'MALE',
         email: '',
         address: '',
+        medical_history: '',
+        allergies: '',
       });
     }
     setErrors({});
@@ -98,7 +106,9 @@ export default function PatientFormModal({
           gender: formData.gender,
           dob: formData.dob,
           address: formData.address,
-          ...(formData.email && { email: formData.email })
+          ...(formData.email && { email: formData.email }),
+          medical_history: formData.medical_history,
+          allergies: formData.allergies,
         };
         await patientApiRequest.update(editingPatient.id, updateData);
       } else if(modalType === 'add') {
@@ -108,7 +118,9 @@ export default function PatientFormModal({
           gender: formData.gender,
           dob: formData.dob,
           address: formData.address,
-          ...(formData.email && { email: formData.email })
+          ...(formData.email && { email: formData.email }),
+          medical_history: formData.medical_history,
+          allergies: formData.allergies,
         };
         await patientApiRequest.create(newData);
       }
@@ -238,6 +250,28 @@ export default function PatientFormModal({
               disabled={isSubmitting}
               error={!!errors.address}
               hint={errors.address}
+            />
+          </div>
+          <div className="col-span-1 sm:col-span-2">
+            <Label>Tiền sử bệnh lý</Label>
+            <Input
+              type="text"
+              value={formData.medical_history}
+              onChange={(e) => handleInputChange('medical_history', e.target.value)}
+              disabled={isSubmitting}
+              error={!!errors.medical_history}
+              hint={errors.medical_history}
+            />
+          </div>
+          <div className="col-span-1 sm:col-span-2">
+            <Label>Dị ứng</Label>
+            <Input
+              type="text"
+              value={formData.allergies}
+              onChange={(e) => handleInputChange('allergies', e.target.value)}
+              disabled={isSubmitting}
+              error={!!errors.allergies}
+              hint={errors.allergies}
             />
           </div>
         </div>

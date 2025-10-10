@@ -15,7 +15,7 @@ import { PatientDataType } from '@/schemaValidations/patient.schema';
 
 interface PatientTableProps {
   patients: PatientDataType[];
-  onEdit: (patient: PatientDataType) => void;
+  onEdit: (id: string) => void;
   onDelete: (id: string) => void;
 }
 
@@ -65,7 +65,7 @@ export default function PatientTable({ patients, onEdit, onDelete }: PatientTabl
                       <Link href={`/patients/${patient.id}`}>
                         <Button size="sm">Xem</Button>
                       </Link>
-                      <Button size="sm" onClick={() => onEdit(patient)}>Sửa</Button>
+                      <Button size="sm" onClick={() => onEdit(patient.id)}>Sửa</Button>
                       <Button size="sm" variant="destructive" onClick={() => onDelete(patient.id)}>Xóa</Button>
                     </div>
                   </TableCell>
