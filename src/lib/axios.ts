@@ -86,6 +86,7 @@ const handleLogout = () => {
     Cookies.remove('access_token')
     Cookies.remove('refresh_token')
     location.href = '/signin'
+    // console.log("handleLogout in axios.ts");
   }
 }
 
@@ -150,7 +151,11 @@ api.interceptors.response.use(
     }
 
     const originalRequest = error.config
-    if (error.response.status == AUTHENTICATION_ERROR_STATUS && isClient() && !originalRequest._retry) {
+    if (
+      (error.response.status == AUTHENTICATION_ERROR_STATUS || error.response.status == 403) &&
+      isClient() &&
+      !originalRequest._retry
+    ) {
       originalRequest._retry = true // Đánh dấu để tránh loop refresh
       if (!clientRefreshRequest) {
         const refreshToken = Cookies.get('refresh_token')
@@ -158,12 +163,14 @@ api.interceptors.response.use(
           clientRefreshRequest = api.post('/auth/refresh', { refresh_token: refreshToken })
           try {
             const refreshResponse = await clientRefreshRequest
-            const { access_token } = refreshResponse.data.data
+            const { access_token } = refreshResponse.data
+            console.log("access_token from /auth/refresh", access_token);
             Cookies.set('access_token', access_token /*, { expires: new Date(expiresAt) } */)
             originalRequest.headers.Authorization = `Bearer ${access_token}`
             return api(originalRequest) // Retry request gốc với token mới
           } catch (refreshError) {
             handleLogout()
+            console.log(refreshError);
             throw refreshError
           } finally {
             clientRefreshRequest = null
