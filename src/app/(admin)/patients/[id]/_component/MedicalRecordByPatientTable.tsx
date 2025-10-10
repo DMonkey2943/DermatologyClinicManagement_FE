@@ -11,6 +11,7 @@ import {
 // import Badge from '@/components/ui/badge/Badge';
 import { MedicalRecordDataType } from '@/schemaValidations/medicalRecord.schema';
 import medicalRecordApiRequest from '@/apiRequests/medicalRecord';
+import { formatDateTime } from '@/lib/utils';
 
 interface MedicalRecordByPatientProps {
   patient_id_props: string;
@@ -80,7 +81,7 @@ export default function MedicalRecordByPatientTable({ patient_id_props }: Medica
               {medicalRecords?.map((medicalRecord) => (
                 <TableRow key={medicalRecord.id}>
                   <TableCell className="px-5 py-4 text-start text-theme-sm text-gray-800 dark:text-white/90">
-                    {medicalRecord.created_at}
+                    {formatDateTime(medicalRecord.created_at)}
                   </TableCell>
                   <TableCell className="px-5 py-4 text-start text-theme-sm text-gray-800 dark:text-white/90">
                     {medicalRecord.doctor.full_name}
