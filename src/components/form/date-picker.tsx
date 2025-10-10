@@ -1,8 +1,9 @@
-import { useEffect } from 'react';
-import flatpickr from 'flatpickr';
-import 'flatpickr/dist/flatpickr.css';
-import Label from './Label';
-import { CalenderIcon } from '../../icons';
+"use client";
+import { useEffect } from "react";
+import flatpickr from "flatpickr";
+import "flatpickr/dist/flatpickr.css";
+import Label from "./Label";
+import { CalenderIcon } from "../../icons";
 import Hook = flatpickr.Options.Hook;
 import DateOption = flatpickr.Options.DateOption;
 
@@ -13,10 +14,12 @@ type PropsType = {
   defaultDate?: DateOption | null | string;
   label?: string;
   placeholder?: string;
-  hint?: string; // Thêm prop hint
-  error?: boolean; // Thêm prop error
-  success?: boolean; // Thêm prop success
-  disabled?: boolean; // Thêm prop disabled để hỗ trợ trạng thái vô hiệu hóa
+  hint?: string;
+  error?: boolean;
+  success?: boolean;
+  disabled?: boolean;
+  maxDate?: string | Date | null; // Thêm prop maxDate
+  minDate?: string | Date | null; // Thêm prop minDate
 };
 
 export default function DatePicker({
@@ -30,15 +33,30 @@ export default function DatePicker({
   error = false,
   success = false,
   disabled = false,
+  maxDate = null, // Mặc định là null
+  minDate = null, // Mặc định là null
 }: PropsType) {
   useEffect(() => {
     const flatPickr = flatpickr(`#${id}`, {
-      mode: mode || 'single',
+      mode: mode || "single",
       static: true,
-      monthSelectorType: 'static',
-      dateFormat: 'Y-m-d',
+      monthSelectorType: "static",
+      dateFormat: "Y-m-d", // Định dạng giá trị nội bộ (cho API)
+      altInput: true, // Sử dụng input thay thế để hiển thị định dạng khác
+      altFormat: "d/m/Y", // Định dạng hiển thị trên UI (07/10/2025)
       defaultDate,
-      onChange,
+      maxDate, // Truyền maxDate vào flatpickr
+      minDate, // Truyền minDate vào flatpickr
+      onChange: (selectedDates, dateStr, instance) => {
+        // Chuyển đổi định dạng ngày thành YYYY-MM-DD khi gọi onChange
+        if (onChange) {
+          if (Array.isArray(onChange)) {
+            onChange.forEach((hook) => hook(selectedDates, dateStr, instance));
+          } else {
+            onChange(selectedDates, dateStr, instance);
+          }
+        }
+      },
     });
 
     return () => {
@@ -46,7 +64,7 @@ export default function DatePicker({
         flatPickr.destroy();
       }
     };
-  }, [mode, onChange, id, defaultDate]);
+  }, [mode, onChange, id, defaultDate, maxDate, minDate]);
 
   // Xây dựng chuỗi lớp CSS cho input
   let inputClasses = `h-11 w-full rounded-lg border appearance-none px-4 py-2.5 text-sm shadow-theme-xs placeholder:text-gray-400 focus:outline-hidden focus:ring-3 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800`;
@@ -82,10 +100,10 @@ export default function DatePicker({
         <p
           className={`mt-1.5 text-xs ${
             error
-              ? 'text-error-500'
+              ? "text-error-500"
               : success
-              ? 'text-success-500'
-              : 'text-gray-500'
+              ? "text-success-500"
+              : "text-gray-500"
           }`}
         >
           {hint}

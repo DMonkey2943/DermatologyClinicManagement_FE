@@ -57,7 +57,7 @@ export default function PatientFormModal({
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
-    const [errors, setErrors] = useState<ValidationErrors>({}); // State để lưu lỗi 422
+  const [errors, setErrors] = useState<ValidationErrors>({}); // State để lưu lỗi 422
 
   useEffect(() => {
     if (modalType === 'edit' && editingPatient) {
@@ -160,6 +160,8 @@ export default function PatientFormModal({
       gender: null,
       email: '',
       address: '',
+      allergies: '',
+      medical_history: '',
     });
   };
 
@@ -197,17 +199,6 @@ export default function PatientFormModal({
             />
           </div>
           <div className="col-span-1">
-            <DatePicker
-              id="dob"
-              label="Ngày sinh"
-              defaultDate={formData.dob}
-              onChange={(dates, currentDateString) => handleInputChange('dob', currentDateString)}
-              placeholder="Chọn ngày sinh"
-              error={!!errors.dob}
-              hint={errors.dob}
-            />
-          </div>
-          <div className="col-span-1">
             <Label>Giới tính</Label>
             <div className="flex gap-4 pt-3">
               <Radio
@@ -229,6 +220,18 @@ export default function PatientFormModal({
                 disabled={isSubmitting}
               />
             </div>
+          </div>
+          <div className="col-span-1">
+            <DatePicker
+              id="dob"
+              label="Ngày sinh"
+              defaultDate={formData.dob}
+              maxDate={new Date()} // Ngày hiện tại
+              onChange={(dates, currentDateString) => handleInputChange('dob', currentDateString)}
+              placeholder="Chọn ngày sinh"
+              error={!!errors.dob}
+              hint={errors.dob}
+            />
           </div>
           <div className="col-span-1 sm:col-span-2">
             <Label>Email</Label>
