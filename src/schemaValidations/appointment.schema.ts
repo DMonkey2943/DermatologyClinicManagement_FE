@@ -19,6 +19,14 @@ export const AppointmentData = z.object({
 })
 export type AppointmentDataType = z.TypeOf<typeof AppointmentData>
 
+export const AppointmentRes = z.object({
+    data: AppointmentData,
+    message: z.string(),
+    success: z.boolean()
+})
+
+export type AppointmentResType = z.TypeOf<typeof AppointmentRes>
+
 export const AppointmentListRes = z.object({
     data: z.array(AppointmentData),
     message: z.string(),
