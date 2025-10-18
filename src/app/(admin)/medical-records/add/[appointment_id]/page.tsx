@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useEffect, useState, use } from 'react';
+import { useRouter } from 'next/navigation';
 import PageBreadcrumb from '@/components/common/PageBreadCrumb';
 import ComponentCard from '@/components/common/ComponentCard';
 import patientApiRequest from '@/apiRequests/patient';
@@ -16,6 +17,8 @@ export default function PatientDetai({ params }: {
   params: Promise<{ appointment_id: string }>
 }) {
     const { appointment_id } = use(params);
+    const router = useRouter();
+
     const [patientId, setPatientId] = useState<string | null>(null);
     const [doctorId, setDoctorId] = useState<string | null>(null);
     const [medicalRecordId, setMedicalRecordId] = useState<string | null>(null);
@@ -65,7 +68,9 @@ export default function PatientDetai({ params }: {
             if (medicalRecordId) {
                 const {payload} = await medicalRecordApiRequest.update(medicalRecordId, {status: "COMPLETED"});
                 console.log(payload.data);
-                //Chuyển qua trang thông tin chi tiết phiên khám
+                //Chuyển sang trang chi tiết phiên khám
+                router.push(`/medical-records/${medicalRecordId}`);
+                router.refresh();
             } else {
                 alert("Bạn chưa lưu phiên khám!!")
             }
