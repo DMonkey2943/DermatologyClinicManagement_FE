@@ -63,7 +63,8 @@ export default function PrescriptionForm({medicalRecordId}: PrescriptionFormProp
   const [dosage, setDosage] = useState('');
   const [prescriptionItems, setPrescriptionItems] = useState<PerscriptionItem[]>([]);
   const [error, setError] = useState('');
-  const [medications, setMedications] = useState<MedicationDataType[]>([]);
+  const [medications, setMedications] = useState<MedicationDataType[]>([]);  
+  const [isSubmitting, setIsSubmitting] = useState(false);
   
   useEffect(() => {
       fetchMedications();
@@ -138,7 +139,8 @@ export default function PrescriptionForm({medicalRecordId}: PrescriptionFormProp
     }
   };
 
-  const submitPrescription = async () => {
+  const submitPrescription = async () => {    
+    setIsSubmitting(true);
     const prescription_details = prescriptionItems.map((item) => {
       return {
         medication_id: item.medication_id,
@@ -158,6 +160,8 @@ export default function PrescriptionForm({medicalRecordId}: PrescriptionFormProp
       console.log(payload.data);
     } catch (e) {
       console.error(e);
+    } finally {      
+      setIsSubmitting(false);
     }
   }
 
@@ -269,6 +273,7 @@ export default function PrescriptionForm({medicalRecordId}: PrescriptionFormProp
             <Button
               onClick={handleAddMedicine}
               className="w-full bg-green-600 hover:bg-green-700"
+              disabled={isSubmitting}
             >
               <Plus className="h-4 w-4" />
             </Button>
@@ -320,6 +325,7 @@ export default function PrescriptionForm({medicalRecordId}: PrescriptionFormProp
                         size="sm"
                         onClick={() => handleRemoveMedicine(item.id!)}
                         className="text-red-600 hover:text-red-800 hover:bg-red-50"
+                        disabled={isSubmitting}
                       >
                         <Trash2 className="h-4 w-4" />
                       </Button>
@@ -335,10 +341,10 @@ export default function PrescriptionForm({medicalRecordId}: PrescriptionFormProp
       {/* Action buttons */}
       {prescriptionItems.length > 0 && (
         <div className="mt-6 flex justify-end gap-3">
-          <Button variant="outline" onClick={() => setPrescriptionItems([])}>
+          {/* <Button variant="outline" onClick={() => setPrescriptionItems([])}>
             Xóa tất cả
-          </Button>
-          <Button className="bg-blue-600 hover:bg-blue-700" onClick={submitPrescription}>
+          </Button> */}
+          <Button className="bg-blue-600 hover:bg-blue-700" disabled={isSubmitting} onClick={submitPrescription}>
             Lưu đơn thuốc
           </Button>
         </div>

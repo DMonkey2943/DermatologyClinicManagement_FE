@@ -8,6 +8,9 @@ import { PatientFullDataType } from '@/schemaValidations/patient.schema';
 import MedicalRecordForm from './_component/MedicalRecordForm';
 import PrescriptionForm from './_component/PrescriptionForm';
 import appointmentApiRequest from '@/apiRequests/appointment';
+import ServiceIndicationForm from './_component/ServiceIndicationForm';
+import Button from '@/components/ui/button/Button';
+import medicalRecordApiRequest from '@/apiRequests/medicalRecord';
 
 export default function PatientDetai({ params }: {
   params: Promise<{ appointment_id: string }>
@@ -56,6 +59,20 @@ export default function PatientDetai({ params }: {
         console.log("medical_record_id: ", mr_id);
         setMedicalRecordId(mr_id);
     }
+
+    const handleCompleteMR = async () => {
+        try {
+            if (medicalRecordId) {
+                const {payload} = await medicalRecordApiRequest.update(medicalRecordId, {status: "COMPLETED"});
+                console.log(payload.data);
+                //Chuyển qua trang thông tin chi tiết phiên khám
+            } else {
+                alert("Bạn chưa lưu phiên khám!!")
+            }
+        } catch (e) {
+            console.error(e);
+        }
+    }
     
 
     return (    
@@ -95,16 +112,20 @@ export default function PatientDetai({ params }: {
                         />
                     </ComponentCard>
                     {medicalRecordId &&
-                        <ComponentCard title="Kê đơn thuốc">           
-                            <PrescriptionForm
-                            medicalRecordId={medicalRecordId}
-                            />
-                        </ComponentCard>
-                    }
-                    
-                    {/* <ComponentCard title="Chỉ định dịch vụ">           
-                        <MedicalRecordForm/>
-                    </ComponentCard> */}
+                        <> 
+                            <ComponentCard title="Kê đơn thuốc">           
+                                <PrescriptionForm
+                                medicalRecordId={medicalRecordId}
+                                />
+                            </ComponentCard>
+                            <ComponentCard title="Chỉ định dịch vụ">           
+                                <ServiceIndicationForm
+                                    medicalRecordId={medicalRecordId}
+                                />
+                            </ComponentCard>
+                            <Button size="md" onClick={handleCompleteMR}>Hoàn thành phiên khám</Button>
+                        </>
+                    }                    
                 </div>
             </div>
         </div>

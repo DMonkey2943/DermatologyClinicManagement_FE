@@ -45,16 +45,11 @@ export const CreateMedicalRecordBody = z.object({
 
 export type CreateMedicalRecordBodyType = z.TypeOf<typeof CreateMedicalRecordBody>
 
-// export const UpdateMedicalRecordBody = z.object({
-//     // patient_id: z.string(),
-//     doctor_id: z.string().optional(),
-//     appointment_date: z.string().date(),
-//     appointment_time: z.string().regex(/^([01]\d|2[0-3]):[0-5]\d:[0-5]\d$/, {
-//         message: 'Giờ hẹn không hợp lệ (e.g., "12:00:00")',
-//     }),
-//     time_slot: z.string().optional(),
-//     status: z.enum(["SCHEDULED", "WAITING", "COMPLETED", "CANCELLED"]),
-//     notes: z.string().nullable().optional()
-// })
+export const UpdateMedicalRecordBody = z.object({
+    symptoms: z.string().optional(),
+    diagnosis: z.string().optional(),
+    status: z.enum(["COMPLETED", "IN_PROGRESS"]).optional(),
+    notes: z.string().nullable().optional(),
+})
 
-// export type UpdateMedicalRecordBodyType = z.TypeOf<typeof UpdateMedicalRecordBody>
+export type UpdateMedicalRecordBodyType = z.TypeOf<typeof UpdateMedicalRecordBody>

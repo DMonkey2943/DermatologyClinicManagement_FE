@@ -39,7 +39,7 @@ export const PrescriptionFullData = z.object({
 export type PrescriptionFullDataType = z.TypeOf<typeof PrescriptionFullData>
 
 export const PrescriptionFullRes = z.object({
-    data: PrescriptionFullData,
+    data: PrescriptionFullData || null,
     message: z.string(),
     success: z.boolean()
 })
