@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useMemo } from 'react';
 import {
   Table,
   TableBody,
@@ -14,16 +14,25 @@ import { ServiceIndicationFullDataType } from '@/schemaValidations/serviceIndica
 interface InvoiceDetailTableProps {
     serviceIndication: ServiceIndicationFullDataType;
     prescription: PrescriptionFullDataType;
+    onSendData: (data: {
+      serviceSubtotal: number;
+      medicationSubtotal: number;
+      grandTotal: number;
+    }) => void;
 }
 
-export default function InvoiceDetailTable({ serviceIndication, prescription }: InvoiceDetailTableProps) {
+export default function InvoiceDetailTable({ serviceIndication, prescription, onSendData }: InvoiceDetailTableProps) {
   const calculateTotal = (items) => {
     return items.reduce((sum, item) => sum + (item.total_price), 0);
   };
 
-  const servicesTotal = calculateTotal(serviceIndication.services);
-  const medicationsTotal = calculateTotal(prescription.medications);
-  const grandTotal = servicesTotal + medicationsTotal;
+  // Tính tổng và memoize
+  const { serviceSubtotal, medicationSubtotal, grandTotal } = useMemo(() => {
+    const serviceSubtotal = calculateTotal(serviceIndication.services);
+    const medicationSubtotal = calculateTotal(prescription.medications);
+    const grandTotal = serviceSubtotal + medicationSubtotal;
+    return { serviceSubtotal, medicationSubtotal, grandTotal };
+  }, [serviceIndication.services, prescription.medications]);
 
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('vi-VN', {
@@ -31,6 +40,10 @@ export default function InvoiceDetailTable({ serviceIndication, prescription }: 
       currency: 'VND'
     }).format(amount);
   };
+
+  useEffect(() => {
+    onSendData({ serviceSubtotal, medicationSubtotal, grandTotal });
+  }, [serviceIndication, prescription, onSendData]);
 
   return (
     <Card className="mb-6">

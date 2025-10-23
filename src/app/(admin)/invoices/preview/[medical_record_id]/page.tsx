@@ -6,25 +6,35 @@ import PageBreadcrumb from '@/components/common/PageBreadCrumb';
 // import ComponentCard from '@/components/common/ComponentCard';
 import patientApiRequest from '@/apiRequests/patient';
 import { PatientFullDataType } from '@/schemaValidations/patient.schema';
-import Button from '@/components/ui/button/Button';
+// import Button from '@/components/ui/button/Button';
 import medicalRecordApiRequest from '@/apiRequests/medicalRecord';
 import { UserFKDataType } from '@/schemaValidations/user.schema';
 import { PrescriptionFullDataType } from '@/schemaValidations/prescription.schema';
 import { ServiceIndicationFullDataType } from '@/schemaValidations/serviceIndication.schema';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import InvoiceDetailTable from './_component/InvoiceDetailTable';
+import invoiceApiRequest from '@/apiRequests/invoice';
+import { useAuth } from "@/context/AuthContext";
+
+interface InvoiceDetailDataType {
+    serviceSubtotal: number;
+    medicationSubtotal: number;
+    grandTotal: number;
+}
 
 export default function InvoiceDetailPreview({ params }: {
   params: Promise<{ medical_record_id: string }>
 }) {
     const { medical_record_id } = use(params);
     const router = useRouter();
+    const { user } = useAuth();
 
     const [patientId, setPatientId] = useState<string | null>(null);
     const [doctor, setDoctor] = useState< UserFKDataType | null>(null);
     const [patient, setPatient] = useState<PatientFullDataType>();  
     const [prescription, setPrescription] = useState<PrescriptionFullDataType | null>();
     const [serviceIndication, setServiceIndication] = useState<ServiceIndicationFullDataType | null>();
+    const [invoiceDetail, setInvoiceDetail] = useState<InvoiceDetailDataType>()
 
     // const [medicalRecordId, setMedicalRecordId] = useState<string | null>(null);
     // const patient_id = '793029ae-44d2-49b4-9fee-e8c077e59899';
@@ -90,6 +100,44 @@ export default function InvoiceDetailPreview({ params }: {
         }
     };
 
+    const handleInvoiceDetailData = (data: InvoiceDetailDataType) => {
+        setInvoiceDetail((prev) => {
+            // So sánh giá trị cũ và mới
+            if (
+                prev?.serviceSubtotal === data.serviceSubtotal &&
+                prev?.medicationSubtotal === data.medicationSubtotal &&
+                prev?.grandTotal === data.grandTotal
+            ) {
+                return prev; // Không thay đổi → không re-render
+            }
+            console.log('Dữ liệu hóa đơn:', data);
+            return data;
+        });
+    }
+
+    const handleSubmitInvoice = async () => {
+        try {
+            const newInvoice = {
+                medical_record_id: medical_record_id,
+                patient_id: patientId!,
+                doctor_id: doctor!.id,
+                created_by: user!.id,
+                service_subtotal: invoiceDetail?.serviceSubtotal,
+                medication_subtotal: invoiceDetail?.medicationSubtotal,
+                total_amount: invoiceDetail?.grandTotal,
+                discount_amount: 0,
+                final_amount: invoiceDetail?.grandTotal,
+            }
+
+            console.log(newInvoice);
+            await invoiceApiRequest.create(newInvoice);
+            router.push(`/invoices`);
+            router.refresh();
+        } catch (err) {
+            console.log("Error submitting invoice: ", err);
+        }
+    }
+
     // const getMedicalRecordId = (mr_id: string) => {
     //     console.log("medical_record_id: ", mr_id);
     //     setMedicalRecordId(mr_id);
@@ -152,7 +200,12 @@ export default function InvoiceDetailPreview({ params }: {
                     }
 
                     {
-                        (serviceIndication && prescription) && <InvoiceDetailTable serviceIndication={serviceIndication} prescription={prescription} />
+                        (serviceIndication && prescription) &&
+                        <InvoiceDetailTable
+                            serviceIndication={serviceIndication}
+                            prescription={prescription}
+                            onSendData={handleInvoiceDetailData}
+                        />
                     }
                     
 
@@ -172,6 +225,15 @@ export default function InvoiceDetailPreview({ params }: {
                         </Card>    
                     </>
                     }
+
+                    <div className="mt-6 text-center print:hidden">
+                        <button
+                            onClick={handleSubmitInvoice}
+                            className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-medium transition-colors"
+                        >
+                            Lưu hóa đơn
+                        </button>
+                    </div>
                 </div>
             </div>           
         </div>
