@@ -25,7 +25,9 @@ export const PrescriptionDetailData = z.object({
     name: z.string(),
     dosage_form: z.string(),
     quantity: z.number(),
-    dosage: z.string()
+    dosage: z.string(),
+    unit_price: z.number(),
+    total_price: z.number(),
 })
 export type PrescriptionDetailDataType = z.TypeOf<typeof PrescriptionDetailData>
 

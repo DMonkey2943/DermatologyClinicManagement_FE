@@ -21,7 +21,9 @@ export const ServiceIndicationDetailData = z.object({
     service_indication_id: z.string(),
     service_id: z.string(),
     name: z.string(),
-    quantity: z.number()
+    quantity: z.number(),
+    unit_price: z.number(),
+    total_price: z.number(),
 })
 export type ServiceIndicationDetailDataType = z.TypeOf<typeof ServiceIndicationDetailData>
 
