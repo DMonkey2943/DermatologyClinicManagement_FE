@@ -21,6 +21,7 @@ import {
   StethoscopeIcon,
   UsersGearIcon,
   HospitalUserIcon,
+  DollarLineIcon,
 } from "../icons/index";
 import SidebarWidget from "./SidebarWidget";
 
@@ -56,6 +57,11 @@ const navItems: NavItem[] = [
     icon: <CalenderIcon />,
     name: "Phiên khám",
     path: "/medical-records",
+  },
+  {
+    icon: <DollarLineIcon />,
+    name: "Hóa đơn",
+    path: "/invoices",
   },
   {
     icon: <MedicationIcon />,
