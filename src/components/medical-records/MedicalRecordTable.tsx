@@ -91,6 +91,9 @@ export default function MedicalRecordTable({ medical_records }: MedicalRecordTab
                       <Link href={`/medical-records/${medical_record.id}`}>
                         <Button size="sm">Xem</Button>
                       </Link>
+                      <Link href={`/invoices/preview/${medical_record.id}`}>
+                        <Button size="sm">Tạo hóa đơn</Button>
+                      </Link>
                       {/* <Link href={`/medical_records/${medical_record.id}`}>
                         <Button size="sm">Xem</Button>
                       </Link>
