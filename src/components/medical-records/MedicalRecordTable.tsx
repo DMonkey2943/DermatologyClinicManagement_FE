@@ -13,12 +13,14 @@ import Button from '@/components/ui/button/Button';
 import Link from 'next/link';
 import { MedicalRecordDataType } from '@/schemaValidations/medicalRecord.schema';
 import { formatDateTime } from '@/lib/utils';
+import CenteredSpinner from '../ui/spinner/CenteredSpinner';
 
 interface MedicalRecordTableProps {
   medical_records: MedicalRecordDataType[];
+  isLoading: boolean;
 }
 
-export default function MedicalRecordTable({ medical_records }: MedicalRecordTableProps) {
+export default function MedicalRecordTable({ medical_records, isLoading }: MedicalRecordTableProps) {
   const getStatusColor = (status: string|null) => {
     switch (status) {
       case 'IN_PROGRESS':
@@ -29,6 +31,10 @@ export default function MedicalRecordTable({ medical_records }: MedicalRecordTab
   };
 
   return (
+    isLoading
+      ?
+        <CenteredSpinner/>
+      :
     <div className="overflow-hidden rounded-xl border border-gray-200 bg-white dark:border-white/[0.05] dark:bg-white/[0.03]">
       <div className="max-w-full overflow-x-auto">
         <div className="min-w-[800px]">

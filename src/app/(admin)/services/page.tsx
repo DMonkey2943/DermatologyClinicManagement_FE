@@ -13,12 +13,14 @@ export default function ServiceListPage() {
     const [services, setServices] = useState<ServiceDataType[]>([]);
     const [editingService, setEditingService] = useState<ServiceDataType | null>(null);
     const [modalType, setModalType] = useState<'add' | 'edit' | null>(null);
+    const [isLoading, setIsLoading] = useState(false);
 
     useEffect(() => {
         fetchServices();
     }, []);
 
     const fetchServices = async () => {
+        setIsLoading(true);
         try {
             const {payload} = await serviceApiRequest.getList();
           const serviceList = payload.data;
@@ -26,6 +28,9 @@ export default function ServiceListPage() {
             setServices(serviceList);
         } catch (error) {
             console.error('Lỗi lấy danh sách Services:', error);
+        }
+        finally {
+            setIsLoading(false);
         }
     }
 
@@ -44,32 +49,6 @@ export default function ServiceListPage() {
           }
         }
     };
-
-    // const handleModalSubmit = async (formData: ServiceFormData) => {
-    //     try {
-    //       if (modalType === 'add') {
-    //         const newService = await createService({
-    //           name: formData.name,
-    //           price: formData.price,
-    //           description: formData.description
-    //         });
-    //         console.log("Created new service: ", newService);
-    //         setServices([...services, newService]);
-    //       } else if (modalType === 'edit' && editingService) {
-    //         const updatedService = await updateService(editingService.id, {
-    //           name: formData.name,
-    //           price: formData.price,
-    //           description: formData.description
-    //         });
-    //         console.log("Updated service: ", updatedService);
-    //         fetchServices(); // Refresh the list
-    //       }
-    //       closeModal();
-    //     } catch (error) {
-    //       console.error('Error submitting service:', error);
-    //       throw error; // Re-throw to let modal handle the error state
-    //     }
-  // };
   
     const handleFormSubmit = async () => {
       // Form đã submit thành công
@@ -109,6 +88,7 @@ export default function ServiceListPage() {
                         services={services}
                         onEdit={handleEdit}
                         onDelete={handleDelete}
+                        isLoading={isLoading}
                     />
                 </ComponentCard>
             </div>

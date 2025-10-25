@@ -10,12 +10,14 @@ import InvoiceTable from '@/components/invoices/InvoiceTable';
 
 export default function InvoiceListPage() {
   const [invoices, setInvoices] = useState<InvoiceDataType[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     fetchInvoices();
   }, []);
 
   const fetchInvoices = async () => {
+    setIsLoading(true);
     try {
       const {payload} = await invoiceApiRequest.getList();
       const data = payload.data;
@@ -23,6 +25,9 @@ export default function InvoiceListPage() {
       setInvoices(data);
     } catch (error) {
       console.error('Lỗi lấy danh sách hóa đơn:', error);
+    }
+    finally {
+      setIsLoading(false);
     }
   };
 
@@ -35,6 +40,7 @@ export default function InvoiceListPage() {
         <ComponentCard title="Danh sách hóa đơn">
           <InvoiceTable 
             invoices={invoices} 
+            isLoading={isLoading}
           />
         </ComponentCard>
       </div>

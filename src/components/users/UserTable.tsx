@@ -11,15 +11,21 @@ import {
 import Badge from '@/components/ui/badge/Badge';
 import Button from '@/components/ui/button/Button';
 import { UserDataType } from '@/schemaValidations/user.schema';
+import CenteredSpinner from '../ui/spinner/CenteredSpinner';
 
 interface UserTableProps {
   users: UserDataType[];
   onEdit: (user: UserDataType) => void;
   onDelete: (id: string) => void;
+  isLoading: boolean;
 }
 
-export default function UserTable({ users, onEdit, onDelete }: UserTableProps) {
+export default function UserTable({ users, onEdit, onDelete, isLoading }: UserTableProps) {
   return (
+    isLoading
+      ?
+        <CenteredSpinner/>
+      :
     <div className="overflow-hidden rounded-xl border border-gray-200 bg-white dark:border-white/[0.05] dark:bg-white/[0.03]">
       <div className="max-w-full overflow-x-auto">
         <div className="min-w-[800px]">

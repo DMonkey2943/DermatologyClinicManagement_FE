@@ -6,24 +6,24 @@ import ComponentCard from '@/components/common/ComponentCard';
 import Button from '@/components/ui/button/Button';
 import AppointmentTable from '@/components/appointments/AppointmentTable';
 import AppointmentFormModal from '@/components/appointments/AppointmentFormModal';
-// import { getAppointments, createAppointment, updateAppointment } from '@/services/appointments';
-// import { Appointment, AppointmentResponse } from '@/types/appointment';
 import appointmentApiRequest from '@/apiRequests/appointment';
 import { AppointmentDataType } from '@/schemaValidations/appointment.schema';
-import { useAuth } from "@/context/AuthContext";
+// import { useAuth } from "@/context/AuthContext";
 
 export default function AppointmentListPage() {
-    const { user } = useAuth();
+  // const { user } = useAuth();
     
   const [appointments, setAppointments] = useState<AppointmentDataType[]>([]);
   const [editingAppointment, setEditingAppointment] = useState<AppointmentDataType | null>(null);
   const [modalType, setModalType] = useState<'add' | 'edit' | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     fetchAppointments();
   }, []);
 
   const fetchAppointments = async () => {
+    setIsLoading(true);
     try {
       const { payload } = await appointmentApiRequest.getList();
       const appointmentList = payload.data
@@ -31,6 +31,9 @@ export default function AppointmentListPage() {
       setAppointments(appointmentList);
     } catch (error) {
       console.error('Lỗi lấy danh sách Appointments:', error);
+    }
+    finally {
+      setIsLoading(false);
     }
   };
 
@@ -49,37 +52,6 @@ export default function AppointmentListPage() {
 //       }
 //     }
 //   };
-
-  // const handleModalSubmit = async (formData: AppointmentFormData) => {
-  //   try {
-  //     if (modalType === 'add') {
-  //       const newAppointment = await createAppointment({
-  //         patient_id: formData.patient_id,
-  //         doctor_id: formData.doctor_id,
-  //         created_by: user!.id,
-  //         appointment_date: formData.appointment_date!,
-  //         time_slot: formData.time_slot,
-  //         status: formData.status || 'SCHEDULED',
-  //       });
-  //       console.log("Created new appointment: ", newAppointment);
-  //       setAppointments([...appointments, newAppointment]);
-  //     } else if (modalType === 'edit' && editingAppointment) {
-  //       const updatedAppointment = await updateAppointment(editingAppointment.id, {
-  //       //   patient_id: formData.patient_id,
-  //         doctor_id: formData.doctor_id,
-  //         appointment_date: formData.appointment_date!,
-  //         time_slot: formData.time_slot,
-  //         status: formData.status,
-  //       });
-  //       console.log("Updated appointment: ", updatedAppointment);
-  //       fetchAppointments(); // Refresh the list
-  //     }
-  //     closeModal();
-  //   } catch (error) {
-  //     console.error('Error submitting appointment:', error);
-  //     throw error; // Re-throw to let modal handle the error state
-  //   }
-  // };
 
   const handleFormSubmit = async () => {
     // Form đã submit thành công
@@ -119,6 +91,7 @@ export default function AppointmentListPage() {
             appointments={appointments} 
             onEdit={handleEdit} 
             // onDelete={handleDelete} 
+            isLoading={isLoading}
           />
         </ComponentCard>
       </div>

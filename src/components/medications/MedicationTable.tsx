@@ -11,15 +11,21 @@ import {
 // import Badge from '@/components/ui/badge/Badge';
 import Button from '@/components/ui/button/Button';
 import { MedicationDataType } from '@/schemaValidations/medication.schema';
+import CenteredSpinner from '../ui/spinner/CenteredSpinner';
 
 interface MedicationTableProps {
   medications: MedicationDataType[];
   onEdit: (medication: MedicationDataType) => void;
   onDelete: (id: string) => void;
+  isLoading: boolean;
 }
 
-export default function MedicationTable({ medications, onEdit, onDelete }: MedicationTableProps) {
+export default function MedicationTable({ medications, onEdit, onDelete, isLoading }: MedicationTableProps) {
   return (
+    isLoading
+      ?
+        <CenteredSpinner/>
+      :
     <div className="overflow-hidden rounded-xl border border-gray-200 bg-white dark:border-white/[0.05] dark:bg-white/[0.03]">
       <div className="max-w-full overflow-x-auto">
         <div className="min-w-[800px]">

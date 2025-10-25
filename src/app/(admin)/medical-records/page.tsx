@@ -10,12 +10,14 @@ import { MedicalRecordDataType } from '@/schemaValidations/medicalRecord.schema'
 
 export default function PatientListPage() {
   const [medicalRecords, setMedicalRecords] = useState<MedicalRecordDataType[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    fetchPatients();
+    fetchMedicalRecords();
   }, []);
 
-  const fetchPatients = async () => {
+  const fetchMedicalRecords = async () => {
+    setIsLoading(true);
     try {
       const {payload} = await medicalRecordApiRequest.getList();
       const medicalRecordList = payload.data;
@@ -23,6 +25,9 @@ export default function PatientListPage() {
       setMedicalRecords(medicalRecordList);
     } catch (error) {
       console.error('Lỗi lấy danh sách phiên khám:', error);
+    }
+    finally {
+      setIsLoading(false);
     }
   };
 
@@ -35,6 +40,7 @@ export default function PatientListPage() {
         <ComponentCard title="Danh sách phiên khám">
           <MedicalRecordTable 
             medical_records={medicalRecords} 
+            isLoading={isLoading}
           />
         </ComponentCard>
       </div>

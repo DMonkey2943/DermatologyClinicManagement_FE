@@ -91,6 +91,7 @@ export default function UserListPage() {
             users={users} 
             onEdit={handleEdit} 
             onDelete={handleDelete} 
+            isLoading={isLoading}
           />
         </ComponentCard>
       </div>

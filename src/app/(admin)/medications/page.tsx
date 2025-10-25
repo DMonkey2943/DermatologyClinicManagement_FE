@@ -52,36 +52,6 @@ export default function MedicationListPage() {
     }
   };
 
-  // const handleModalSubmit = async (formData: MedicationFormData) => {
-  //   try {
-  //     if (modalType === 'add') {
-  //       const newMedication = await createMedication({
-  //         name: formData.name,
-  //         dosage_form: formData.dosage_form,
-  //         price: formData.price,
-  //         stock_quantity: formData.stock_quantity,
-  //         description: formData.description
-  //       });
-  //       console.log("Created new medication: ", newMedication);
-  //       setMedications([...medications, newMedication]);
-  //     } else if (modalType === 'edit' && editingMedication) {
-  //       const updatedMedication = await updateMedication(editingMedication.id, {
-  //         name: formData.name,
-  //         dosage_form: formData.dosage_form,
-  //         price: formData.price,
-  //         stock_quantity: formData.stock_quantity,
-  //         description: formData.description
-  //       });
-  //       console.log("Updated medication: ", updatedMedication);
-  //       fetchMedications(); // Refresh the list
-  //     }
-  //     closeModal();
-  //   } catch (error) {
-  //     console.error('Error submitting medication:', error);
-  //     throw error; // Re-throw to let modal handle the error state
-  //   }
-  // };
-
   const handleFormSubmit = async () => {
     // Form đã submit thành công
     // toast.success(editingUser ? 'Cập nhật user thành công' : 'Thêm user thành công');
@@ -122,6 +92,7 @@ export default function MedicationListPage() {
             medications={medications} 
             onEdit={handleEdit} 
             onDelete={handleDelete} 
+            isLoading={isLoading}
           />
         </ComponentCard>
       </div>

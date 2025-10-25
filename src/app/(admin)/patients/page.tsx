@@ -13,12 +13,14 @@ export default function PatientListPage() {
   const [patients, setPatients] = useState<PatientDataType[]>([]);
   const [editingPatient, setEditingPatient] = useState<PatientDataType | null>(null);
   const [modalType, setModalType] = useState<'add' | 'edit' | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     fetchPatients();
   }, []);
 
   const fetchPatients = async () => {
+    setIsLoading(true);
     try {
       const {payload} = await patientApiRequest.getList();
       const patientList = payload.data;
@@ -26,6 +28,9 @@ export default function PatientListPage() {
       setPatients(patientList);
     } catch (error) {
       console.error('Lỗi lấy danh sách Patients:', error);
+    }
+    finally {
+      setIsLoading(false);
     }
   };
 
@@ -85,6 +90,7 @@ export default function PatientListPage() {
             patients={patients} 
             onEdit={handleEdit} 
             onDelete={handleDelete} 
+            isLoading={isLoading}
           />
         </ComponentCard>
       </div>
