@@ -25,7 +25,7 @@ export default function MedicalRecordCard({
     <div className="grid grid-cols-1 gap-x-6 gap-y-5 sm:grid-cols-2">
       <div className="col-span-1 sm:col-span-2">
         <Label>Ngày khám</Label>
-        <p>{ formatDateTime(medicalRecordData?.created_at) }</p>
+        <p>{ medicalRecordData?.created_at && formatDateTime(medicalRecordData.created_at) }</p>
       </div>
       <div className="col-span-1 sm:col-span-2">
         <Label>Triệu chứng</Label>

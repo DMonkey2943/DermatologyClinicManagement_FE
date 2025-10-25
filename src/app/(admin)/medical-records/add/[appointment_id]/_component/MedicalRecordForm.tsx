@@ -86,7 +86,7 @@ export default function MedicalRecordForm({
         />
       </div>
       <div className="col-span-1 sm:col-span-2">
-        <Label>Ghi chú</Label>
+        <Label>Lời dặn của BS</Label>
         <Input
           type="text"
           value={formData.notes}

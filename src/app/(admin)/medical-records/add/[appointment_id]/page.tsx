@@ -13,7 +13,7 @@ import ServiceIndicationForm from './_component/ServiceIndicationForm';
 import Button from '@/components/ui/button/Button';
 import medicalRecordApiRequest from '@/apiRequests/medicalRecord';
 
-export default function PatientDetai({ params }: {
+export default function MedicalRecordCreate({ params }: {
   params: Promise<{ appointment_id: string }>
 }) {
     const { appointment_id } = use(params);

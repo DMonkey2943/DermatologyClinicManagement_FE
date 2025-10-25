@@ -1,6 +1,6 @@
 import z from 'zod';
 import { UserFKData } from './user.schema';
-import { PatientFKData } from './patient.schema';
+import { PatientData, PatientFKData } from './patient.schema';
 import { PrescriptionDetailData } from './prescription.schema';
 import { ServiceIndicationDetailData } from './serviceIndication.schema';
 
@@ -42,7 +42,7 @@ export const InvoiceFullData = z.object({
     id: z.string(),
     medical_record_id: z.string(),
     patient_id: z.string(),
-    patient: PatientFKData,
+    patient: PatientData,
     doctor_id: z.string(),
     doctor: UserFKData,
     created_by: z.string(),
