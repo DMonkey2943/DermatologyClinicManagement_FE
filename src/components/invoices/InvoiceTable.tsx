@@ -76,16 +76,13 @@ export default function InvoiceTable({ invoices }: InvoiceTableProps) {
                   <TableCell className="px-5 py-4 text-start text-theme-sm text-gray-800 dark:text-white/90">
                     {formatCurrency(invoice.final_amount!)}
                   </TableCell>
-                  {/* <TableCell className="px-5 py-4 text-start text-theme-xs text-gray-500 dark:text-gray-400">
+                  <TableCell className="px-5 py-4 text-start text-theme-xs text-gray-500 dark:text-gray-400">
                     <div className="flex gap-2">
-                      <Link href={`/medical-records/${invoice.id}`}>
+                      <Link href={`/invoices/${invoice.id}`}>
                         <Button size="sm">Xem</Button>
                       </Link>
-                      <Link href={`/invoices/preview/${invoice.id}`}>
-                        <Button size="sm">Tạo hóa đơn</Button>
-                      </Link>
                     </div>
-                  </TableCell> */}
+                  </TableCell>
                 </TableRow>
               ))}
             </TableBody>
