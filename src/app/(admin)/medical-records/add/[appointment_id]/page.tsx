@@ -41,6 +41,13 @@ export default function MedicalRecordCreate({ params }: {
             const {payload} = await appointmentApiRequest.getDetail(appointment_id);
             const appointmentData = payload.data;
             console.log(appointmentData);
+
+            if(appointmentData.status !== 'WAITING') {
+                toast.error("Chỉ có thể tạo phiếu khám cho cuộc hẹn đang chờ!");
+                router.push('/appointments');
+                return;
+            }
+
             setPatientId(appointmentData.patient_id);
             setDoctorId(appointmentData.doctor_id);
         } catch(error) {

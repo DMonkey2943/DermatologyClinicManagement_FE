@@ -110,10 +110,11 @@ export default function AppointmentTable({ appointments, onEdit, isLoading }: Ap
                   </TableCell>
                   <TableCell className="px-5 py-4 text-start text-theme-xs text-gray-500 dark:text-gray-400">
                     <div className="flex gap-2">
-                      {/* <Button size="sm" onClick={() => alert('Chuyển trang chi tiết thông tin bệnh nhân')}>Xem</Button> */}
-                      <Link href={`/medical-records/add/${appointment.id}`}>
-                        <Button size="sm">Tạo phiên khám</Button>
-                      </Link>
+                      {appointment.status === 'WAITING' && 
+                        <Link href={`/medical-records/add/${appointment.id}`}>
+                          <Button size="sm">Tạo phiên khám</Button>
+                        </Link>
+                      }                      
                       <Button size="sm" onClick={() => onEdit(appointment)}>Sửa</Button>
                       {/* <Button size="sm" variant="destructive" onClick={() => onDelete(appointment.id)}>Xóa</Button> */}
                     </div>
