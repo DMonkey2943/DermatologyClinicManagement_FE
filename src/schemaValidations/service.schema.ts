@@ -1,4 +1,5 @@
 import z from 'zod';
+import { MetaData } from './user.schema';
 
 export const ServiceData = z.object({
     id: z.string(),
@@ -13,7 +14,8 @@ export type ServiceDataType = z.TypeOf<typeof ServiceData>
 export const ServiceListRes = z.object({
     data: z.array(ServiceData),
     message: z.string(),
-    success: z.boolean()
+    success: z.boolean(),
+    meta: MetaData,
 })
 
 export type ServiceListResType = z.TypeOf<typeof ServiceListRes>

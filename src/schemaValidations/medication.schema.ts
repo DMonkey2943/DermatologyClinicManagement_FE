@@ -1,4 +1,5 @@
 import z from 'zod';
+import { MetaData } from './user.schema';
 
 export const MedicationData = z.object({
     id: z.string(),
@@ -15,7 +16,8 @@ export type MedicationDataType = z.TypeOf<typeof MedicationData>
 export const MedicationListRes = z.object({
     data: z.array(MedicationData),
     message: z.string(),
-    success: z.boolean()
+    success: z.boolean(),
+    meta: MetaData,
 })
 
 export type MedicationListResType = z.TypeOf<typeof MedicationListRes>

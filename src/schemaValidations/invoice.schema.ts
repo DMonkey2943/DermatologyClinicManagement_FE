@@ -1,5 +1,5 @@
 import z from 'zod';
-import { UserFKData } from './user.schema';
+import { MetaData, UserFKData } from './user.schema';
 import { PatientData, PatientFKData } from './patient.schema';
 import { PrescriptionDetailData } from './prescription.schema';
 import { ServiceIndicationDetailData } from './serviceIndication.schema';
@@ -34,7 +34,8 @@ export type InvoiceResType = z.TypeOf<typeof InvoiceRes>
 export const InvoiceListRes = z.object({
     data: z.array(InvoiceData),
     message: z.string(),
-    success: z.boolean()
+    success: z.boolean(),
+    meta: MetaData,
 })
 export type InvoiceListResType = z.TypeOf<typeof InvoiceListRes>
 

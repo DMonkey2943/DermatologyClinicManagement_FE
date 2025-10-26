@@ -1,5 +1,5 @@
 import z from 'zod';
-import { UserFKData } from './user.schema';
+import { MetaData, UserFKData } from './user.schema';
 import { PatientFKData } from './patient.schema';
 
 export const AppointmentData = z.object({
@@ -30,7 +30,8 @@ export type AppointmentResType = z.TypeOf<typeof AppointmentRes>
 export const AppointmentListRes = z.object({
     data: z.array(AppointmentData),
     message: z.string(),
-    success: z.boolean()
+    success: z.boolean(),
+    meta: MetaData,
 })
 
 export type AppointmentListResType = z.TypeOf<typeof AppointmentListRes>

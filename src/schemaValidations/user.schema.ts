@@ -1,4 +1,13 @@
+import page from '@/app/(admin)/(others-pages)/calendar/page';
 import z from 'zod';
+
+export const MetaData = z.object({
+    total: z.number(),
+    page: z.number(),
+    skip: z.number(),
+    total_pages: z.number(),
+})
+export type MetaDataType = z.TypeOf<typeof MetaData>
 
 // export const UserData = z.object({
 //     id: z.string(),
@@ -38,7 +47,8 @@ export type CurrentUserResType = z.TypeOf<typeof CurrentUserRes>
 export const UserListRes = z.object({
     data: z.array(UserData),
     message: z.string(),
-    success: z.boolean()
+    success: z.boolean(),
+    meta: MetaData,
 })
 
 export type UserListResType = z.TypeOf<typeof UserListRes>
