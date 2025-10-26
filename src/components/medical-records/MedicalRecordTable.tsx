@@ -27,6 +27,8 @@ export default function MedicalRecordTable({ medical_records, isLoading }: Medic
         return 'warning';
       case 'COMPLETED':
         return 'success';
+      case 'PAID':
+        return 'primary';
     }
   };
 
@@ -93,16 +95,16 @@ export default function MedicalRecordTable({ medical_records, isLoading }: Medic
                   </TableCell>
                   <TableCell className="px-5 py-4 text-start text-theme-xs text-gray-500 dark:text-gray-400">
                     <div className="flex gap-2">
-                      {/* <Button size="sm" onClick={() => alert('Chuyển trang chi tiết thông tin phiên khám')}>Xem</Button> */}
                       <Link href={`/medical-records/${medical_record.id}`}>
                         <Button size="sm">Xem</Button>
                       </Link>
-                      <Link href={`/invoices/preview/${medical_record.id}`}>
-                        <Button size="sm">Tạo hóa đơn</Button>
-                      </Link>
-                      {/* <Link href={`/medical_records/${medical_record.id}`}>
-                        <Button size="sm">Xem</Button>
-                      </Link>
+                      {medical_record.status === 'COMPLETED' && 
+                        <Link href={`/invoices/preview/${medical_record.id}`}>
+                          <Button size="sm">Tạo hóa đơn</Button>
+                        </Link>
+                      }
+                      
+                      {/* 
                       <Button size="sm" onClick={() => onEdit(medical_record.id)}>Sửa</Button>
                       <Button size="sm" variant="destructive" onClick={() => onDelete(medical_record.id)}>Xóa</Button> */}
                     </div>

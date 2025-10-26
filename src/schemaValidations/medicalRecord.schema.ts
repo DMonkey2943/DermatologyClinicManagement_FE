@@ -4,13 +4,14 @@ import { PatientFKData } from './patient.schema';
 
 export const MedicalRecordData = z.object({
     id: z.string(),
+    appointment_id: z.string(),
     patient_id: z.string(),
     patient: PatientFKData,
     doctor_id: z.string(),
     doctor: UserFKData,
     symptoms: z.string().nullable().optional(),
     diagnosis: z.string().nullable().optional(),
-    status: z.enum(["COMPLETED", "IN_PROGRESS"]),
+    status: z.enum(["COMPLETED", "IN_PROGRESS", "PAID"]),
     notes: z.string().nullable().optional(),
     created_at: z.string(),
 })
@@ -48,7 +49,7 @@ export type CreateMedicalRecordBodyType = z.TypeOf<typeof CreateMedicalRecordBod
 export const UpdateMedicalRecordBody = z.object({
     symptoms: z.string().optional(),
     diagnosis: z.string().optional(),
-    status: z.enum(["COMPLETED", "IN_PROGRESS"]).optional(),
+    status: z.enum(["COMPLETED", "IN_PROGRESS", "PAID"]).optional(),
     notes: z.string().nullable().optional(),
 })
 
