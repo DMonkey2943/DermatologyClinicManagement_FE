@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import PageBreadcrumb from '@/components/common/PageBreadCrumb';
 import ComponentCard from '@/components/common/ComponentCard';
 import UserTable from '@/components/users/UserTable';
@@ -9,6 +9,7 @@ import UserFormModal from '@/components/users/UserFormModal';
 import userApiRequest from '@/apiRequests/user';
 import { UserDataType } from '@/schemaValidations/user.schema';
 import { toast } from "sonner";
+import SearchInput from '@/components/ui/searchInput/SearchInput';
 
 export default function UserListPage() {
   const [users, setUsers] = useState<UserDataType[]>([]);
@@ -21,17 +22,34 @@ export default function UserListPage() {
   const [pageSize, setPageSize] = useState<number>(10);
   const [total, setTotal] = useState<number>(0);
 
+  // NEW: search states
+  const [searchQuery, setSearchQuery] = useState<string>('');
+  const [debouncedQuery, setDebouncedQuery] = useState<string>('');
+  const searchRef = useRef<HTMLInputElement | null>(null);
+
   // Tự động fetch khi page hoặc pageSize thay đổi
   useEffect(() => {
     fetchUsers();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [page, pageSize]);
+  }, [page, pageSize, debouncedQuery]);
+
+  // Debounce searchQuery -> debouncedQuery
+  useEffect(() => {
+    const t = setTimeout(() => {
+      setDebouncedQuery(searchQuery.trim());
+    }, 500);
+    return () => clearTimeout(t);
+  }, [searchQuery]);
 
   const fetchUsers = async () => {
     setIsLoading(true);
     try {
-      // Gọi API với skip & limit để phân trang
-      const { payload } = await userApiRequest.getList({ skip: page * pageSize, limit: pageSize });
+      // Gọi API với skip & limit để phân trang, thêm query q để tìm kiếm
+      const { payload } = await userApiRequest.getList({
+        skip: page * pageSize,
+        limit: pageSize,
+        q: debouncedQuery,
+      });
       const userList = payload.data ?? [];
       setUsers(userList);
 
@@ -108,6 +126,14 @@ export default function UserListPage() {
     setPage(0); // quay về trang đầu khi thay đổi pageSize
   };
 
+  // Clear search handler used by the inline "X" button
+  const clearSearch = () => {
+    setSearchQuery('');
+    setDebouncedQuery('');
+    setPage(0);
+    if (searchRef.current) searchRef.current.focus();
+  };
+
   return (
     <div>
       <UserFormModal
@@ -122,7 +148,25 @@ export default function UserListPage() {
       
       <div className="space-y-6">
         <ComponentCard title="Danh sách Users">
-          <Button onClick={openAddModal}>+ Thêm người dùng</Button>
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+            <div className="flex items-center gap-2">
+              <Button onClick={openAddModal}>+ Thêm người dùng</Button>
+            </div>
+
+            {/* Search placed to the right */}
+            <div className="flex items-center justify-end w-full md:w-auto">
+              <SearchInput
+                ref={searchRef}
+                value={searchQuery}
+                onChange={(e) => { setSearchQuery(e.target.value); setPage(0); }}
+                onClear={clearSearch}
+                placeholder="Tìm kiếm username, tên, SĐT..."
+                className="pl-9 pr-8"
+                ariaLabel="Search users"
+              />
+            </div>
+          </div>
+
           <UserTable 
             users={users} 
             onEdit={handleEdit} 
