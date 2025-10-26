@@ -61,6 +61,17 @@ export default function InvoiceDetailPreview({ params }: {
             const {payload} = await medicalRecordApiRequest.getDetail(medical_record_id);
             const data = payload.data;
             // console.log(data);
+
+            if(data.status === 'IN_PROGRESS') {
+                toast.error("Chỉ có thể tạo hóa đơn khi phiên khám đã hoàn thành!");
+                router.push('/medical-records');
+                return;
+            } else if(data.status === 'PAID') {
+                toast.error("Đã tồn tại hóa đơn cho phiên khám này!");
+                router.push('/invoices');
+                return;
+            }
+            
             setPatientId(data.patient_id);
             setDoctor(data.doctor);
         } catch(error) {
