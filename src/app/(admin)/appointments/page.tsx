@@ -56,6 +56,13 @@ export default function AppointmentListPage() {
     setModalType('edit');
   };
 
+  // NEW: update local appointments array when status changes
+  const handleStatusChange = (id: string, newStatus: string) => {
+    setAppointments(prev =>
+      prev.map(a => (a.id === id ? { ...a, status: newStatus } : a))
+    );
+  };
+
 //   const handleDelete = async (id: string) => {
 //     if (confirm('Bạn có chắc chắn xoá Appointment này?')) {
 //       try {
@@ -124,6 +131,7 @@ export default function AppointmentListPage() {
             total={total}
             onPageChange={handlePageChange}
             onPageSizeChange={handlePageSizeChange}
+            onStatusChange={handleStatusChange}
           />
         </ComponentCard>
       </div>
