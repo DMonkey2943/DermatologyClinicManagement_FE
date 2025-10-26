@@ -29,6 +29,7 @@ import { ServiceIndicationData } from '@/schemaValidations/serviceIndication.sch
 import { ServiceDataType } from '@/schemaValidations/service.schema';
 import serviceApiRequest from '@/apiRequests/service';
 import serviceIndicationApiRequest from '@/apiRequests/serviceIndication';
+import { toast } from 'sonner';
 
 interface ServiceIndicationFormProps {
   medicalRecordId: string;
@@ -136,8 +137,10 @@ export default function ServiceIndicationForm({medicalRecordId}: ServiceIndicati
       });
   
       console.log(payload.data);
+      toast.success("Chỉ định dịch vụ thành công");
     } catch (e) {
       console.error(e);
+      toast.error("Có lỗi xảy ra, vui lòng thử lại!");
     } finally {
       setIsSubmitting(false);
     }

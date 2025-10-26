@@ -7,6 +7,7 @@ import { Modal } from '@/components/ui/modal/index';
 import { ServiceDataType } from '@/schemaValidations/service.schema';
 import serviceApiRequest from '@/apiRequests/service';
 import { EntityError } from '@/lib/axios';
+import { toast } from "sonner";
 
 interface ServiceFormModalProps {
   isOpen: boolean;
@@ -82,6 +83,7 @@ export default function ServiceFormModal({
           description: formData.description,
         }
         await serviceApiRequest.update(editingService.id, updateData);
+        toast.success("Cập nhật dịch vụ thành công");
       } else if (modalType === 'add') {
         const newData = {
           name: formData.name,
@@ -89,6 +91,7 @@ export default function ServiceFormModal({
           description: formData.description,
         }
         await serviceApiRequest.create(newData);
+        toast.success("Thêm dịch vụ mới thành công");
       }
 
       // Thành công
@@ -103,11 +106,13 @@ export default function ServiceFormModal({
           validationErrors[field] = msg;
         });
         setErrors(validationErrors);
+        toast.error("Hãy kiểm tra lại dữ liệu trước khi Lưu!");
       } else {
         // Lỗi khác
         setErrors({ 
           _form: err.payload?.message || 'Có lỗi xảy ra, vui lòng thử lại' 
         });
+        toast.error("Có lỗi xảy ra, vui lòng thử lại!");
       }
     } finally {
       setIsSubmitting(false);

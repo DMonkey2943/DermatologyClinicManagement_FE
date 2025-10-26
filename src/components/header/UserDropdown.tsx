@@ -6,6 +6,7 @@ import { Dropdown } from "../ui/dropdown/Dropdown";
 import { DropdownItem } from "../ui/dropdown/DropdownItem";
 import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 
 export default function UserDropdown() {
   const { user, signout } = useAuth();
@@ -17,7 +18,9 @@ export default function UserDropdown() {
   const handleLogout = async () => {
     // console.log('Logging out user');
     await signout();  // Gọi logout từ context: xóa cookie, setUser(null), và redirect
+    toast.success("Đăng xuất thành công")
     router.push("/signin");
+    router.refresh();
   };
 
   function toggleDropdown(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) {

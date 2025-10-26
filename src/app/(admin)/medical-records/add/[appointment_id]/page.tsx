@@ -12,6 +12,7 @@ import appointmentApiRequest from '@/apiRequests/appointment';
 import ServiceIndicationForm from './_component/ServiceIndicationForm';
 import Button from '@/components/ui/button/Button';
 import medicalRecordApiRequest from '@/apiRequests/medicalRecord';
+import { toast } from 'sonner';
 
 export default function MedicalRecordCreate({ params }: {
   params: Promise<{ appointment_id: string }>
@@ -68,14 +69,17 @@ export default function MedicalRecordCreate({ params }: {
             if (medicalRecordId) {
                 const {payload} = await medicalRecordApiRequest.update(medicalRecordId, {status: "COMPLETED"});
                 console.log(payload.data);
+                toast.success("Hoàn thành phiên khám");
                 //Chuyển sang trang chi tiết phiên khám
                 router.push(`/medical-records/${medicalRecordId}`);
                 router.refresh();
             } else {
-                alert("Bạn chưa lưu phiên khám!!")
+                // alert("Bạn chưa lưu phiên khám!!");
+                toast.warning("Hãy lưu phiên khám!");
             }
         } catch (e) {
             console.error(e);
+            toast.error("Có lỗi xảy ra, vui lòng thử lại!");
         }
     }
     

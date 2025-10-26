@@ -9,6 +9,7 @@ import React, { useState } from "react";
 import { useAuth } from '@/context/AuthContext';
 import { EntityError, UnauthorizedError } from '@/lib/axios';
 import authApiRequest from "@/apiRequests/auth";
+import { toast } from "sonner";
 
 export default function SignInForm() {
   const [showPassword, setShowPassword] = useState(false);
@@ -38,6 +39,7 @@ export default function SignInForm() {
       const currentUser = res.payload.data.user;
       // console.log('Logged in user:', currentUser);
       setUser(currentUser); // Cập nhật user trong AuthContext
+      toast.success("Đăng nhập thành công");
       // Nếu login thành công
       if (currentUser.id) {
         router.push("/"); // Redirect về trang home
@@ -59,6 +61,7 @@ export default function SignInForm() {
       } else {
         console.error("Login failed", err);
         alert("Sai tài khoản hoặc mật khẩu!");
+        toast.error("Có lỗi xảy ra, vui lòng thử lại!");
       }
     } finally {
       setIsLoading(false);

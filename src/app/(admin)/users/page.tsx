@@ -8,6 +8,7 @@ import Button from '@/components/ui/button/Button';
 import UserFormModal from '@/components/users/UserFormModal';
 import userApiRequest from '@/apiRequests/user';
 import { UserDataType } from '@/schemaValidations/user.schema';
+import { toast } from "sonner";
 
 export default function UserListPage() {
   const [users, setUsers] = useState<UserDataType[]>([]);
@@ -22,7 +23,7 @@ export default function UserListPage() {
   const fetchUsers = async () => {
     setIsLoading(true);
     try {
-      const {payload} = await userApiRequest.getList();
+      const { payload } = await userApiRequest.getList();
       const userList = payload.data;
       console.log(userList);
       setUsers(userList);
@@ -44,9 +45,11 @@ export default function UserListPage() {
       setIsLoading(true);
       try {
         await userApiRequest.delete(id);
+        toast.success("Xóa tài khoản thành công");
         fetchUsers();
       } catch (error) {
         console.error('Lỗi xóa user: ', error);
+        toast.error("Có lỗi xảy ra, vui lòng thử lại!");
       } finally {
         setIsLoading(false);
       }
@@ -72,6 +75,10 @@ export default function UserListPage() {
     setModalType(null);
   };
 
+  // const handleToast = () => {
+  //   toast.error("Test toast");
+  // }
+
   return (
     <div>
       <UserFormModal
@@ -87,6 +94,7 @@ export default function UserListPage() {
       <div className="space-y-6">
         <ComponentCard title="Danh sách Users">
           <Button onClick={openAddModal}>+ Thêm người dùng</Button>
+          {/* <Button onClick={handleToast}>Toast</Button> */}
           <UserTable 
             users={users} 
             onEdit={handleEdit} 

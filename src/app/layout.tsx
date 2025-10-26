@@ -4,6 +4,7 @@ import './globals.css';
 import { SidebarProvider } from '@/context/SidebarContext';
 import { ThemeProvider } from '@/context/ThemeContext';
 import { AuthProvider } from '@/context/AuthContext';
+import { Toaster } from "@/components/ui/sonner"
 
 const montserrat = Montserrat({
   subsets: ['latin', 'latin-ext'],
@@ -21,6 +22,7 @@ export default function RootLayout({
         <ThemeProvider>
           <AuthProvider>
             <SidebarProvider>{children}</SidebarProvider>
+            <Toaster />
           </AuthProvider>
         </ThemeProvider>
       </body>

@@ -3,6 +3,7 @@ import Label from '@/components/form/Label';
 import Input from '@/components/form/input/InputField';
 import { Button } from '@/components/ui/button';
 import medicalRecordApiRequest from '@/apiRequests/medicalRecord';
+import { toast } from "sonner";
 
 interface MedicalRecordFormProps {
   appointmentId: string;
@@ -50,11 +51,13 @@ export default function MedicalRecordForm({
         notes: formData.notes,
         status: "IN_PROGRESS"
       };
-      const {payload} = await medicalRecordApiRequest.create(newData);
+      const { payload } = await medicalRecordApiRequest.create(newData);
+      toast.success("Tạo phiên khám mới thành công");
       const mr_id = payload.data.id;
       onSuccess(mr_id); // Truyền medical_record_id lên parent
     } catch (err: any) {
       console.error('Submit error:', err);
+      toast.error("Có lỗi xảy ra, vui lòng thử lại!");
     } finally {
       setIsSubmitting(false);
     }

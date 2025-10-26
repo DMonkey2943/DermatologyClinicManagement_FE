@@ -14,6 +14,7 @@ import { EntityError } from '@/lib/axios';
 import { DoctorDataType } from '@/schemaValidations/user.schema';
 import { PatientDataType } from '@/schemaValidations/patient.schema';
 import { useAuth } from '@/context/AuthContext';
+import { toast } from 'sonner';
 
 interface AppointmentFormModalProps {
   isOpen: boolean;
@@ -153,6 +154,7 @@ export default function AppointmentFormModal({
           status: formData.status!,
         }
         await appointmentApiRequest.update(editingAppointment.id, updateData);
+        toast.success("Cập nhật lịch hẹn thành công");
       } else if (modalType === 'add') {
         const newData = {
           patient_id: formData.patient_id,
@@ -164,6 +166,7 @@ export default function AppointmentFormModal({
           status: formData.status || 'SCHEDULED',
         }
         await appointmentApiRequest.create(newData);
+        toast.success("Thêm lịch hẹn mới thành công");
       }
 
       // Thành công
@@ -178,11 +181,13 @@ export default function AppointmentFormModal({
           validationErrors[field] = msg;
         });
         setErrors(validationErrors);
+        toast.error("Hãy kiểm tra lại dữ liệu trước khi Lưu!");
       } else {
         // Lỗi khác
         setErrors({ 
           _form: err.payload?.message || 'Có lỗi xảy ra, vui lòng thử lại' 
         });
+        toast.error("Có lỗi xảy ra, vui lòng thử lại!");
       }
     } finally {
       setIsSubmitting(false);

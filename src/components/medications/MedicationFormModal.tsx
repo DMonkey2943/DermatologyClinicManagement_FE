@@ -6,6 +6,7 @@ import { Modal } from '@/components/ui/modal/index';
 import { MedicationDataType } from '@/schemaValidations/medication.schema';
 import medicationApiRequest from '@/apiRequests/medication';
 import { EntityError } from '@/lib/axios';
+import { toast } from "sonner";
 
 interface MedicationFormModalProps {
   isOpen: boolean;
@@ -79,16 +80,6 @@ export default function MedicationFormModal({
     }));
   };
 
-  // const validateForm = (): boolean => {
-  //   const { name, dosage_form, price, stock_quantity } = formData;
-    
-  //   if (modalType === 'add') {
-  //     return !!(name && dosage_form && price && stock_quantity);
-  //   } else {
-  //     return !!(name && dosage_form && price && stock_quantity);
-  //   }
-  // };
-
   const handleSubmit = async () => {
     setErrors({});
     setIsSubmitting(true);
@@ -103,6 +94,7 @@ export default function MedicationFormModal({
           description: formData.description,
         }
         await medicationApiRequest.update(editingMedication.id, updateData);
+        toast.success("Cập nhật thuốc thành công");
       } else if (modalType === 'add') {
         const newData = {
           name: formData.name,
@@ -112,6 +104,7 @@ export default function MedicationFormModal({
           description: formData.description,
         }
         await medicationApiRequest.create(newData);
+        toast.success("Thêm thuốc mới thành công");
       }
 
       // Thành công
@@ -126,11 +119,13 @@ export default function MedicationFormModal({
           validationErrors[field] = msg;
         });
         setErrors(validationErrors);
+        toast.error("Hãy kiểm tra lại dữ liệu trước khi Lưu!");
       } else {
         // Lỗi khác
         setErrors({ 
           _form: err.payload?.message || 'Có lỗi xảy ra, vui lòng thử lại' 
         });
+        toast.error("Có lỗi xảy ra, vui lòng thử lại!");
       }
     } finally {
       setIsSubmitting(false);

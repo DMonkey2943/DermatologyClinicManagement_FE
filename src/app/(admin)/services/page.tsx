@@ -8,6 +8,7 @@ import ServiceTable from '@/components/services/ServiceTable';
 import ServiceFormModal from '@/components/services/ServiceFormModal';
 import { ServiceDataType } from '@/schemaValidations/service.schema';
 import serviceApiRequest from '@/apiRequests/service';
+import { toast } from "sonner";
 
 export default function ServiceListPage() {
     const [services, setServices] = useState<ServiceDataType[]>([]);
@@ -43,9 +44,11 @@ export default function ServiceListPage() {
         if (confirm('Bạn có chắc chắn xoá dịch vụ này?')) {
           try {
             await serviceApiRequest.delete(id);
+            toast.success("Xóa dịch vụ thành công");
             fetchServices();
           } catch (error) {
             console.error('Lỗi xóa Service: ', error);
+            toast.error("Có lỗi xảy ra, vui lòng thử lại!");
           }
         }
     };

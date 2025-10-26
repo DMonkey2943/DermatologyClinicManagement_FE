@@ -28,6 +28,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { MedicationDataType } from '@/schemaValidations/medication.schema';
 import medicationApiRequest from '@/apiRequests/medication';
 import prescriptionApiRequest from '@/apiRequests/prescription';
+import { toast } from 'sonner';
 
 // Dữ liệu mẫu danh sách thuốc
 // const medicineList = [
@@ -155,11 +156,12 @@ export default function PrescriptionForm({medicalRecordId}: PrescriptionFormProp
         medical_record_id: medicalRecordId,
         notes: '',
         prescription_details: prescription_details
-      });
-  
+      });  
       console.log(payload.data);
+      toast.success("Kê đơn thuốc thành công");
     } catch (e) {
       console.error(e);
+      toast.error("Có lỗi xảy ra, vui lòng thử lại!");
     } finally {      
       setIsSubmitting(false);
     }

@@ -6,6 +6,7 @@ import { Modal } from '@/components/ui/modal/index';
 import { UserDataType } from '@/schemaValidations/user.schema';
 import userApiRequest from '@/apiRequests/user';
 import { EntityError } from '@/lib/axios';
+import { toast } from "sonner";
 
 interface UserFormModalProps {
   isOpen: boolean;
@@ -91,6 +92,7 @@ export default function UserFormModal({
           phone_number: formData.phone_number,
         };
         await userApiRequest.update(editingUser.id, updateData);
+        toast.success("Cập nhật tài khoản thành công");
       } else if(modalType === 'add') {
         // Thêm mới user - bắt buộc phải có password
         await userApiRequest.create({
@@ -100,7 +102,8 @@ export default function UserFormModal({
           phone_number: formData.phone_number,
           password: formData.password,
           role: "STAFF",
-        });
+        });        
+        toast.success("Thêm tài khoản mới thành công");
       }
 
       // Thành công
@@ -116,11 +119,13 @@ export default function UserFormModal({
           validationErrors[field] = msg;
         });
         setErrors(validationErrors);
+        toast.error("Hãy kiểm tra lại dữ liệu trước khi Lưu!");
       } else {
         // Lỗi khác
         setErrors({ 
           _form: err.payload?.message || 'Có lỗi xảy ra, vui lòng thử lại' 
         });
+        toast.error("Có lỗi xảy ra, vui lòng thử lại!");
       }
     } finally {
       setIsSubmitting(false);

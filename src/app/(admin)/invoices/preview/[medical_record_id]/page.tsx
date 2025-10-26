@@ -15,6 +15,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import InvoiceDetailTable from './_component/InvoiceDetailTable';
 import invoiceApiRequest from '@/apiRequests/invoice';
 import { useAuth } from "@/context/AuthContext";
+import { toast } from 'sonner';
 
 interface InvoiceDetailDataType {
     serviceSubtotal: number;
@@ -131,10 +132,12 @@ export default function InvoiceDetailPreview({ params }: {
 
             console.log(newInvoice);
             await invoiceApiRequest.create(newInvoice);
+            toast.success("Tạo hóa đơn thanh toán thành công");
             router.push(`/invoices`);
             router.refresh();
         } catch (err) {
             console.log("Error submitting invoice: ", err);
+            toast.error("Có lỗi xảy ra, vui lòng thử lại!");
         }
     }
 

@@ -8,6 +8,7 @@ import MedicationTable from '@/components/medications/MedicationTable';
 import MedicationFormModal from '@/components/medications/MedicationFormModal';
 import medicationApiRequest from '@/apiRequests/medication';
 import { MedicationDataType } from '@/schemaValidations/medication.schema';
+import { toast } from "sonner";
 
 export default function MedicationListPage() {
   const [medications, setMedications] = useState<MedicationDataType[]>([]);
@@ -43,9 +44,11 @@ export default function MedicationListPage() {
       setIsLoading(true);
       try {
         await medicationApiRequest.delete(id);
+        toast.success("Xóa thuốc thành công");
         fetchMedications();
       } catch (error) {
         console.error('Lỗi xóa Medication: ', error);
+        toast.error("Có lỗi xảy ra, vui lòng thử lại!");
       } finally {
         setIsLoading(false);
       }

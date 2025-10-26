@@ -8,6 +8,7 @@ import { Modal } from '@/components/ui/modal/index';
 import { PatientFullDataType } from '@/schemaValidations/patient.schema';
 import patientApiRequest from '@/apiRequests/patient';
 import { EntityError } from '@/lib/axios';
+import { toast } from "sonner";
 
 interface PatientFormModalProps {
   isOpen: boolean;
@@ -111,6 +112,7 @@ export default function PatientFormModal({
           allergies: formData.allergies,
         };
         await patientApiRequest.update(editingPatient.id, updateData);
+        toast.success("Cập nhật bệnh nhân thành công");
       } else if(modalType === 'add') {
         const newData = {
           full_name: formData.full_name,
@@ -123,6 +125,7 @@ export default function PatientFormModal({
           allergies: formData.allergies,
         };
         await patientApiRequest.create(newData);
+        toast.success("Thêm bệnh nhân mới thành công");
       }
 
       // Thành công
@@ -138,11 +141,13 @@ export default function PatientFormModal({
           validationErrors[field] = msg;
         });
         setErrors(validationErrors);
+        toast.error("Hãy kiểm tra lại dữ liệu trước khi Lưu!");
       } else {
         // Lỗi khác
         setErrors({ 
           _form: err.payload?.message || 'Có lỗi xảy ra, vui lòng thử lại' 
         });
+        toast.error("Có lỗi xảy ra, vui lòng thử lại!");
       }
     } finally {
       setIsSubmitting(false);
