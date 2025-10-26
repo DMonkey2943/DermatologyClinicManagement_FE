@@ -5,7 +5,7 @@ const prefix = 'services';
 
 const serviceApiRequest = {
     getList: (
-        params: { skip?: number; limit?: number } = { skip: 0, limit: 100 }
+        params: { skip?: number; limit?: number; q?: string } = { skip: 0, limit: 100, q: '' }
     ) => http.get<ServiceListResType>(`/${prefix}/`, { params }),
 
     create: (body: CreateServiceBodyType) => http.post<ServiceDataType>(`/${prefix}/`, body),

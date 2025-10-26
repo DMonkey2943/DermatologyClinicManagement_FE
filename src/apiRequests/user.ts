@@ -3,7 +3,7 @@ import { UserListResType, CreateUserBodyType, UpdateUserBodyType, UserDataType, 
 
 const userApiRequest = {
     getList: (
-        params: { skip?: number; limit?: number } = { skip: 0, limit: 100 }
+        params: { skip?: number; limit?: number; q?: string } = { skip: 0, limit: 100, q: '' }
     ) => http.get<UserListResType>('/users/', { params }),
 
     create: (body: CreateUserBodyType) => http.post<UserDataType>("/users/", body),

@@ -5,7 +5,7 @@ const prefix = 'patients';
 
 const patientApiRequest = {
     getList: (
-        params: { skip?: number; limit?: number } = { skip: 0, limit: 100 }
+        params: { skip?: number; limit?: number; q?: string } = { skip: 0, limit: 100, q: '' }
     ) => http.get<PatientListResType>(`/${prefix}/`, { params }),
 
     getDetail: (id: string) => http.get<PatientResType>(`/${prefix}/${id}`),

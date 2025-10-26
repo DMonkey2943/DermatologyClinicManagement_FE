@@ -5,7 +5,7 @@ const prefix = 'medications';
 
 const medicationApiRequest = {
     getList: (
-        params: { skip?: number; limit?: number } = { skip: 0, limit: 100 }
+        params: { skip?: number; limit?: number; q?: string } = { skip: 0, limit: 100, q: '' }
     ) => http.get<MedicationListResType>(`/${prefix}/`, { params }),
 
     create: (body: CreateMedicationBodyType) => http.post<MedicationDataType>(`/${prefix}/`, body),
