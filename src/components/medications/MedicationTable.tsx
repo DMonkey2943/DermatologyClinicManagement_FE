@@ -12,15 +12,23 @@ import {
 import Button from '@/components/ui/button/Button';
 import { MedicationDataType } from '@/schemaValidations/medication.schema';
 import CenteredSpinner from '../ui/spinner/CenteredSpinner';
+import PaginationControls from '../ui/pagination/PaginationControls';
 
 interface MedicationTableProps {
   medications: MedicationDataType[];
   onEdit: (medication: MedicationDataType) => void;
   onDelete: (id: string) => void;
   isLoading: boolean;
+
+  // Props phân trang mới
+  page?: number; // zero-based
+  pageSize?: number;
+  total?: number;
+  onPageChange: (newPage: number) => void;
+  onPageSizeChange?: (newSize: number) => void;
 }
 
-export default function MedicationTable({ medications, onEdit, onDelete, isLoading }: MedicationTableProps) {
+export default function MedicationTable({ medications, onEdit, onDelete, isLoading, page=0, pageSize=10, total=0, onPageChange, onPageSizeChange }: MedicationTableProps) {
   return (
     isLoading
       ?
@@ -93,7 +101,14 @@ export default function MedicationTable({ medications, onEdit, onDelete, isLoadi
             </TableBody>
           </Table>
         </div>
-      </div>
+        </div>
+        <PaginationControls
+          page={page}
+          pageSize={pageSize}
+          total={total}
+          onPageChange={onPageChange}
+          onPageSizeChange={onPageSizeChange}
+        />
     </div>
   );
 }

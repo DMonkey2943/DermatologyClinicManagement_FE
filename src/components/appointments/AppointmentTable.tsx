@@ -13,15 +13,23 @@ import Button from '@/components/ui/button/Button';
 import Link from 'next/link';
 import { AppointmentDataType } from '@/schemaValidations/appointment.schema';
 import CenteredSpinner from '../ui/spinner/CenteredSpinner';
+import PaginationControls from '../ui/pagination/PaginationControls';
 
 interface AppointmentTableProps {
   appointments: AppointmentDataType[];
   onEdit: (appointment: AppointmentDataType) => void;
   // onDelete: (id: string) => void;
   isLoading: boolean;
+
+  // Props phân trang mới
+  page?: number; // zero-based
+  pageSize?: number;
+  total?: number;
+  onPageChange: (newPage: number) => void;
+  onPageSizeChange?: (newSize: number) => void;
 }
 
-export default function AppointmentTable({ appointments, onEdit, isLoading }: AppointmentTableProps) {
+export default function AppointmentTable({ appointments, onEdit, isLoading, page=0, pageSize=10, total=0, onPageChange, onPageSizeChange }: AppointmentTableProps) {
   // Define badge color mapping based on status
   const getStatusColor = (status: string|null) => {
     switch (status) {
@@ -125,6 +133,13 @@ export default function AppointmentTable({ appointments, onEdit, isLoading }: Ap
           </Table>
         </div>
       </div>
+      <PaginationControls
+        page={page}
+        pageSize={pageSize}
+        total={total}
+        onPageChange={onPageChange}
+        onPageSizeChange={onPageSizeChange}
+      />
     </div>
   );
 }

@@ -15,18 +15,33 @@ export default function MedicationListPage() {
   const [editingMedication, setEditingMedication] = useState<MedicationDataType | null>(null);
   const [modalType, setModalType] = useState<'add' | 'edit' | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  
+  // Thêm state phân trang
+  const [page, setPage] = useState<number>(0); // zero-based
+  const [pageSize, setPageSize] = useState<number>(10);
+  const [total, setTotal] = useState<number>(0);
 
   useEffect(() => {
     fetchMedications();
-  }, []);
+  }, [page, pageSize]);
 
   const fetchMedications = async () => {
     setIsLoading(true);
     try {
-      const { payload } = await medicationApiRequest.getList();
-      const medicationList = payload.data
+      const { payload } = await medicationApiRequest.getList({ skip: page * pageSize, limit: pageSize });
+      const medicationList = payload.data ?? [];
       console.log(medicationList);
       setMedications(medicationList);
+
+      // Cố gắng lấy tổng số bản ghi từ response (hỗ trợ các key phổ biến)
+      const totalFromPayload = payload.meta?.total;
+      setTotal(Number(totalFromPayload) || medicationList.length);
+
+      // Nếu trang hiện tại vượt quá tổng trang sau khi cập nhật total => đưa về trang cuối cùng hợp lệ
+      const totalPages = Math.max(1, Math.ceil(Number(totalFromPayload || medicationList.length) / pageSize));
+      if (page > totalPages - 1) {
+        setPage(totalPages - 1);
+      }
     } catch (error) {
       console.error('Lỗi lấy danh sách Medications:', error);
     } finally {
@@ -68,11 +83,23 @@ export default function MedicationListPage() {
   const openAddModal = () => {
     setEditingMedication(null);
     setModalType('add');
+    // Khi tạo mới, thường muốn về trang đầu để thấy item mới (tuỳ yêu cầu)
+    setPage(0);
   };
 
   const closeModal = () => {
     setEditingMedication(null);
     setModalType(null);
+  };
+
+  // Handlers phân trang được truyền xuống UserTable
+  const handlePageChange = (newPage: number) => {
+    setPage(newPage);
+  };
+
+  const handlePageSizeChange = (newSize: number) => {
+    setPageSize(newSize);
+    setPage(0); // quay về trang đầu khi thay đổi pageSize
   };
 
   return (
@@ -96,6 +123,12 @@ export default function MedicationListPage() {
             onEdit={handleEdit} 
             onDelete={handleDelete} 
             isLoading={isLoading}
+            // Truyền props phân trang vào UserTable
+            page={page}
+            pageSize={pageSize}
+            total={total}
+            onPageChange={handlePageChange}
+            onPageSizeChange={handlePageSizeChange}
           />
         </ComponentCard>
       </div>

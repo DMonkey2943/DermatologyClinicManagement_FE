@@ -16,21 +16,44 @@ export default function UserListPage() {
   const [modalType, setModalType] = useState<'add' | 'edit' | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
+  // Thêm state phân trang
+  const [page, setPage] = useState<number>(0); // zero-based
+  const [pageSize, setPageSize] = useState<number>(10);
+  const [total, setTotal] = useState<number>(0);
+
+  // Tự động fetch khi page hoặc pageSize thay đổi
   useEffect(() => {
     fetchUsers();
-  }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [page, pageSize]);
 
   const fetchUsers = async () => {
     setIsLoading(true);
     try {
-      const { payload } = await userApiRequest.getList();
-      const userList = payload.data;
-      console.log(userList);
+      // Gọi API với skip & limit để phân trang
+      const { payload } = await userApiRequest.getList({ skip: page * pageSize, limit: pageSize });
+      const userList = payload.data ?? [];
       setUsers(userList);
+
+      // Cố gắng lấy tổng số bản ghi từ response (hỗ trợ các key phổ biến)
+      const totalFromPayload =
+        payload.meta?.total ??
+        // payload.total ??
+        // payload.count ??
+        // payload.pagination?.total ??
+        userList.length;
+
+      setTotal(Number(totalFromPayload) || userList.length);
+
+      // Nếu trang hiện tại vượt quá tổng trang sau khi cập nhật total => đưa về trang cuối cùng hợp lệ
+      const totalPages = Math.max(1, Math.ceil(Number(totalFromPayload || userList.length) / pageSize));
+      if (page > totalPages - 1) {
+        setPage(totalPages - 1);
+      }
     } catch (error) {
       console.error('Lỗi lấy danh sách users:', error);
-    }
-    finally {
+      toast.error("Lỗi khi tải danh sách người dùng");
+    } finally {
       setIsLoading(false);
     }
   };
@@ -46,6 +69,7 @@ export default function UserListPage() {
       try {
         await userApiRequest.delete(id);
         toast.success("Xóa tài khoản thành công");
+        // Giữ nguyên page hiện tại và refetch
         fetchUsers();
       } catch (error) {
         console.error('Lỗi xóa user: ', error);
@@ -57,10 +81,7 @@ export default function UserListPage() {
   };
 
   const handleFormSubmit = async () => {
-    // Form đã submit thành công
-    // toast.success(editingUser ? 'Cập nhật user thành công' : 'Thêm user thành công');
-    
-    // Đóng modal và refresh
+    // Đóng modal và refresh (giữ page)
     closeModal();
     await fetchUsers(); // Refresh the list
   };
@@ -68,6 +89,8 @@ export default function UserListPage() {
   const openAddModal = () => {
     setEditingUser(null);
     setModalType('add');
+    // Khi tạo mới, thường muốn về trang đầu để thấy item mới (tuỳ yêu cầu)
+    setPage(0);
   };
 
   const closeModal = () => {
@@ -75,9 +98,15 @@ export default function UserListPage() {
     setModalType(null);
   };
 
-  // const handleToast = () => {
-  //   toast.error("Test toast");
-  // }
+  // Handlers phân trang được truyền xuống UserTable
+  const handlePageChange = (newPage: number) => {
+    setPage(newPage);
+  };
+
+  const handlePageSizeChange = (newSize: number) => {
+    setPageSize(newSize);
+    setPage(0); // quay về trang đầu khi thay đổi pageSize
+  };
 
   return (
     <div>
@@ -94,12 +123,17 @@ export default function UserListPage() {
       <div className="space-y-6">
         <ComponentCard title="Danh sách Users">
           <Button onClick={openAddModal}>+ Thêm người dùng</Button>
-          {/* <Button onClick={handleToast}>Toast</Button> */}
           <UserTable 
             users={users} 
             onEdit={handleEdit} 
             onDelete={handleDelete} 
             isLoading={isLoading}
+            // Truyền props phân trang vào UserTable
+            page={page}
+            pageSize={pageSize}
+            total={total}
+            onPageChange={handlePageChange}
+            onPageSizeChange={handlePageSizeChange}
           />
         </ComponentCard>
       </div>

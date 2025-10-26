@@ -14,13 +14,21 @@ import Link from 'next/link';
 import { MedicalRecordDataType } from '@/schemaValidations/medicalRecord.schema';
 import { formatDateTime } from '@/lib/utils';
 import CenteredSpinner from '../ui/spinner/CenteredSpinner';
+import PaginationControls from '../ui/pagination/PaginationControls';
 
 interface MedicalRecordTableProps {
   medical_records: MedicalRecordDataType[];
   isLoading: boolean;
+
+  // Props phân trang mới
+  page?: number; // zero-based
+  pageSize?: number;
+  total?: number;
+  onPageChange: (newPage: number) => void;
+  onPageSizeChange?: (newSize: number) => void;
 }
 
-export default function MedicalRecordTable({ medical_records, isLoading }: MedicalRecordTableProps) {
+export default function MedicalRecordTable({ medical_records, isLoading, page=0, pageSize=10, total=0, onPageChange, onPageSizeChange }: MedicalRecordTableProps) {
   const getStatusColor = (status: string|null) => {
     switch (status) {
       case 'IN_PROGRESS':
@@ -115,6 +123,13 @@ export default function MedicalRecordTable({ medical_records, isLoading }: Medic
           </Table>
         </div>
       </div>
+        <PaginationControls
+          page={page}
+          pageSize={pageSize}
+          total={total}
+          onPageChange={onPageChange}
+          onPageSizeChange={onPageSizeChange}
+        />
     </div>
   );
 }

@@ -12,15 +12,23 @@ import {
 import Button from '@/components/ui/button/Button';
 import { ServiceDataType } from '@/schemaValidations/service.schema';
 import CenteredSpinner from '../ui/spinner/CenteredSpinner';
+import PaginationControls from '../ui/pagination/PaginationControls';
 
 interface ServiceTableProps {
   services: ServiceDataType[];
   onEdit: (service: ServiceDataType) => void;
   onDelete: (id: string) => void;
   isLoading: boolean;
+
+  // Props phân trang mới
+  page?: number; // zero-based
+  pageSize?: number;
+  total?: number;
+  onPageChange: (newPage: number) => void;
+  onPageSizeChange?: (newSize: number) => void;
 }
 
-export default function ServiceTable({ services, onEdit, onDelete, isLoading }: ServiceTableProps) {
+export default function ServiceTable({ services, onEdit, onDelete, isLoading, page=0, pageSize=10, total=0, onPageChange, onPageSizeChange }: ServiceTableProps) {
   return (
     isLoading
       ?
@@ -76,6 +84,13 @@ export default function ServiceTable({ services, onEdit, onDelete, isLoading }: 
           </Table>
         </div>
       </div>
+      <PaginationControls
+        page={page}
+        pageSize={pageSize}
+        total={total}
+        onPageChange={onPageChange}
+        onPageSizeChange={onPageSizeChange}
+      />
     </div>
   );
 }

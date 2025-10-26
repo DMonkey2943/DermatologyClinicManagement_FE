@@ -14,13 +14,21 @@ import Link from 'next/link';
 import { formatCurrency, formatDateTime } from '@/lib/utils';
 import { InvoiceDataType } from '@/schemaValidations/invoice.schema';
 import CenteredSpinner from '../ui/spinner/CenteredSpinner';
+import PaginationControls from '../ui/pagination/PaginationControls';
 
 interface InvoiceTableProps {
   invoices: InvoiceDataType[];
   isLoading: boolean;
+
+  // Props phân trang mới
+  page?: number; // zero-based
+  pageSize?: number;
+  total?: number;
+  onPageChange: (newPage: number) => void;
+  onPageSizeChange?: (newSize: number) => void;
 }
 
-export default function InvoiceTable({ invoices, isLoading }: InvoiceTableProps) {
+export default function InvoiceTable({ invoices, isLoading, page=0, pageSize=10, total=0, onPageChange, onPageSizeChange }: InvoiceTableProps) {
   return (
     isLoading
       ?
@@ -95,6 +103,13 @@ export default function InvoiceTable({ invoices, isLoading }: InvoiceTableProps)
           </Table>
         </div>
       </div>
+      <PaginationControls
+        page={page}
+        pageSize={pageSize}
+        total={total}
+        onPageChange={onPageChange}
+        onPageSizeChange={onPageSizeChange}
+      />
     </div>
   );
 }

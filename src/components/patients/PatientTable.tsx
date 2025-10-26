@@ -13,15 +13,33 @@ import Button from '@/components/ui/button/Button';
 import Link from 'next/link'
 import { PatientDataType } from '@/schemaValidations/patient.schema';
 import CenteredSpinner from '../ui/spinner/CenteredSpinner';
+import PaginationControls from '../ui/pagination/PaginationControls';
 
 interface PatientTableProps {
   patients: PatientDataType[];
   onEdit: (id: string) => void;
   onDelete: (id: string) => void;
   isLoading: boolean;
+
+  // Props phân trang mới
+  page?: number; // zero-based
+  pageSize?: number;
+  total?: number;
+  onPageChange: (newPage: number) => void;
+  onPageSizeChange?: (newSize: number) => void;
 }
 
-export default function PatientTable({ patients, onEdit, onDelete, isLoading }: PatientTableProps) {
+export default function PatientTable({
+  patients,
+  onEdit,
+  onDelete,
+  isLoading,
+  page = 0,
+  pageSize = 10,
+  total = 0,
+  onPageChange,
+  onPageSizeChange,
+}: PatientTableProps) {
   return (
     isLoading
     ?
@@ -35,19 +53,19 @@ export default function PatientTable({ patients, onEdit, onDelete, isLoading }: 
             <TableHeader className="border-b border-gray-100 dark:border-white/[0.05]">
               <TableRow>
                 <TableCell
-                  isHeader
+                  // isHeader
                   className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
                 >
                   Tên
                 </TableCell>
                 <TableCell
-                  isHeader
+                  // isHeader
                   className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
                 >
                   SĐT
                 </TableCell>
                 <TableCell
-                  isHeader
+                  // isHeader
                   className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
                 >
                   Tùy chọn
@@ -80,7 +98,14 @@ export default function PatientTable({ patients, onEdit, onDelete, isLoading }: 
             </TableBody>
           </Table>
         </div>
-      </div>
+        </div>
+        <PaginationControls
+          page={page}
+          pageSize={pageSize}
+          total={total}
+          onPageChange={onPageChange}
+          onPageSizeChange={onPageSizeChange}
+        />
     </div>
   );
 }

@@ -12,15 +12,34 @@ import Badge from '@/components/ui/badge/Badge';
 import Button from '@/components/ui/button/Button';
 import { UserDataType } from '@/schemaValidations/user.schema';
 import CenteredSpinner from '../ui/spinner/CenteredSpinner';
+import PaginationControls from '../ui/pagination/PaginationControls';
 
 interface UserTableProps {
   users: UserDataType[];
   onEdit: (user: UserDataType) => void;
   onDelete: (id: string) => void;
   isLoading: boolean;
+
+  // Props phân trang mới
+  page?: number; // zero-based
+  pageSize?: number;
+  total?: number;
+  onPageChange: (newPage: number) => void;
+  onPageSizeChange?: (newSize: number) => void;
 }
 
-export default function UserTable({ users, onEdit, onDelete, isLoading }: UserTableProps) {
+export default function UserTable({
+  users,
+  onEdit,
+  onDelete,
+  isLoading,
+  page = 0,
+  pageSize = 10,
+  total = 0,
+  onPageChange,
+  onPageSizeChange,
+}: UserTableProps) {
+
   return (
     isLoading
       ?
@@ -34,37 +53,37 @@ export default function UserTable({ users, onEdit, onDelete, isLoading }: UserTa
             <TableHeader className="border-b border-gray-100 dark:border-white/[0.05]">
               <TableRow>
                 <TableCell
-                  isHeader
+                  // isHeader
                   className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
                 >
                   Username
                 </TableCell>
                 <TableCell
-                  isHeader
+                  // isHeader
                   className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
                 >
                   Họ tên
                 </TableCell>
                 <TableCell
-                  isHeader
+                  // isHeader
                   className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
                 >
                   Email
                 </TableCell>
                 <TableCell
-                  isHeader
+                  // isHeader
                   className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
                 >
                   SĐT
                 </TableCell>
                 <TableCell
-                  isHeader
+                  // isHeader
                   className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
                 >
                   Vai trò
                 </TableCell>
                 <TableCell
-                  isHeader
+                  // isHeader
                   className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
                 >
                   Tùy chọn
@@ -103,6 +122,13 @@ export default function UserTable({ users, onEdit, onDelete, isLoading }: UserTa
           </Table>
         </div>
       </div>
+      <PaginationControls
+        page={page}
+        pageSize={pageSize}
+        total={total}
+        onPageChange={onPageChange}
+        onPageSizeChange={onPageSizeChange}
+      />
     </div>
   );
 }
