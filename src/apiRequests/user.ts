@@ -1,5 +1,5 @@
 import http from "@/lib/axios"
-import { UserListResType, CreateUserBodyType, UpdateUserBodyType, UserDataType, DoctorListResType } from "@/schemaValidations/user.schema";
+import { UserListResType, CreateUserBodyType, UpdateUserBodyType, UserDataType, DoctorListResType, createUserSchemaType } from "@/schemaValidations/user.schema";
 
 const userApiRequest = {
     getList: (
@@ -7,6 +7,8 @@ const userApiRequest = {
     ) => http.get<UserListResType>('/users/', { params }),
 
     create: (body: CreateUserBodyType) => http.post<UserDataType>("/users/", body),
+    
+    createWithRHF: (body: CreateUserBodyType) => http.post<UserDataType>("/users/", body),
 
     update: (id: string, body: UpdateUserBodyType) => http.put<UserDataType>(`/users/${id}`, body),
 

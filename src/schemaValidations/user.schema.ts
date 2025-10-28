@@ -1,4 +1,3 @@
-import page from '@/app/(admin)/(others-pages)/calendar/page';
 import z from 'zod';
 
 export const MetaData = z.object({
@@ -97,3 +96,42 @@ export const DoctorListRes = z.object({
 })
 
 export type DoctorListResType = z.TypeOf<typeof DoctorListRes>
+
+
+
+// ------------------------------
+// Regex số điện thoại Việt Nam
+const PHONE_REGEX = /^(032|033|034|035|036|037|038|039|096|097|098|086|083|084|085|081|082|088|091|094|070|079|077|076|078|090|093|089|056|058|092|059|099)[0-9]{7}$/;
+const today = new Date();
+today.setHours(0, 0, 0, 0);
+export const createUserSchema = z.object({
+    full_name: z.string().min(4, "Họ tên phải ít nhất 4 ký tự").max(50, "Họ tên không quá 50 ký tự"),
+    email: z.string().email("Email không hợp lệ"),
+    phone_number: z.string().regex(PHONE_REGEX, "Số điện thoại không hợp lệ"),
+    dob: z.string().refine((val) => {
+        const date = new Date(val);
+        return !isNaN(date.getTime());
+    }, "Ngày sinh không hợp lệ")
+        .refine((val) => {
+            const date = new Date(val);
+            return date <= today;
+        }, "Ngày sinh không được lớn hơn hôm nay")
+        .refine((val) => {
+            const birthDate = new Date(val);
+            let age = today.getFullYear() - birthDate.getFullYear();
+            const m = today.getMonth() - birthDate.getMonth();
+            if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+                age--;
+            }
+            return age >= 18;
+        }, "Tuổi phải lớn hơn hoặc bằng 18"),
+    gender: z.enum(["MALE", "FEMALE"], {
+        required_error: "Giới tính là bắt buộc",
+    }),
+    role: z.enum(["ADMIN", "STAFF", "DOCTOR"], {
+        required_error: "Vai trò là bắt buộc",
+    }),
+    username: z.string().min(4, "Tên đăng nhập phải ít nhất 4 ký tự").max(50, "Tên đăng nhập không quá 50 ký tự"),
+    password: z.string().min(8, "Mật khẩu phải ít nhất 8 ký tự").max(50, "Mật khẩu không quá 50 ký tự"),
+});
+export type createUserSchemaType = z.TypeOf<typeof createUserSchema>
