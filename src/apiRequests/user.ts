@@ -8,7 +8,9 @@ const userApiRequest = {
 
     create: (body: CreateUserBodyType) => http.post<UserDataType>("/users/", body),
     
-    createWithRHF: (body: CreateUserBodyType) => http.post<UserDataType>("/users/", body),
+    createWithRHF: (body: createUserSchemaType) => http.post<UserDataType>("/users/", body),
+
+    createWithAvatar: (formData: FormData) => http.post<UserDataType>("/users/avatar", formData),
 
     update: (id: string, body: UpdateUserBodyType) => http.put<UserDataType>(`/users/${id}`, body),
 

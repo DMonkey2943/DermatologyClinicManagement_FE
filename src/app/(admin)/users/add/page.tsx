@@ -35,13 +35,18 @@ import {
 } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
 import { cn } from "@/lib/utils";
-import { CalendarIcon } from "lucide-react";
+import { CalendarIcon, Upload, X } from "lucide-react";
 import userApiRequest from "@/apiRequests/user";
 import { toast } from "sonner";
 import { EntityError, HttpError } from "@/lib/axios";
 import { useRouter } from 'next/navigation';
+import { useRef, useState } from "react";
 
 export default function CreateUserPage() {
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [avatarFile, setAvatarFile] = useState<File | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
   const form = useForm<createUserSchemaType>({
     resolver: zodResolver(createUserSchema),
     defaultValues: {
@@ -55,12 +60,59 @@ export default function CreateUserPage() {
     },
   });
     
-const router = useRouter();
+  const router = useRouter();
+  
+  // Xử lý chọn file
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Validate loại file
+    if (!file.type.startsWith("image/")) {
+      toast.error("Vui lòng chọn file ảnh");
+      return;
+    }
+
+    // Validate dung lượng < 5MB
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error("Ảnh đại diện không được vượt quá 5MB");
+      return;
+    }
+
+    setAvatarFile(file);
+
+    // Tạo preview
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setPreviewUrl(reader.result as string);
+    };
+    reader.readAsDataURL(file);
+  };
+
+  // Xóa ảnh
+  const removeAvatar = () => {
+    setAvatarFile(null);
+    setPreviewUrl(null);
+    if (fileInputRef.current) fileInputRef.current.value = "";
+  };
 
   const onSubmit = async (data: createUserSchemaType) => {
     console.log("Dữ liệu hợp lệ:", data);
+    const formData = new FormData();
+    // Append các field text
+    Object.entries(data).forEach(([key, value]) => {
+      if (value !== undefined && value !== null && value !== "") {
+        formData.append(key, value.toString());
+      }
+    });
+
+    // Append file nếu có
+    if (avatarFile) {
+      formData.append("avatar", avatarFile);
+    }
+      
     try {
-        await userApiRequest.createWithRHF(data);
+        await userApiRequest.createWithAvatar(formData);
         toast.success("Thêm tài khoản mới thành công");        
         router.push(`/users`);
         router.refresh();
@@ -279,6 +331,56 @@ const router = useRouter();
                     </FormItem>
                   )}
                 />
+              </div>
+
+                {/* === Avatar Upload === */}
+              <div className="space-y-2">
+                <FormLabel>Ảnh đại diện (tùy chọn)</FormLabel>
+                <div className="flex items-center gap-4">
+                  {/* Preview */}
+                  {previewUrl ? (
+                    <div className="relative">
+                      <img
+                        src={previewUrl}
+                        alt="Preview"
+                        className="w-24 h-24 rounded-full object-cover border"
+                      />
+                      <button
+                        type="button"
+                        onClick={removeAvatar}
+                        className="absolute top-0 right-0 bg-red-500 text-white rounded-full p-1"
+                      >
+                        <X className="w-4 h-4" />
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="w-24 h-24 rounded-full border-2 border-dashed border-gray-300 flex items-center justify-center">
+                      <Upload className="w-8 h-8 text-gray-400" />
+                    </div>
+                  )}
+
+                  {/* Input file ẩn */}
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/*"
+                    onChange={handleFileChange}
+                    className="hidden"
+                    id="avatar-upload"
+                  />
+
+                  {/* Button chọn file */}
+                  <div>
+                    <label htmlFor="avatar-upload">
+                      <Button type="button" variant="outline" asChild>
+                        <span className="cursor-pointer">Chọn ảnh</span>
+                      </Button>
+                    </label>
+                    <p className="text-sm text-muted-foreground mt-1">
+                      Tối đa 5MB, định dạng ảnh
+                    </p>
+                  </div>
+                </div>
               </div>
 
               {/* Nút submit */}
