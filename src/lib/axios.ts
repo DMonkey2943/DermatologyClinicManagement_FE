@@ -85,6 +85,7 @@ const handleLogout = () => {
   if (isClient()) {
     Cookies.remove('access_token')
     Cookies.remove('refresh_token')
+    Cookies.remove('role')
     location.href = '/signin'
     // console.log("handleLogout in axios.ts");
   }
@@ -121,12 +122,14 @@ api.interceptors.response.use(
     if (isClient()) {
       if (url === 'auth/login'){
         const { access_token, refresh_token } = response.data.data as LoginResType['data']
+        const role = response.data.data.user.role;
         Cookies.set('access_token', access_token,
             // { expires: new Date(expiresAt) }
         )
         Cookies.set('refresh_token', refresh_token,
-            // { expires: new Date(expiresAt) }
-        )
+          // { expires: new Date(expiresAt) }
+        );
+        Cookies.set('role', role);
       }
     }
 
@@ -152,7 +155,7 @@ api.interceptors.response.use(
 
     const originalRequest = error.config
     if (
-      (error.response.status == AUTHENTICATION_ERROR_STATUS || error.response.status == 403) &&
+      (error.response.status == AUTHENTICATION_ERROR_STATUS) &&
       isClient() &&
       !originalRequest._retry
     ) {
