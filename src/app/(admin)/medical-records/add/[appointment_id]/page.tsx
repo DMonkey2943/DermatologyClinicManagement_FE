@@ -33,6 +33,8 @@ import { PatientFullDataType } from '@/schemaValidations/patient.schema';
 import { MedicalRecordDataType } from '@/schemaValidations/medicalRecord.schema';
 import { ServiceIndicationDetailDataType, ServiceItemType } from '@/schemaValidations/serviceIndication.schema';
 import { PrescriptionDetailDataType, PrescriptionItemType } from '@/schemaValidations/prescription.schema';
+import serviceIndicationApiRequest from '@/apiRequests/serviceIndication';
+import prescriptionApiRequest from '@/apiRequests/prescription';
 
 export default function AddMedicalRecordPage() {
   const { appointment_id } = useParams();
@@ -226,6 +228,74 @@ export default function AddMedicalRecordPage() {
     await finalizeExamination();
   };
 
+  const handleTabChange = async (newTab: string) => {
+    // Nếu chuyển từ tab prescription và có thay đổi chưa lưu
+    if (prescriptionDirty) {
+      try {
+        if (!prescriptionId) {
+          // Tạo mới đơn thuốc
+          const {payload} = await prescriptionApiRequest.create({
+            medical_record_id: medicalRecord!.id,
+            notes: "",
+            prescription_details: prescriptionItems.map(i => ({
+              medication_id: i.medication_id,
+              quantity: i.quantity,
+              dosage: i.dosage,
+            })),
+          });
+          setPrescriptionId(payload.data.id);
+        } else {
+          // Cập nhật đơn thuốc
+          await prescriptionApiRequest.update(prescriptionId, {
+            notes: "",
+            prescription_details: prescriptionItems.map(i => ({
+              medication_id: i.medication_id,
+              quantity: i.quantity, 
+              dosage: i.dosage,
+            })),
+          });
+        }
+        setPrescriptionDirty(false);
+        toast.success("Đã tự động lưu đơn thuốc");
+      } catch {
+        toast.error("Lỗi khi tự động lưu đơn thuốc");
+        return; // Không cho phép chuyển tab nếu lỗi
+      }
+    }
+
+    // Nếu chuyển từ tab services và có thay đổi chưa lưu
+    if (serviceDirty) {
+      try {
+        if (!serviceIndicationId) {
+          // Tạo mới phiếu chỉ định
+          const {payload} = await serviceIndicationApiRequest.create({
+            medical_record_id: medicalRecord!.id,
+            notes: "",
+            service_indication_details: serviceItems.map(i => ({
+              service_id: i.service_id,
+              quantity: i.quantity,
+            })),
+          });
+          setServiceIndicationId(payload.data.id);
+        } else {
+          // Cập nhật phiếu chỉ định
+          await serviceIndicationApiRequest.update(serviceIndicationId, {
+            notes: "",
+            service_indication_details: serviceItems.map(i => ({
+              service_id: i.service_id,
+              quantity: i.quantity,
+            })),
+          });
+        }
+        setServiceDirty(false);
+        toast.success("Đã tự động lưu phiếu chỉ định");
+      } catch {
+        toast.error("Lỗi khi tự động lưu phiếu chỉ định");
+        return; // Không cho phép chuyển tab nếu lỗi
+      }
+    }
+  };
+
   const canComplete = diagnosis.trim() !== "" && (prescriptionItems.length > 0 || serviceItems.length > 0);
 
   if (loading || !medicalRecord || !patient) return <div>Đang tải...</div>;
@@ -246,7 +316,7 @@ export default function AddMedicalRecordPage() {
             canComplete={canComplete}
           />
 
-          <Tabs defaultValue="examination">
+          <Tabs defaultValue="examination" onValueChange={handleTabChange}>
             <TabsList className="grid w-full grid-cols-3">
               <TabsTrigger value="examination">Phiếu khám</TabsTrigger>
               <TabsTrigger value="prescription">
