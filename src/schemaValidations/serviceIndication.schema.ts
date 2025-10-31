@@ -32,7 +32,8 @@ export const ServiceIndicationFullData = z.object({
     medical_record_id: z.string(),
     notes: z.string().nullable().optional(),
     created_at: z.string(),
-    services: z.array(ServiceIndicationDetailData)
+    services: z.array(ServiceIndicationDetailData).nullable(),
+    service_indication_details: z.array(ServiceIndicationDetailData).nullable(),
 })
 export type ServiceIndicationFullDataType = z.TypeOf<typeof ServiceIndicationFullData>
 
@@ -55,4 +56,17 @@ export const CreateServiceIndicationBody = z.object({
     service_indication_details: z.array(CreateServiceIndicationDetailBody)
 })
 export type CreateServiceIndicationBodyType = z.TypeOf<typeof CreateServiceIndicationBody>
+
+export const UpdateServiceIndicationBody = z.object({
+    notes: z.string().nullable().optional(),
+    service_indication_details: z.array(CreateServiceIndicationDetailBody)
+})
+export type UpdateServiceIndicationBodyType = z.TypeOf<typeof UpdateServiceIndicationBody>
+
+export const ServiceItem = z.object({
+    service_id: z.string(),
+    name: z.string(),
+    quantity: z.number(),
+})
+export type ServiceItemType = z.TypeOf<typeof ServiceItem>
 

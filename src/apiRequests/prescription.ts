@@ -1,5 +1,5 @@
 import http from "@/lib/axios"
-import { CreatePrescriptionBodyType, PrescriptionFullResType } from "@/schemaValidations/prescription.schema";
+import { CreatePrescriptionBodyType, PrescriptionFullResType, UpdatePrescriptionBodyType } from "@/schemaValidations/prescription.schema";
 
 const prefix = 'prescriptions';
 
@@ -9,6 +9,7 @@ const prescriptionApiRequest = {
     // ) => http.get<MedicalRecordListResType>(`/${prefix}/`, { params }),
 
     create: (body: CreatePrescriptionBodyType) => http.post<PrescriptionFullResType>(`/${prefix}/`, body),
+    update: (id: string, body: UpdatePrescriptionBodyType) => http.put<PrescriptionFullResType>(`/${prefix}/${id}`, body),
 };
 
 export default prescriptionApiRequest;

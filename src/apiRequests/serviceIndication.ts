@@ -1,5 +1,5 @@
 import http from "@/lib/axios"
-import { CreateServiceIndicationBodyType, ServiceIndicationFullResType } from "@/schemaValidations/serviceIndication.schema";
+import { CreateServiceIndicationBodyType, ServiceIndicationFullResType, UpdateServiceIndicationBodyType } from "@/schemaValidations/serviceIndication.schema";
 
 const prefix = 'service-indications';
 
@@ -9,6 +9,7 @@ const serviceIndicationApiRequest = {
     // ) => http.get<MedicalRecordListResType>(`/${prefix}/`, { params }),
 
     create: (body: CreateServiceIndicationBodyType) => http.post<ServiceIndicationFullResType>(`/${prefix}/`, body),
+    update: (id: string, body: UpdateServiceIndicationBodyType) => http.put<ServiceIndicationFullResType>(`/${prefix}/${id}`, body),
 };
 
 export default serviceIndicationApiRequest;

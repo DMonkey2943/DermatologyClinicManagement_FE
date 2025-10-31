@@ -36,7 +36,8 @@ export const PrescriptionFullData = z.object({
     medical_record_id: z.string(),
     notes: z.string().nullable().optional(),
     created_at: z.string(),
-    medications: z.array(PrescriptionDetailData)
+    medications: z.array(PrescriptionDetailData).nullable(),
+    prescription_details: z.array(PrescriptionDetailData).nullable(),
 })
 export type PrescriptionFullDataType = z.TypeOf<typeof PrescriptionFullData>
 
@@ -61,3 +62,17 @@ export const CreatePrescriptionBody = z.object({
 })
 export type CreatePrescriptionBodyType = z.TypeOf<typeof CreatePrescriptionBody>
 
+export const UpdatePrescriptionBody = z.object({
+    notes: z.string().nullable().optional(),
+    prescription_details: z.array(CreatePrescriptionDetailBody)
+})
+export type UpdatePrescriptionBodyType = z.TypeOf<typeof UpdatePrescriptionBody>
+
+export const PrescriptionItem = z.object({
+    medication_id: z.string(),
+    name: z.string(),
+    dosage_form: z.string(),
+    quantity: z.number(),
+    dosage: z.string()
+})
+export type PrescriptionItemType = z.TypeOf<typeof PrescriptionItem>
