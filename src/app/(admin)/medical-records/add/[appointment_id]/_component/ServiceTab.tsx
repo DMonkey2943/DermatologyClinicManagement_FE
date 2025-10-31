@@ -20,9 +20,10 @@ interface Props {
   items: ServiceItemType[];
   onItemsChange: (items: ServiceItemType[]) => void;
   onServiceIndicationIdChange: (id: string | null) => void;
+  onDirtyChange: (dirty: boolean) => void; // Mới
 }
 
-export default function ServiceTab({ medicalRecordId, serviceIndicationId, items, onItemsChange, onServiceIndicationIdChange }: Props) {
+export default function ServiceTab({ medicalRecordId, serviceIndicationId, items, onItemsChange, onServiceIndicationIdChange, onDirtyChange }: Props) {
   const [services, setServices] = useState<ServiceDataType[]>([]);
   const [open, setOpen] = useState(false);
   const [selected, setSelected] = useState<ServiceDataType | null>(null);
@@ -52,6 +53,10 @@ export default function ServiceTab({ medicalRecordId, serviceIndicationId, items
   }, [items, initialItems, serviceIndicationId]);
 
   useEffect(() => setIsDirty(hasChanges), [hasChanges]);
+
+    useEffect(() => {
+        onDirtyChange(hasChanges);
+    }, [hasChanges, onDirtyChange]);
 
   const handleAdd = () => {
     if (!selected || !quantity) return;
@@ -91,6 +96,7 @@ export default function ServiceTab({ medicalRecordId, serviceIndicationId, items
         // setIsSaved(true);
         setInitialItems([...items]);  // Cập nhật initial
         setIsDirty(false);
+        onDirtyChange(false); // Đánh dấu sạch
     } catch {
       toast.error("Lỗi lưu chỉ định");      
     //   console.error(err);

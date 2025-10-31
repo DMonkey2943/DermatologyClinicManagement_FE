@@ -20,9 +20,10 @@ interface Props {
   items: PrescriptionItemType[];
   onItemsChange: (items: PrescriptionItemType[]) => void;
   onPrescriptionIdChange: (id: string | null) => void;
+  onDirtyChange: (dirty: boolean) => void; // Mới
 }
 
-export default function PrescriptionTab({ medicalRecordId, prescriptionId, items, onItemsChange, onPrescriptionIdChange }: Props) {
+export default function PrescriptionTab({ medicalRecordId, prescriptionId, items, onItemsChange, onPrescriptionIdChange, onDirtyChange }: Props) {
   const [medications, setMedications] = useState<MedicationDataType[]>([]);
   const [open, setOpen] = useState(false);
   const [selected, setSelected] = useState<MedicationDataType | null>(null);
@@ -58,6 +59,10 @@ export default function PrescriptionTab({ medicalRecordId, prescriptionId, items
     setIsDirty(hasChanges);
   }, [hasChanges]);
 
+    useEffect(() => {
+        onDirtyChange(hasChanges);
+    }, [hasChanges, onDirtyChange]);
+
   const handleAdd = () => {
     if (!selected || !quantity || !dosage) {
       setError("Vui lòng nhập đầy đủ");
@@ -81,34 +86,35 @@ export default function PrescriptionTab({ medicalRecordId, prescriptionId, items
 
   const handleSave = async () => {
     try {
-    if (!prescriptionId) {
-        // Chưa có → tạo mới
-        const {payload} = await prescriptionApiRequest.create({
-          medical_record_id: medicalRecordId,
-          notes: "",
-          prescription_details: items.map(i => ({
-            medication_id: i.medication_id,
-            quantity: i.quantity,
-            dosage: i.dosage,
-          })),
-        });
-        onPrescriptionIdChange(payload.data.id);
-        toast.success("Lưu đơn thuốc thành công");        
-      } else {
-        // Đã có → cập nhật (backend xóa + tạo lại)
-        await prescriptionApiRequest.update(prescriptionId!, {
-          notes: "",
-          prescription_details: items.map(i => ({
-            medication_id: i.medication_id,
-            quantity: i.quantity,
-            dosage: i.dosage,
-          })),
-        });
-        toast.success("Cập nhật đơn thuốc thành công");
-      }
+        if (!prescriptionId) {
+            // Chưa có → tạo mới
+            const {payload} = await prescriptionApiRequest.create({
+            medical_record_id: medicalRecordId,
+            notes: "",
+            prescription_details: items.map(i => ({
+                medication_id: i.medication_id,
+                quantity: i.quantity,
+                dosage: i.dosage,
+            })),
+            });
+            onPrescriptionIdChange(payload.data.id);
+            toast.success("Lưu đơn thuốc thành công");        
+        } else {
+            // Đã có → cập nhật (backend xóa + tạo lại)
+            await prescriptionApiRequest.update(prescriptionId!, {
+            notes: "",
+            prescription_details: items.map(i => ({
+                medication_id: i.medication_id,
+                quantity: i.quantity,
+                dosage: i.dosage,
+            })),
+            });
+            toast.success("Cập nhật đơn thuốc thành công");
+        }
       
       setInitialItems([...items]); // Cập nhật initial
       setIsDirty(false);
+      onDirtyChange(false); // Đánh dấu sạch
     } catch {
       toast.error("Lỗi lưu đơn thuốc");
     //   console.error(err);

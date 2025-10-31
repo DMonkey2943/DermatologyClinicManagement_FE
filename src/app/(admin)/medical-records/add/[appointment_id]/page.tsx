@@ -7,6 +7,16 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from 'sonner';
 import { debounce } from 'lodash';
 import { Badge } from "@/components/ui/badge";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 import PageHeader from './_component/PageHeader';
 import PatientInfoCard from './_component/PatientInfoCard';
@@ -45,6 +55,11 @@ export default function AddMedicalRecordPage() {
 
   const [lastSaved, setLastSaved] = useState<string>();
   const [isSaving, setIsSaving] = useState(false);
+
+  const [prescriptionDirty, setPrescriptionDirty] = useState(false);
+  const [serviceDirty, setServiceDirty] = useState(false);
+  const [showAlert, setShowAlert] = useState(false);
+  const hasUnsavedChanges = prescriptionDirty || serviceDirty;
 
   // Autosave debounce
   const debouncedSave = useCallback(
@@ -173,16 +188,42 @@ export default function AddMedicalRecordPage() {
     init();
   }, [appointment_id,router]);
 
-  const handleComplete = async () => {
+  // const handleComplete = async () => {
+  //   if (!medicalRecord) return;
+  //   try {
+  //     await medicalRecordApiRequest.update(medicalRecord.id, { status: "COMPLETED" });
+  //     await appointmentApiRequest.update(appointment_id as string, { status: "COMPLETED" });
+  //     toast.success("Hoàn thành phiên khám!");
+  //     router.push(`/medical-records/${medicalRecord.id}`);
+  //   } catch {
+  //     toast.error("Lỗi hoàn thành");
+  //   }
+  // };
+  const finalizeExamination = async () => {
     if (!medicalRecord) return;
+
     try {
-      await medicalRecordApiRequest.update(medicalRecord.id, { status: "COMPLETED" });
-      await appointmentApiRequest.update(appointment_id as string, { status: "COMPLETED" });
+      // 1. Đồng bộ MR (đảm bảo autosave không bị delay)
+      await medicalRecordApiRequest.update(medicalRecord.id, {
+        symptoms,
+        diagnosis,
+        notes,
+        status: "COMPLETED"
+      });
+
       toast.success("Hoàn thành phiên khám!");
       router.push(`/medical-records/${medicalRecord.id}`);
     } catch {
       toast.error("Lỗi hoàn thành");
     }
+  };
+  const handleComplete = async () => {
+    if (hasUnsavedChanges) {
+      setShowAlert(true);
+      return;
+    }
+
+    await finalizeExamination();
   };
 
   const canComplete = diagnosis.trim() !== "" && (prescriptionItems.length > 0 || serviceItems.length > 0);
@@ -190,65 +231,85 @@ export default function AddMedicalRecordPage() {
   if (loading || !medicalRecord || !patient) return <div>Đang tải...</div>;
 
   return (
-    <div className="container max-w-7xl py-6 grid grid-cols-1 lg:grid-cols-3 gap-6">
-      <div className="lg:col-span-1">
-        <PatientInfoCard patient={patient} />
+    <>
+      <div className="container max-w-7xl py-6 grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="lg:col-span-1">
+          <PatientInfoCard patient={patient} />
+        </div>
+
+        <div className="lg:col-span-2 space-y-6">
+          <PageHeader
+            patientName={patient.full_name}
+            lastSaved={lastSaved}
+            isSaving={isSaving}
+            onComplete={handleComplete}
+            canComplete={canComplete}
+          />
+
+          <Tabs defaultValue="examination">
+            <TabsList className="grid w-full grid-cols-3">
+              <TabsTrigger value="examination">Phiếu khám</TabsTrigger>
+              <TabsTrigger value="prescription">
+                Kê đơn {prescriptionItems.length > 0 && <Badge className="ml-2">{prescriptionItems.length}</Badge>}
+              </TabsTrigger>
+              <TabsTrigger value="services">
+                Dịch vụ {serviceItems.length > 0 && <Badge className="ml-2">{serviceItems.length}</Badge>}
+              </TabsTrigger>
+            </TabsList>
+
+            <TabsContent value="examination">
+              <ExaminationTab
+                symptoms={symptoms}
+                diagnosis={diagnosis}
+                notes={notes}
+                onChange={(field, value) => {
+                  if (field === 'symptoms') setSymptoms(value);
+                  if (field === 'diagnosis') setDiagnosis(value);
+                  if (field === 'notes') setNotes(value);
+                }}
+              />
+            </TabsContent>
+
+            <TabsContent value="prescription">
+              <PrescriptionTab
+                medicalRecordId={medicalRecord.id}
+                prescriptionId={prescriptionId}
+                items={prescriptionItems}
+                onItemsChange={setPrescriptionItems}
+                onPrescriptionIdChange={setPrescriptionId}
+                onDirtyChange={setPrescriptionDirty}
+              />
+            </TabsContent>
+
+            <TabsContent value="services">
+              <ServiceTab
+                medicalRecordId={medicalRecord.id}
+                serviceIndicationId={serviceIndicationId}
+                items={serviceItems}
+                onItemsChange={setServiceItems}
+                onServiceIndicationIdChange={setServiceIndicationId}
+                onDirtyChange={setServiceDirty}
+              />
+            </TabsContent>
+          </Tabs>
+        </div>
       </div>
-
-      <div className="lg:col-span-2 space-y-6">
-        <PageHeader
-          patientName={patient.full_name}
-          lastSaved={lastSaved}
-          isSaving={isSaving}
-          onComplete={handleComplete}
-          canComplete={canComplete}
-        />
-
-        <Tabs defaultValue="examination">
-          <TabsList className="grid w-full grid-cols-3">
-            <TabsTrigger value="examination">Phiếu khám</TabsTrigger>
-            <TabsTrigger value="prescription">
-              Kê đơn {prescriptionItems.length > 0 && <Badge className="ml-2">{prescriptionItems.length}</Badge>}
-            </TabsTrigger>
-            <TabsTrigger value="services">
-              Dịch vụ {serviceItems.length > 0 && <Badge className="ml-2">{serviceItems.length}</Badge>}
-            </TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="examination">
-            <ExaminationTab
-              symptoms={symptoms}
-              diagnosis={diagnosis}
-              notes={notes}
-              onChange={(field, value) => {
-                if (field === 'symptoms') setSymptoms(value);
-                if (field === 'diagnosis') setDiagnosis(value);
-                if (field === 'notes') setNotes(value);
-              }}
-            />
-          </TabsContent>
-
-          <TabsContent value="prescription">
-            <PrescriptionTab
-              medicalRecordId={medicalRecord.id}
-              prescriptionId={prescriptionId}
-              items={prescriptionItems}
-              onItemsChange={setPrescriptionItems}
-              onPrescriptionIdChange={setPrescriptionId}
-            />
-          </TabsContent>
-
-          <TabsContent value="services">
-            <ServiceTab
-              medicalRecordId={medicalRecord.id}
-              serviceIndicationId={serviceIndicationId}
-              items={serviceItems}
-              onItemsChange={setServiceItems}
-              onServiceIndicationIdChange={setServiceIndicationId}
-            />
-          </TabsContent>
-        </Tabs>
-      </div>
-    </div>
+      <AlertDialog open={showAlert} onOpenChange={setShowAlert}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Bạn có thay đổi chưa lưu</AlertDialogTitle>
+            <AlertDialogDescription>
+              Đơn thuốc hoặc Phiếu chỉ định dịch vụ chưa được lưu. Bạn có muốn hoàn thành phiên khám?
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Hủy</AlertDialogCancel>
+            <AlertDialogAction onClick={finalizeExamination}>
+              Hoàn thành (không lưu đơn thuốc/phiếu chỉ định dịch vụ)
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </>
   );
 }
