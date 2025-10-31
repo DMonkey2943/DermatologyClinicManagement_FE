@@ -1,150 +1,254 @@
+// app/medical-records/add/[appointment_id]/page.tsx
 'use client';
 
-import React, { useEffect, useState, use } from 'react';
-import { useRouter } from 'next/navigation';
-import PageBreadcrumb from '@/components/common/PageBreadCrumb';
-import ComponentCard from '@/components/common/ComponentCard';
-import patientApiRequest from '@/apiRequests/patient';
-import { PatientFullDataType } from '@/schemaValidations/patient.schema';
-import MedicalRecordForm from './_component/MedicalRecordForm';
-import PrescriptionForm from './_component/PrescriptionForm';
-import appointmentApiRequest from '@/apiRequests/appointment';
-import ServiceIndicationForm from './_component/ServiceIndicationForm';
-import Button from '@/components/ui/button/Button';
-import medicalRecordApiRequest from '@/apiRequests/medicalRecord';
+import { useEffect, useState, useCallback, useRef } from 'react';
+import { useParams, useRouter } from 'next/navigation';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from 'sonner';
+import { debounce } from 'lodash';
+import { Badge } from "@/components/ui/badge";
 
-export default function MedicalRecordCreate({ params }: {
-  params: Promise<{ appointment_id: string }>
-}) {
-    const { appointment_id } = use(params);
-    const router = useRouter();
+import PageHeader from './_component/PageHeader';
+import PatientInfoCard from './_component/PatientInfoCard';
+import ExaminationTab from './_component/ExaminationTab';
+import PrescriptionTab from './_component/PrescriptionTab';
+import ServiceTab from './_component/ServiceTab';
 
-    const [patientId, setPatientId] = useState<string | null>(null);
-    const [doctorId, setDoctorId] = useState<string | null>(null);
-    const [medicalRecordId, setMedicalRecordId] = useState<string | null>(null);
-    const [patient, setPatient] = useState<PatientFullDataType>();
-    // const patient_id = '793029ae-44d2-49b4-9fee-e8c077e59899';
+import appointmentApiRequest from '@/apiRequests/appointment';
+import patientApiRequest from '@/apiRequests/patient';
+import medicalRecordApiRequest from '@/apiRequests/medicalRecord';
 
-    useEffect(() => {
-        fetchAppointmentInfo();
-    }, []);
+import { PatientFullDataType } from '@/schemaValidations/patient.schema';
+// import { PrescriptionItem, ServiceItem } from '@/types/medical-record';
+import { MedicalRecordDataType } from '@/schemaValidations/medicalRecord.schema';
+import { ServiceIndicationDetailDataType, ServiceItemType } from '@/schemaValidations/serviceIndication.schema';
+import { PrescriptionDetailDataType, PrescriptionItemType } from '@/schemaValidations/prescription.schema';
 
-    useEffect(() => {
-        if (patientId) {
-            fetchPatient(patientId);
+export default function AddMedicalRecordPage() {
+  const { appointment_id } = useParams();
+  const router = useRouter();
+  const initialized = useRef(false); // Thêm ref
+
+  const [loading, setLoading] = useState(true);
+  const [patient, setPatient] = useState<PatientFullDataType | null>(null);
+  const [medicalRecord, setMedicalRecord] = useState<MedicalRecordDataType | null>(null);
+
+  const [symptoms, setSymptoms] = useState("");
+  const [diagnosis, setDiagnosis] = useState("");
+  const [notes, setNotes] = useState("");
+
+  const [prescriptionId, setPrescriptionId] = useState<string | null>(null);
+  const [serviceIndicationId, setServiceIndicationId] = useState<string | null>(null);
+
+  const [prescriptionItems, setPrescriptionItems] = useState<PrescriptionItemType[]>([]);
+  const [serviceItems, setServiceItems] = useState<ServiceItemType[]>([]);
+
+  const [lastSaved, setLastSaved] = useState<string>();
+  const [isSaving, setIsSaving] = useState(false);
+
+  // Autosave debounce
+  const debouncedSave = useCallback(
+    debounce(async () => {
+      if (!medicalRecord) return;
+      setIsSaving(true);
+      try {
+        await medicalRecordApiRequest.update(medicalRecord.id, { symptoms, diagnosis, notes });
+        setLastSaved(new Date().toISOString());
+      } catch {
+        toast.error("Lưu tạm thất bại");
+      } finally {
+        setIsSaving(false);
+      }
+    }, 10000),
+    [medicalRecord, symptoms, diagnosis, notes]
+  );
+
+  useEffect(() => {
+    if (medicalRecord) debouncedSave();
+    return () => debouncedSave.cancel();
+  }, [symptoms, diagnosis, notes, debouncedSave, medicalRecord]);
+
+  // INIT: Load MR + đơn thuốc + chỉ định
+  useEffect(() => {
+    if (initialized.current) return; // Nếu đã chạy → bỏ qua
+    initialized.current = true;       // Đánh dấu đã chạy
+
+    const init = async () => {
+      try {
+        const { payload: apt } = await appointmentApiRequest.getDetail(appointment_id as string);
+        // console.log(apt.message);
+        if (apt.data.status !== 'WAITING') {
+          toast.error("Lịch hẹn không hợp lệ");
+          router.push('/appointments');
+          return;
         }
-    }, [patientId]);
 
-    const fetchAppointmentInfo = async () => {
+        const { payload: pt } = await patientApiRequest.getDetail(apt.data.patient_id);
+        // console.log(pt.message);
+        setPatient(pt.data);
+
+        let mr: MedicalRecordDataType;
+        let prescriptionId: string | null = null;
+        let serviceIndicationId: string | null = null;
+        // Load medical record theo appointment_id
         try {
-            const {payload} = await appointmentApiRequest.getDetail(appointment_id);
-            const appointmentData = payload.data;
-            console.log(appointmentData);
-
-            if(appointmentData.status !== 'WAITING') {
-                toast.error("Chỉ có thể tạo phiếu khám cho cuộc hẹn đang chờ!");
-                router.push('/appointments');
-                return;
-            }
-
-            setPatientId(appointmentData.patient_id);
-            setDoctorId(appointmentData.doctor_id);
-        } catch(error) {
-            console.error('Lỗi lấy thông tin Appointment:', error);
+          const { payload: existingMR } = await medicalRecordApiRequest.getByAppointment(appointment_id as string);
+          mr = existingMR.data;
+          // console.log("existingMR: ", mr);
+          if (mr) {
+            setMedicalRecord(mr); 
+            setSymptoms(mr.symptoms ?? "");
+            setDiagnosis(mr.diagnosis ?? "");
+            setNotes(mr.notes ?? "");  
+            toast.success("Tiếp tục phiên khám chưa hoàn thành");
+            // Load symptoms, diagnosis, notes từ DB
+          } else {           
+            // console.log("ĐÃ TẠO PHIÊN KHÁM MỚI")
+            const { payload: newMr } = await medicalRecordApiRequest.create({
+              appointment_id: appointment_id as string,
+              patient_id: apt.data.patient_id,
+              doctor_id: apt.data.doctor_id,
+              symptoms: "",
+              diagnosis: "",
+              notes: "",
+              status: "IN_PROGRESS"
+            });
+            // console.log(newMr.message);
+            mr = newMr.data;
+            setMedicalRecord(mr);
+            toast.success("Tạo phiên khám mới thành công")
+          }
+        } catch (err) {
+          console.error(err);
+          toast.error("Lỗi tải phiên khám");
+          throw err;
         }
-    }
-    
-    const fetchPatient = async (patient_id: string) => {
+
+        //Load đơn thuốc
         try {
-            const {payload} = await patientApiRequest.getDetail(patient_id);
-            const patientData = payload.data;
-            console.log(patientData);
-            setPatient(patientData);
-        } catch (error) {
-            console.error('Lỗi lấy thông tin Patients:', error);
+          const presRes = await medicalRecordApiRequest.getPrescriptionByMRId(mr.id);
+          if (presRes.payload.data !== null) {
+            const presId = presRes.payload.data.id;
+            prescriptionId = presId;
+            const presDetails = presRes.payload.data.medications || [];
+            setPrescriptionItems(presDetails.map((d: PrescriptionDetailDataType) => ({
+              medication_id: d.medication_id,
+              name: d.name || "Không rõ",
+              dosage_form: d.dosage_form || "",
+              quantity: d.quantity,
+              dosage: d.dosage,
+            })));            
+          }
+        } catch {
+          console.log("Chưa có đơn thuốc");
         }
+
+        //  Load chỉ định dịch vụ
+        try {
+          const servRes = await medicalRecordApiRequest.getServiceIndicationByMRId(mr.id);
+          if (servRes.payload.data !== null) { 
+            const servId = servRes.payload.data.id;
+            serviceIndicationId = servId;
+            const servDetails = servRes.payload.data.services || [];
+            setServiceItems(servDetails.map((d: ServiceIndicationDetailDataType) => ({
+              service_id: d.service_id,
+              name: d.name || "Không rõ",
+              quantity: d.quantity,
+            })));
+          }
+        } catch {
+          console.log("Chưa có chỉ định");
+        }
+
+        setPrescriptionId(prescriptionId);
+        setServiceIndicationId(serviceIndicationId);
+
+        setLoading(false);
+      } catch (err) {
+        console.error(err);
+        toast.error("Không thể tạo phiên khám");
+        router.push('/appointments');
+      }
     };
+    init();
+  }, [appointment_id,router]);
 
-    const getMedicalRecordId = (mr_id: string) => {
-        console.log("medical_record_id: ", mr_id);
-        setMedicalRecordId(mr_id);
+  const handleComplete = async () => {
+    if (!medicalRecord) return;
+    try {
+      await medicalRecordApiRequest.update(medicalRecord.id, { status: "COMPLETED" });
+      await appointmentApiRequest.update(appointment_id as string, { status: "COMPLETED" });
+      toast.success("Hoàn thành phiên khám!");
+      router.push(`/medical-records/${medicalRecord.id}`);
+    } catch {
+      toast.error("Lỗi hoàn thành");
     }
+  };
 
-    const handleCompleteMR = async () => {
-        try {
-            if (medicalRecordId) {
-                const {payload} = await medicalRecordApiRequest.update(medicalRecordId, {status: "COMPLETED"});
-                console.log(payload.data);
-                toast.success("Hoàn thành phiên khám");
-                //Chuyển sang trang chi tiết phiên khám
-                router.push(`/medical-records/${medicalRecordId}`);
-                router.refresh();
-            } else {
-                // alert("Bạn chưa lưu phiên khám!!");
-                toast.warning("Hãy lưu phiên khám!");
-            }
-        } catch (e) {
-            console.error(e);
-            toast.error("Có lỗi xảy ra, vui lòng thử lại!");
-        }
-    }
-    
+  const canComplete = diagnosis.trim() !== "" && (prescriptionItems.length > 0 || serviceItems.length > 0);
 
-    return (    
-        <div>
-            <PageBreadcrumb pageTitle="Phiếu khám bệnh" />
-            <div className="grid grid-cols-12 gap-4 md:gap-6">
-                <div className="col-span-12 xl:col-span-3">
-                    <ComponentCard title="Thông tin bệnh nhân">
-                        <div className="space-y-6">
-                            {/* <p className='text-xs font-light text-gray-500 text-theme-sm dark:text-gray-400'>ID bệnh nhân: {patient?.id}</p> */}
-                            <p className='text-center text-lg font-semibold text-gray-800 dark:text-white/90'>{patient?.full_name}</p>
-                        </div>
-                        <div>
-                            <h6 className='font-medium'>Thông tin cá nhân</h6>
-                            <p className='py-1 text-theme-sm text-gray-800 dark:text-white/90'>{ patient?.gender == 'FEMALE' ? 'Nữ' : 'Nam'}</p>
-                            <p className='py-1 text-theme-sm text-gray-800 dark:text-white/90'>Ngày sinh: {patient?.dob ?? '---'}</p>
-                            <p className='py-1 text-theme-sm text-gray-800 dark:text-white/90'>SĐT: {patient?.phone_number ?? '---'}</p>
-                            <p className='py-1 text-theme-sm text-gray-800 dark:text-white/90'>Email: {patient?.email ?? '---'}</p>
-                            <p className='py-1 text-theme-sm text-gray-800 dark:text-white/90'>Địa chỉ: {patient?.address ?? '---'}</p>
-                        </div>
-                        <div>
-                            <h6 className='font-medium'>Thông tin y tế</h6>                            
-                            <p className='py-1 text-theme-sm text-gray-800 dark:text-white/90'>Tiền sử bệnh lý: {patient?.medical_history ?? '---'}</p>
-                            <p className='py-1 text-theme-sm text-gray-800 dark:text-white/90'>Dị ứng: {patient?.allergies ?? '---'}</p>
-                            <p className='py-1 text-theme-sm text-gray-800 dark:text-white/90'>Thuốc đang dùng: {patient?.current_medications ?? '---'}</p>
-                            <p className='py-1 text-theme-sm text-gray-800 dark:text-white/90'>Tình trạng ban đầu: {patient?.current_condition ?? '---'}</p>
-                        </div>
-                    </ComponentCard>
-                </div>
-                <div className="col-span-12 space-y-6 xl:col-span-9">
-                    <ComponentCard title="Khám bệnh">           
-                        <MedicalRecordForm
-                            appointmentId={appointment_id!}
-                            patientId={patientId!}
-                            doctorId={doctorId!}
-                            onSuccess={getMedicalRecordId}
-                        />
-                    </ComponentCard>
-                    {medicalRecordId &&
-                        <> 
-                            <ComponentCard title="Kê đơn thuốc">           
-                                <PrescriptionForm
-                                medicalRecordId={medicalRecordId}
-                                />
-                            </ComponentCard>
-                            <ComponentCard title="Chỉ định dịch vụ">           
-                                <ServiceIndicationForm
-                                    medicalRecordId={medicalRecordId}
-                                />
-                            </ComponentCard>
-                            <Button size="md" onClick={handleCompleteMR}>Hoàn thành phiên khám</Button>
-                        </>
-                    }                    
-                </div>
-            </div>
-        </div>
-    );
+  if (loading || !medicalRecord || !patient) return <div>Đang tải...</div>;
+
+  return (
+    <div className="container max-w-7xl py-6 grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="lg:col-span-1">
+        <PatientInfoCard patient={patient} />
+      </div>
+
+      <div className="lg:col-span-2 space-y-6">
+        <PageHeader
+          patientName={patient.full_name}
+          lastSaved={lastSaved}
+          isSaving={isSaving}
+          onComplete={handleComplete}
+          canComplete={canComplete}
+        />
+
+        <Tabs defaultValue="examination">
+          <TabsList className="grid w-full grid-cols-3">
+            <TabsTrigger value="examination">Phiếu khám</TabsTrigger>
+            <TabsTrigger value="prescription">
+              Kê đơn {prescriptionItems.length > 0 && <Badge className="ml-2">{prescriptionItems.length}</Badge>}
+            </TabsTrigger>
+            <TabsTrigger value="services">
+              Dịch vụ {serviceItems.length > 0 && <Badge className="ml-2">{serviceItems.length}</Badge>}
+            </TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="examination">
+            <ExaminationTab
+              symptoms={symptoms}
+              diagnosis={diagnosis}
+              notes={notes}
+              onChange={(field, value) => {
+                if (field === 'symptoms') setSymptoms(value);
+                if (field === 'diagnosis') setDiagnosis(value);
+                if (field === 'notes') setNotes(value);
+              }}
+            />
+          </TabsContent>
+
+          <TabsContent value="prescription">
+            <PrescriptionTab
+              medicalRecordId={medicalRecord.id}
+              prescriptionId={prescriptionId}
+              items={prescriptionItems}
+              onItemsChange={setPrescriptionItems}
+              onPrescriptionIdChange={setPrescriptionId}
+            />
+          </TabsContent>
+
+          <TabsContent value="services">
+            <ServiceTab
+              medicalRecordId={medicalRecord.id}
+              serviceIndicationId={serviceIndicationId}
+              items={serviceItems}
+              onItemsChange={setServiceItems}
+              onServiceIndicationIdChange={setServiceIndicationId}
+            />
+          </TabsContent>
+        </Tabs>
+      </div>
+    </div>
+  );
 }
-
