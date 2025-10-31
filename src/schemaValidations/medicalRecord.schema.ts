@@ -18,7 +18,7 @@ export const MedicalRecordData = z.object({
 export type MedicalRecordDataType = z.TypeOf<typeof MedicalRecordData>
 
 export const MedicalRecordRes = z.object({
-    data: MedicalRecordData,
+    data: MedicalRecordData || null,
     message: z.string(),
     success: z.boolean()
 })
@@ -39,8 +39,8 @@ export const CreateMedicalRecordBody = z.object({
     appointment_id: z.string(),
     patient_id: z.string(),
     doctor_id: z.string(),
-    symptoms: z.string(),
-    diagnosis: z.string(),
+    symptoms: z.string().optional(),
+    diagnosis: z.string().optional(),
     status: z.enum(["COMPLETED", "IN_PROGRESS"]),
     notes: z.string().nullable().optional(),
 })

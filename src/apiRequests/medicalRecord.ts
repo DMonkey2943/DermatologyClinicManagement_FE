@@ -12,6 +12,8 @@ const medicalRecordApiRequest = {
 
     getDetail: (id: string) => http.get<MedicalRecordResType>(`/${prefix}/${id}`),
 
+    getByAppointment: (appointment_id: string) => http.get<MedicalRecordResType>(`/${prefix}/by-appointment/${appointment_id}`),
+
     create: (body: CreateMedicalRecordBodyType) => http.post<MedicalRecordResType>(`/${prefix}/`, body),
     
     update: (id: string, body: UpdateMedicalRecordBodyType) => http.put<MedicalRecordResType>(`/${prefix}/${id}`, body),
