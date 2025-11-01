@@ -83,7 +83,7 @@ export default function UserListPage() {
   // };
 
   const handleDelete = async (id: string) => {
-    if (confirm('Bạn có chắc chắn xoá user này?')) {
+    // if (confirm('Bạn có chắc chắn xoá user này?')) {
       setIsLoading(true);
       try {
         await userApiRequest.delete(id);
@@ -96,7 +96,7 @@ export default function UserListPage() {
       } finally {
         setIsLoading(false);
       }
-    }
+    // }
   };
 
   // const handleFormSubmit = async () => {

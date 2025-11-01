@@ -10,11 +10,32 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  // DropdownMenuLabel,
+  // DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { MoreHorizontal, Edit, Trash2 } from "lucide-react";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import Badge from '@/components/ui/badge/Badge';
-import Button from '@/components/ui/button/Button';
+// import Button from '@/components/ui/button/Button';
 import { UserDataType } from '@/schemaValidations/user.schema';
 import CenteredSpinner from '../ui/spinner/CenteredSpinner';
 import PaginationControls from '../ui/pagination/PaginationControls';
+import { Button as ButtonUI } from "@/components/ui/button";
 
 interface UserTableProps {
   users: UserDataType[];
@@ -142,14 +163,77 @@ export default function UserTable({
                   <TableCell className="px-5 py-4 text-start text-theme-sm text-gray-500 dark:text-gray-400">
                     <Badge size="sm" color="info">{user.role}</Badge>
                   </TableCell>
-                  <TableCell className="px-5 py-4 text-start text-theme-xs text-gray-500 dark:text-gray-400">
+                  {/* <TableCell className="px-5 py-4 text-start text-theme-xs text-gray-500 dark:text-gray-400">
                     <div className="flex gap-2">
-                      {/* <Button size="sm" onClick={() => onEdit(user)}>Edit</Button> */}
                       <Link href={`/users/${user.id}/edit`}>
                         <Button size="sm">Sửa</Button>
                       </Link>
                       <Button size="sm" variant="destructive" onClick={() => onDelete(user.id)}>Xóa</Button>
                     </div>
+                  </TableCell> */}
+                  <TableCell className="px-5 py-4 text-start text-theme-xs text-gray-500 dark:text-gray-400">
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <ButtonUI variant="ghost" size="icon" className="h-8 w-8 p-0">
+                          <MoreHorizontal className="h-4 w-4" />
+                          <span className="sr-only">Open menu</span>
+                        </ButtonUI>
+                      </DropdownMenuTrigger>
+
+                      <DropdownMenuContent align="end" className="w-40">
+                        {/* <DropdownMenuLabel>Hành động</DropdownMenuLabel> */}
+
+                        <DropdownMenuItem asChild>
+                          <Link
+                            href={`/users/${user.id}/edit`}
+                            className="flex items-center gap-2"
+                          >
+                            <Edit className="h-4 w-4" />
+                            <span>Sửa</span>
+                          </Link>
+                        </DropdownMenuItem>
+
+                        {/* <DropdownMenuItem
+                          onClick={() => onDelete(user.id)}
+                          className="flex items-center gap-2 text-red-600 focus:text-red-700"
+                        >
+                          <Trash2 className="h-4 w-4 text-red-600" />
+                          <span>Xóa</span>
+                        </DropdownMenuItem> */}
+                        <DropdownMenuItem asChild>
+                          <AlertDialog>
+                            <AlertDialogTrigger asChild>
+                              <button className="flex items-center gap-2 text-red-600 focus:text-red-700 w-full">
+                                <Trash2 className="h-4 w-4" />
+                                <span>Xóa</span>
+                              </button>
+                            </AlertDialogTrigger>
+
+                            <AlertDialogContent>
+                              <AlertDialogHeader>
+                                <AlertDialogTitle>
+                                  Xác nhận xoá tài khoản
+                                </AlertDialogTitle>
+                                <AlertDialogDescription>
+                                  Bạn có chắc chắn muốn xoá tài khoản{" "}
+                                  <strong>{user.full_name}</strong>?  
+                                  Hành động này không thể hoàn tác.
+                                </AlertDialogDescription>
+                              </AlertDialogHeader>
+                              <AlertDialogFooter>
+                                <AlertDialogCancel>Huỷ</AlertDialogCancel>
+                                <AlertDialogAction
+                                  className="bg-red-600 hover:bg-red-700 text-white"
+                                  onClick={() => onDelete(user.id)}
+                                >
+                                  Xoá
+                                </AlertDialogAction>
+                              </AlertDialogFooter>
+                            </AlertDialogContent>
+                          </AlertDialog>
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
                   </TableCell>
                 </TableRow>
               ))}
