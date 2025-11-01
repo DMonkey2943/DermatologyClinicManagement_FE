@@ -19,18 +19,18 @@ export default function AuthLayout({
           <div className="lg:w-1/2 w-full h-full bg-brand-950 dark:bg-white/5 lg:grid items-center hidden">
             <div className="relative items-center justify-center  flex z-1">
               {/* <!-- ===== Common Grid Shape Start ===== --> */}
-              <GridShape />
+              {/* <GridShape /> */}
               <div className="flex flex-col items-center max-w-xs">
-                <Link href="/" className="block mb-4">
+                {/* <Link href="/" className="block mb-4">
                   <Image
                     width={231}
                     height={48}
-                    src="./images/logo/auth-logo.svg"
+                    src="/images/logo/logo.svg"
                     alt="Logo"
                   />
-                </Link>
-                <p className="text-center text-gray-400 dark:text-white/60">
-                  Free and Open-Source Tailwind CSS Admin Dashboard Template
+                </Link> */}
+                <p className="text-xl text-center text-gray-400 font-semibold dark:text-white/60">
+                  Quản lý phòng khám da liễu ForSkin
                 </p>
               </div>
             </div>

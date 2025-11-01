@@ -74,10 +74,10 @@ export default function SignInForm() {
         <div>
           <div className="mb-5 sm:mb-8">
             <h1 className="mb-2 font-semibold text-gray-800 text-title-sm dark:text-white/90 sm:text-title-md">
-              Sign In
+              Đăng nhập
             </h1>
             <p className="text-sm text-gray-500 dark:text-gray-400">
-              Enter your username and password to sign in!
+              Nhập username và mật khẩu để đăng nhập vào hệ thống!
             </p>
             {unauthorizedErrors && (
               <p
@@ -91,10 +91,10 @@ export default function SignInForm() {
             <div className="space-y-6">
               <div>
                 <Label>
-                  username <span className="text-error-500">*</span>
+                  Username <span className="text-error-500">*</span>
                 </Label>
                 <Input
-                  placeholder="Username"
+                  placeholder="Nhập username"
                   type="text"
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
@@ -104,12 +104,12 @@ export default function SignInForm() {
               </div>
               <div>
                 <Label>
-                  Password <span className="text-error-500">*</span>
+                  Mật khẩu <span className="text-error-500">*</span>
                 </Label>
                 <div className="relative">
                   <Input
                     type={showPassword ? "text" : "password"}
-                    placeholder="Enter your password"
+                    placeholder="Nhập mật khẩu"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}error={!!errors.password} // Hiển thị trạng thái lỗi
                     hint={errors.password} // Hiển thị message lỗi
@@ -133,7 +133,7 @@ export default function SignInForm() {
                 </span>
               </div> */}
               <Button className="w-full" size="sm" disabled={isLoading}>
-                Sign in
+                Đăng nhập
               </Button>
             </div>
           </form>
