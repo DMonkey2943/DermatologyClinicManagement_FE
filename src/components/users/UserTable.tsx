@@ -2,6 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
+import Image from "next/image";
 import {
   Table,
   TableBody,
@@ -17,7 +18,7 @@ import PaginationControls from '../ui/pagination/PaginationControls';
 
 interface UserTableProps {
   users: UserDataType[];
-  onEdit: (user: UserDataType) => void;
+  // onEdit: (user: UserDataType) => void;
   onDelete: (id: string) => void;
   isLoading: boolean;
 
@@ -29,9 +30,12 @@ interface UserTableProps {
   onPageSizeChange?: (newSize: number) => void;
 }
 
+// Environment variable for API base URL
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://127.0.0.1:8000";
+
 export default function UserTable({
   users,
-  onEdit,
+  // onEdit,
   onDelete,
   isLoading,
   page = 0,
@@ -40,7 +44,6 @@ export default function UserTable({
   onPageChange,
   onPageSizeChange,
 }: UserTableProps) {
-
   return (
     isLoading
       ?
@@ -57,9 +60,15 @@ export default function UserTable({
                   // isHeader
                   className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
                 >
-                  Username
+                  User
                 </TableCell>
                 <TableCell
+                  // isHeader
+                  className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
+                >
+                  Username
+                </TableCell>
+                {/* <TableCell
                   // isHeader
                   className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
                 >
@@ -70,7 +79,7 @@ export default function UserTable({
                   className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
                 >
                   Email
-                </TableCell>
+                </TableCell> */}
                 <TableCell
                   // isHeader
                   className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
@@ -96,15 +105,37 @@ export default function UserTable({
             <TableBody className="divide-y divide-gray-100 dark:divide-white/[0.05]">
               {users.map((user) => (
                 <TableRow key={user.id}>
+                  <TableCell className="px-5 py-4 sm:px-6 text-start">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 overflow-hidden rounded-full">
+                          <Image
+                            width={40}
+                            height={40}
+                            src={user.avatar
+                                ? `${API_BASE_URL}${user.avatar}`
+                                : "/images/user/avatar-default.png"}
+                            alt={user.username}
+                          />
+                        </div>
+                        <div>
+                          <span className="block font-medium text-gray-800 text-theme-sm dark:text-white/90">
+                            {user.full_name}
+                          </span>
+                          <span className="block text-gray-500 text-theme-xs dark:text-gray-400">
+                            {user.email}
+                          </span>
+                        </div>
+                      </div>
+                    </TableCell>
                   <TableCell className="px-5 py-4 text-start text-theme-sm text-gray-800 dark:text-white/90">
                     {user.username}
                   </TableCell>
-                  <TableCell className="px-5 py-4 text-start text-theme-sm text-gray-800 dark:text-white/90">
+                  {/* <TableCell className="px-5 py-4 text-start text-theme-sm text-gray-800 dark:text-white/90">
                     {user.full_name}
                   </TableCell>
                   <TableCell className="px-5 py-4 text-start text-theme-sm text-gray-800 dark:text-white/90">
                     {user.email}
-                  </TableCell>
+                  </TableCell> */}
                   <TableCell className="px-5 py-4 text-start text-theme-sm text-gray-800 dark:text-white/90">
                     {user.phone_number}
                   </TableCell>

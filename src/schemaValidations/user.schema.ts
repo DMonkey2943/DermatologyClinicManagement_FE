@@ -33,7 +33,7 @@ export const UserData = z.object({
     email: z.string(),
     dob: z.string().optional(),
     gender: z.enum(["MALE", "FEMALE"]).optional(),
-    avatar: z.string().optional(),
+    avatar: z.string().nullable(),
     role: z.enum(["ADMIN", "STAFF", "DOCTOR"]),
 })
 export type UserDataType = z.TypeOf<typeof UserData>
