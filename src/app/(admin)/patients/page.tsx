@@ -72,7 +72,7 @@ export default function PatientListPage() {
   };
 
   const handleDelete = async (id: string) => {
-    if (confirm('Bạn có chắc chắn xoá bệnh nhân này?')) {
+    // if (confirm('Bạn có chắc chắn xoá bệnh nhân này?')) {
       try {
         await patientApiRequest.delete(id);        
         toast.success("Xóa bệnh nhân thành công");
@@ -81,7 +81,7 @@ export default function PatientListPage() {
         console.error('Lỗi xóa Patient: ', error);
         toast.error("Có lỗi xảy ra, vui lòng thử lại!");
       }
-    }
+    // }
   };
 
   const handleFormSubmit = async () => {
