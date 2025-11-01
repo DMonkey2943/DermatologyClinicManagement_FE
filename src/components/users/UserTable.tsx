@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import Link from 'next/link';
 import {
   Table,
   TableBody,
@@ -112,8 +113,11 @@ export default function UserTable({
                   </TableCell>
                   <TableCell className="px-5 py-4 text-start text-theme-xs text-gray-500 dark:text-gray-400">
                     <div className="flex gap-2">
-                      <Button size="sm" onClick={() => onEdit(user)}>Edit</Button>
-                      <Button size="sm" variant="destructive" onClick={() => onDelete(user.id)}>Delete</Button>
+                      {/* <Button size="sm" onClick={() => onEdit(user)}>Edit</Button> */}
+                      <Link href={`/users/${user.id}/edit`}>
+                        <Button size="sm">Sửa</Button>
+                      </Link>
+                      <Button size="sm" variant="destructive" onClick={() => onDelete(user.id)}>Xóa</Button>
                     </div>
                   </TableCell>
                 </TableRow>

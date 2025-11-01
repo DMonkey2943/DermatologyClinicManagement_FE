@@ -31,6 +31,9 @@ export const UserData = z.object({
     full_name: z.string(),
     phone_number: z.string(),
     email: z.string(),
+    dob: z.string().optional(),
+    gender: z.enum(["MALE", "FEMALE"]).optional(),
+    avatar: z.string().optional(),
     role: z.enum(["ADMIN", "STAFF", "DOCTOR"]),
 })
 export type UserDataType = z.TypeOf<typeof UserData>
@@ -42,6 +45,15 @@ export const CurrentUserRes = z.object({
 })
 
 export type CurrentUserResType = z.TypeOf<typeof CurrentUserRes>
+
+export const UserRes = z.object({
+    data: UserData,
+    message: z.string(),
+    success: z.boolean(),
+    meta: MetaData,
+})
+
+export type UserResType = z.TypeOf<typeof UserRes>
 
 export const UserListRes = z.object({
     data: z.array(UserData),
