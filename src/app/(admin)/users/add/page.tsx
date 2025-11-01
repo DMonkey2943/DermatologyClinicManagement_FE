@@ -141,261 +141,264 @@ export default function CreateUserPage() {
   };
 
   return (
-    <div className="container mx-auto p-4 md:p-6 max-w-4xl">
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-2xl">Thêm người dùng mới</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-              {/* === Nhóm 1: Thông tin cá nhân === */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <FormField
-                  control={form.control}
-                  name="full_name"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Họ và tên</FormLabel>
-                      <FormControl>
-                        <Input placeholder="Nguyễn Văn A" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="email"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Email</FormLabel>
-                      <FormControl>
-                        <Input type="email" placeholder="user@example.com" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <FormField
-                  control={form.control}
-                  name="phone_number"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Số điện thoại</FormLabel>
-                      <FormControl>
-                        <Input placeholder="0901234567" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="dob"
-                  render={({ field }) => (
-                    <FormItem className="flex flex-col">
-                      <FormLabel>Ngày sinh</FormLabel>
-                      <Popover>
-                        <PopoverTrigger asChild>
-                          <FormControl>
-                            <Button
-                              variant="outline"
-                              className={cn(
-                                "w-full pl-3 text-left font-normal",
-                                !field.value && "text-muted-foreground"
-                              )}
-                            >
-                              {field.value ? (
-                                format(field.value, "dd/MM/yyyy")
-                              ) : (
-                                <span>Chọn ngày sinh</span>
-                              )}
-                              <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                            </Button>
-                          </FormControl>
-                        </PopoverTrigger>
-                        <PopoverContent className="w-auto p-0" align="start">
-                          <Calendar
-                            mode="single"
-                            selected={field.value ? new Date(field.value) : undefined}
-                            onSelect={(date) => {
-                              if (date) {
-                                field.onChange(date.toISOString().split("T")[0]);
-                              }
-                            }}
-                            disabled={(date) =>
-                              date > new Date() || date < new Date("1900-01-01")
-                            }
-                            initialFocus
-                            captionLayout="dropdown"
-                          />
-                        </PopoverContent>
-                      </Popover>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-
-              {/* === Nhóm 2: Giới tính & Vai trò === */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {/* Giới tính - Radio */}
-                <FormField
-                  control={form.control}
-                  name="gender"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Giới tính</FormLabel>
-                      <FormControl>
-                        <RadioGroup
-                          onValueChange={field.onChange}
-                          defaultValue={field.value}
-                          className="flex flex-row space-x-4"
-                        >
-                          <div className="flex items-center space-x-2">
-                            <RadioGroupItem value="MALE" id="male" />
-                            <label htmlFor="male" className="cursor-pointer font-normal">
-                              Nam
-                            </label>
-                          </div>
-                          <div className="flex items-center space-x-2">
-                            <RadioGroupItem value="FEMALE" id="female" />
-                            <label htmlFor="female" className="cursor-pointer font-normal">
-                              Nữ
-                            </label>
-                          </div>
-                        </RadioGroup>
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                {/* Vai trò - Select */}
-                <FormField
-                  control={form.control}
-                  name="role"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Vai trò</FormLabel>
-                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+    <div>
+      <div className="container mx-auto p-4 md:p-6 max-w-4xl">
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-2xl">Thêm tài khoản mới</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <Form {...form}>
+              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+                {/* === Nhóm 1: Thông tin cá nhân === */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <FormField
+                    control={form.control}
+                    name="full_name"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Họ và tên</FormLabel>
                         <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Chọn vai trò" />
-                          </SelectTrigger>
+                          <Input placeholder="Nguyễn Văn A" {...field} />
                         </FormControl>
-                        <SelectContent>
-                          <SelectItem value="ADMIN">Quản trị viên</SelectItem>
-                          <SelectItem value="STAFF">Nhân viên</SelectItem>
-                          <SelectItem value="DOCTOR">Bác sĩ</SelectItem>
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-
-              {/* === Nhóm 3: Tài khoản === */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <FormField
-                  control={form.control}
-                  name="username"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Tên đăng nhập</FormLabel>
-                      <FormControl>
-                        <Input placeholder="username123" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="password"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Mật khẩu</FormLabel>
-                      <FormControl>
-                        <Input type="password" placeholder="••••••••" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-
-                {/* === Avatar Upload === */}
-              <div className="space-y-2">
-                <FormLabel>Ảnh đại diện (tùy chọn)</FormLabel>
-                <div className="flex items-center gap-4">
-                  {/* Preview */}
-                  {previewUrl ? (
-                    <div className="relative">
-                      <img
-                        src={previewUrl}
-                        alt="Preview"
-                        className="w-24 h-24 rounded-full object-cover border"
-                      />
-                      <button
-                        type="button"
-                        onClick={removeAvatar}
-                        className="absolute top-0 right-0 bg-red-500 text-white rounded-full p-1"
-                      >
-                        <X className="w-4 h-4" />
-                      </button>
-                    </div>
-                  ) : (
-                    <div className="w-24 h-24 rounded-full border-2 border-dashed border-gray-300 flex items-center justify-center">
-                      <Upload className="w-8 h-8 text-gray-400" />
-                    </div>
-                  )}
-
-                  {/* Input file ẩn */}
-                  <input
-                    ref={fileInputRef}
-                    type="file"
-                    accept="image/*"
-                    onChange={handleFileChange}
-                    className="hidden"
-                    id="avatar-upload"
+                        <FormMessage />
+                      </FormItem>
+                    )}
                   />
 
-                  {/* Button chọn file */}
-                  <div>
-                    <label htmlFor="avatar-upload">
-                      <Button type="button" variant="outline" asChild>
-                        <span className="cursor-pointer">Chọn ảnh</span>
-                      </Button>
-                    </label>
-                    <p className="text-sm text-muted-foreground mt-1">
-                      Tối đa 5MB, định dạng ảnh
-                    </p>
+                  <FormField
+                    control={form.control}
+                    name="email"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Email</FormLabel>
+                        <FormControl>
+                          <Input type="email" placeholder="user@example.com" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <FormField
+                    control={form.control}
+                    name="phone_number"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Số điện thoại</FormLabel>
+                        <FormControl>
+                          <Input placeholder="0901234567" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="dob"
+                    render={({ field }) => (
+                      <FormItem className="flex flex-col">
+                        <FormLabel>Ngày sinh</FormLabel>
+                        <Popover>
+                          <PopoverTrigger asChild>
+                            <FormControl>
+                              <Button
+                                variant="outline"
+                                className={cn(
+                                  "w-full pl-3 text-left font-normal",
+                                  !field.value && "text-muted-foreground"
+                                )}
+                              >
+                                {field.value ? (
+                                  format(field.value, "dd/MM/yyyy")
+                                ) : (
+                                  <span>Chọn ngày sinh</span>
+                                )}
+                                <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                              </Button>
+                            </FormControl>
+                          </PopoverTrigger>
+                          <PopoverContent className="w-auto p-0" align="start">
+                            <Calendar
+                              mode="single"
+                              selected={field.value ? new Date(field.value) : undefined}
+                              onSelect={(date) => {
+                                if (date) {
+                                  field.onChange(date.toISOString().split("T")[0]);
+                                }
+                              }}
+                              disabled={(date) =>
+                                date > new Date() || date < new Date("1900-01-01")
+                              }
+                              initialFocus
+                              captionLayout="dropdown"
+                            />
+                          </PopoverContent>
+                        </Popover>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
+                {/* === Nhóm 2: Giới tính & Vai trò === */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {/* Giới tính - Radio */}
+                  <FormField
+                    control={form.control}
+                    name="gender"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Giới tính</FormLabel>
+                        <FormControl>
+                          <RadioGroup
+                            onValueChange={field.onChange}
+                            defaultValue={field.value}
+                            className="flex flex-row space-x-4"
+                          >
+                            <div className="flex items-center space-x-2">
+                              <RadioGroupItem value="MALE" id="male" />
+                              <label htmlFor="male" className="cursor-pointer font-normal">
+                                Nam
+                              </label>
+                            </div>
+                            <div className="flex items-center space-x-2">
+                              <RadioGroupItem value="FEMALE" id="female" />
+                              <label htmlFor="female" className="cursor-pointer font-normal">
+                                Nữ
+                              </label>
+                            </div>
+                          </RadioGroup>
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  {/* Vai trò - Select */}
+                  <FormField
+                    control={form.control}
+                    name="role"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Vai trò</FormLabel>
+                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Chọn vai trò" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            <SelectItem value="ADMIN">Quản trị viên</SelectItem>
+                            <SelectItem value="STAFF">Nhân viên</SelectItem>
+                            <SelectItem value="DOCTOR">Bác sĩ</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
+                {/* === Nhóm 3: Tài khoản === */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <FormField
+                    control={form.control}
+                    name="username"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Tên đăng nhập</FormLabel>
+                        <FormControl>
+                          <Input placeholder="username123" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="password"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Mật khẩu</FormLabel>
+                        <FormControl>
+                          <Input type="password" placeholder="••••••••" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
+                  {/* === Avatar Upload === */}
+                <div className="space-y-2">
+                  <FormLabel>Ảnh đại diện (tùy chọn)</FormLabel>
+                  <div className="flex items-center gap-4">
+                    {/* Preview */}
+                    {previewUrl ? (
+                      <div className="relative">
+                        <img
+                          src={previewUrl}
+                          alt="Preview"
+                          className="w-24 h-24 rounded-full object-cover border"
+                        />
+                        <button
+                          type="button"
+                          onClick={removeAvatar}
+                          className="absolute top-0 right-0 bg-red-500 text-white rounded-full p-1"
+                        >
+                          <X className="w-4 h-4" />
+                        </button>
+                      </div>
+                    ) : (
+                      <div className="w-24 h-24 rounded-full border-2 border-dashed border-gray-300 flex items-center justify-center">
+                        <Upload className="w-8 h-8 text-gray-400" />
+                      </div>
+                    )}
+
+                    {/* Input file ẩn */}
+                    <input
+                      ref={fileInputRef}
+                      type="file"
+                      accept="image/*"
+                      onChange={handleFileChange}
+                      className="hidden"
+                      id="avatar-upload"
+                    />
+
+                    {/* Button chọn file */}
+                    <div>
+                      <label htmlFor="avatar-upload">
+                        <Button type="button" variant="outline" asChild>
+                          <span className="cursor-pointer">Chọn ảnh</span>
+                        </Button>
+                      </label>
+                      <p className="text-sm text-muted-foreground mt-1">
+                        Tối đa 5MB, định dạng ảnh
+                      </p>
+                    </div>
                   </div>
                 </div>
-              </div>
 
-              {/* Nút submit */}
-              <Button
-                type="submit"
-                className="w-full md:w-auto md:min-w-48"
-                size="lg"
-                disabled={form.formState.isSubmitting}
-              >
-                {form.formState.isSubmitting ? "Đang tạo..." : "Tạo người dùng"}
-              </Button>
-            </form>
-          </Form>
-        </CardContent>
-      </Card>
+                {/* Nút submit */}
+                <Button
+                  type="submit"
+                  className="w-full md:w-auto md:min-w-48"
+                  size="lg"
+                  disabled={form.formState.isSubmitting}
+                  variant="primary"
+                >
+                  {form.formState.isSubmitting ? "Đang tạo..." : "Tạo người dùng"}
+                </Button>
+              </form>
+            </Form>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 }

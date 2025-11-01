@@ -1,11 +1,12 @@
 'use client';
 
 import React, { useEffect, useState, useRef } from 'react';
+import Link from 'next/link';
 import PageBreadcrumb from '@/components/common/PageBreadCrumb';
 import ComponentCard from '@/components/common/ComponentCard';
 import UserTable from '@/components/users/UserTable';
 import Button from '@/components/ui/button/Button';
-import UserFormModal from '@/components/users/UserFormModal';
+// import UserFormModal from '@/components/users/UserFormModal';
 import userApiRequest from '@/apiRequests/user';
 import { UserDataType } from '@/schemaValidations/user.schema';
 import { toast } from "sonner";
@@ -13,8 +14,8 @@ import SearchInput from '@/components/ui/searchInput/SearchInput';
 
 export default function UserListPage() {
   const [users, setUsers] = useState<UserDataType[]>([]);
-  const [editingUser, setEditingUser] = useState<UserDataType | null>(null);
-  const [modalType, setModalType] = useState<'add' | 'edit' | null>(null);
+  // const [editingUser, setEditingUser] = useState<UserDataType | null>(null);
+  // const [modalType, setModalType] = useState<'add' | 'edit' | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
   // Thêm state phân trang
@@ -76,10 +77,10 @@ export default function UserListPage() {
     }
   };
 
-  const handleEdit = (user: UserDataType) => {
-    setEditingUser(user);
-    setModalType('edit');
-  };
+  // const handleEdit = (user: UserDataType) => {
+  //   setEditingUser(user);
+  //   setModalType('edit');
+  // };
 
   const handleDelete = async (id: string) => {
     if (confirm('Bạn có chắc chắn xoá user này?')) {
@@ -98,23 +99,23 @@ export default function UserListPage() {
     }
   };
 
-  const handleFormSubmit = async () => {
-    // Đóng modal và refresh (giữ page)
-    closeModal();
-    await fetchUsers(); // Refresh the list
-  };
+  // const handleFormSubmit = async () => {
+  //   // Đóng modal và refresh (giữ page)
+  //   closeModal();
+  //   await fetchUsers(); // Refresh the list
+  // };
 
-  const openAddModal = () => {
-    setEditingUser(null);
-    setModalType('add');
-    // Khi tạo mới, thường muốn về trang đầu để thấy item mới (tuỳ yêu cầu)
-    setPage(0);
-  };
+  // const openAddModal = () => {
+  //   setEditingUser(null);
+  //   setModalType('add');
+  //   // Khi tạo mới, thường muốn về trang đầu để thấy item mới (tuỳ yêu cầu)
+  //   setPage(0);
+  // };
 
-  const closeModal = () => {
-    setEditingUser(null);
-    setModalType(null);
-  };
+  // const closeModal = () => {
+  //   setEditingUser(null);
+  //   setModalType(null);
+  // };
 
   // Handlers phân trang được truyền xuống UserTable
   const handlePageChange = (newPage: number) => {
@@ -136,21 +137,24 @@ export default function UserListPage() {
 
   return (
     <div>
-      <UserFormModal
+      {/* <UserFormModal
         isOpen={!!modalType}
         onClose={closeModal}
         onSuccess={handleFormSubmit}
         editingUser={editingUser}
         modalType={modalType}
-      />
+      /> */}
       
-      <PageBreadcrumb pageTitle="Danh sách Users" />
+      <PageBreadcrumb pageTitle="Danh sách Tài khoản" />
       
       <div className="space-y-6">
-        <ComponentCard title="Danh sách Users">
+        <ComponentCard title="Danh sách Tài khoản">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
             <div className="flex items-center gap-2">
-              <Button onClick={openAddModal}>+ Thêm người dùng</Button>
+              {/* <Button onClick={openAddModal}>+ Thêm tài khoản</Button> */}
+              <Link href={`/users/add`}>
+                <Button >+ Thêm tài khoản</Button>
+              </Link>
             </div>
 
             {/* Search placed to the right */}
@@ -169,7 +173,7 @@ export default function UserListPage() {
 
           <UserTable 
             users={users} 
-            onEdit={handleEdit} 
+            // onEdit={handleEdit} 
             onDelete={handleDelete} 
             isLoading={isLoading}
             // Truyền props phân trang vào UserTable
