@@ -29,6 +29,7 @@ import patientApiRequest from '@/apiRequests/patient';
 import medicalRecordApiRequest from '@/apiRequests/medicalRecord';
 
 import { PatientFullDataType } from '@/schemaValidations/patient.schema';
+import MedicalRecordByPatientTable from '@/components/medical-records/MedicalRecordByPatientTable';
 // import { PrescriptionItem, ServiceItem } from '@/types/medical-record';
 import { MedicalRecordDataType } from '@/schemaValidations/medicalRecord.schema';
 import { ServiceIndicationDetailDataType, ServiceItemType } from '@/schemaValidations/serviceIndication.schema';
@@ -305,6 +306,11 @@ export default function AddMedicalRecordPage() {
       <div className="container max-w-7xl py-6 grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-1">
           <PatientInfoCard patient={patient} />
+          <span className='p-2'>
+            <MedicalRecordByPatientTable
+              patient_id_props={patient.id}
+            />
+          </span>
         </div>
 
         <div className="lg:col-span-2 space-y-6">
