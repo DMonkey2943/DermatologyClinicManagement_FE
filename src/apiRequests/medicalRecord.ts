@@ -10,6 +10,11 @@ const medicalRecordApiRequest = {
         params: { skip?: number; limit?: number, doctor_id?: string, patient_id?:string } = { skip: 0, limit: 100 }
     ) => http.get<MedicalRecordListResType>(`/${prefix}/`, { params }),
 
+    getListByPatient: (
+        patient_id: string,
+        params: { skip?: number; limit?: number } = { skip: 0, limit: 5 }
+    ) => http.get<MedicalRecordListResType>(`/${prefix}/patient/${patient_id}`, { params }),
+
     getDetail: (id: string) => http.get<MedicalRecordResType>(`/${prefix}/${id}`),
 
     getByAppointment: (appointment_id: string) => http.get<MedicalRecordResType>(`/${prefix}/by-appointment/${appointment_id}`),
