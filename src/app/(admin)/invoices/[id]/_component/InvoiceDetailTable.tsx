@@ -19,34 +19,12 @@ interface InvoiceDetailTableProps {
 }
 
 export default function InvoiceDetailTable({ services, medications, finalAmounts }: InvoiceDetailTableProps) {
-  // const calculateTotal = (items) => {
-  //   return items.reduce((sum, item) => sum + (item.total_price), 0);
-  // };
-
-  // Tính tổng và memoize
-  // const { serviceSubtotal, medicationSubtotal, grandTotal } = useMemo(() => {
-  //   const serviceSubtotal = calculateTotal(serviceIndication.services);
-  //   const medicationSubtotal = calculateTotal(prescription.medications);
-  //   const grandTotal = serviceSubtotal + medicationSubtotal;
-  //   return { serviceSubtotal, medicationSubtotal, grandTotal };
-  // }, [serviceIndication.services, prescription.medications]);
-
-  // const formatCurrency = (amount: number) => {
-  //   return new Intl.NumberFormat('vi-VN', {
-  //     style: 'currency',
-  //     currency: 'VND'
-  //   }).format(amount);
-  // };
-
-  // useEffect(() => {
-  //   onSendData({ serviceSubtotal, medicationSubtotal, grandTotal });
-  // }, [serviceIndication, prescription, onSendData]);
 
   return (
     <Card className="mb-6">
-      <CardHeader className="pb-3">
+      {/* <CardHeader className="pb-3">
         <CardTitle className="text-lg md:text-xl">Chi Tiết Hóa Đơn</CardTitle>
-      </CardHeader>
+      </CardHeader> */}
       <CardContent className="overflow-x-auto">
         <Table>
           <TableHeader>
@@ -54,7 +32,7 @@ export default function InvoiceDetailTable({ services, medications, finalAmounts
               <TableHead className="w-12 md:w-16">STT</TableHead>
               <TableHead className="min-w-[150px]">Tên hàng</TableHead>
               <TableHead className="w-16 md:w-24 text-center">SL</TableHead>
-              <TableHead className="w-16 md:w-20">ĐVT</TableHead>
+              {/* <TableHead className="w-16 md:w-20">ĐVT</TableHead> */}
               <TableHead className="w-24 md:w-32 text-right">Đơn giá</TableHead>
               <TableHead className="w-28 md:w-36 text-right">Thành tiền</TableHead>
             </TableRow>
@@ -62,7 +40,7 @@ export default function InvoiceDetailTable({ services, medications, finalAmounts
           <TableBody>
             {/* Dịch vụ */}
             <TableRow className="bg-blue-50">
-              <TableCell colSpan={6} className="font-semibold text-blue-900">
+              <TableCell colSpan={5} className="font-semibold text-blue-900">
                 Dịch vụ chẩn đoán - điều trị
               </TableCell>
             </TableRow>
@@ -71,7 +49,7 @@ export default function InvoiceDetailTable({ services, medications, finalAmounts
                 <TableCell className="text-center">{index + 1}</TableCell>
                 <TableCell>{item.name}</TableCell>
                 <TableCell className="text-center">{item.quantity}</TableCell>
-                <TableCell>{"Gói"}</TableCell>
+                {/* <TableCell>{"Gói"}</TableCell> */}
                 <TableCell className="text-right text-xs md:text-sm">
                   {formatCurrency(item.unit_price)}
                 </TableCell>
@@ -83,7 +61,7 @@ export default function InvoiceDetailTable({ services, medications, finalAmounts
             
             {/* Thuốc */}
             <TableRow className="bg-green-50">
-              <TableCell colSpan={6} className="font-semibold text-green-900">
+              <TableCell colSpan={5} className="font-semibold text-green-900">
                 Thuốc
               </TableCell>
             </TableRow>
@@ -92,7 +70,7 @@ export default function InvoiceDetailTable({ services, medications, finalAmounts
                 <TableCell className="text-center">{services.length + index + 1}</TableCell>
                 <TableCell>{item.name}</TableCell>
                 <TableCell className="text-center">{item.quantity}</TableCell>
-                <TableCell>{item.dosage_form}</TableCell>
+                {/* <TableCell>{item.dosage_form}</TableCell> */}
                 <TableCell className="text-right text-xs md:text-sm">
                   {formatCurrency(item.unit_price)}
                 </TableCell>
@@ -104,7 +82,7 @@ export default function InvoiceDetailTable({ services, medications, finalAmounts
             
             {/* Tổng cộng */}
             <TableRow className="bg-gray-100 font-bold">
-              <TableCell colSpan={5} className="text-right text-base md:text-lg">
+              <TableCell colSpan={4} className="text-right text-base md:text-lg">
                 TỔNG CỘNG:
               </TableCell>
               <TableCell className="text-right text-base md:text-lg text-red-600">
