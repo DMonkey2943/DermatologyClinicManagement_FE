@@ -5,7 +5,15 @@ const prefix = 'appointments';
 
 const appointmentApiRequest = {
     getList: (
-        params: { skip?: number; limit?: number } = { skip: 0, limit: 100 }
+        params: {
+            skip?: number;
+            limit?: number;
+            doctor_id?: string;
+            patient_id?: string;
+            status?: string[];
+            appointment_date?: string;
+            upcoming?: boolean;
+        } = { skip: 0, limit: 100 }
     ) => http.get<AppointmentListResType>(`/${prefix}/`, { params }),
 
     getDetail: (id: string) => http.get<AppointmentResType>(`/${prefix}/${id}`),
