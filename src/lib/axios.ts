@@ -1,5 +1,6 @@
 import axios from 'axios';
 import Cookies from 'js-cookie';
+import qs from 'qs'; // Thêm thư viện qs để tùy chỉnh query string
 import { normalizePath } from '@/lib/utils';
 import { LoginResType } from '@/schemaValidations/auth.schema'
 
@@ -201,7 +202,11 @@ const http = {
     const fullUrl = options?.baseUrl
       ? (url.startsWith('/') ? `${options.baseUrl}${url}` : `${options.baseUrl}/${url}`)
       : url
-    return api.get(fullUrl, { params: options?.params, headers: options?.headers }).then((res) => ({
+    return api.get(fullUrl, {
+      params: options?.params,
+      paramsSerializer: (params) => qs.stringify(params, { arrayFormat: 'repeat' }), // Sử dụng qs để mã hóa query string, đảm bảo (status=value1&status=value2)
+      headers: options?.headers
+    }).then((res) => ({
       status: res.status,
       payload: res.data as Response
     }))
@@ -210,7 +215,11 @@ const http = {
     const fullUrl = options?.baseUrl
       ? (url.startsWith('/') ? `${options.baseUrl}${url}` : `${options.baseUrl}/${url}`)
       : url
-    return api.post(fullUrl, body, { params: options?.params, headers: options?.headers }).then((res) => ({
+    return api.post(fullUrl, body, {
+      params: options?.params,
+      paramsSerializer: (params) => qs.stringify(params, { arrayFormat: 'repeat' }),
+      headers: options?.headers
+    }).then((res) => ({
       status: res.status,
       payload: res.data as Response
     }))
@@ -219,7 +228,11 @@ const http = {
     const fullUrl = options?.baseUrl
       ? (url.startsWith('/') ? `${options.baseUrl}${url}` : `${options.baseUrl}/${url}`)
       : url
-    return api.put(fullUrl, body, { params: options?.params, headers: options?.headers }).then((res) => ({
+    return api.put(fullUrl, body, {
+      params: options?.params,
+      paramsSerializer: (params) => qs.stringify(params, { arrayFormat: 'repeat' }),
+      headers: options?.headers
+    }).then((res) => ({
       status: res.status,
       payload: res.data as Response
     }))
@@ -228,7 +241,11 @@ const http = {
     const fullUrl = options?.baseUrl
       ? (url.startsWith('/') ? `${options.baseUrl}${url}` : `${options.baseUrl}/${url}`)
       : url
-    return api.delete(fullUrl, { params: options?.params, headers: options?.headers }).then((res) => ({
+    return api.delete(fullUrl, {
+      params: options?.params,
+      paramsSerializer: (params) => qs.stringify(params, { arrayFormat: 'repeat' }),
+      headers: options?.headers
+    }).then((res) => ({
       status: res.status,
       payload: res.data as Response
     }))
