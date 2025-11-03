@@ -61,8 +61,9 @@ export function Combobox({
   }
 
   // Xây dựng chuỗi lớp CSS cho Button
-  let buttonClasses = cn(
+  const buttonClasses = cn(
     "h-11 w-full justify-between rounded-lg border px-4 py-2.5 pr-11 text-sm shadow-theme-xs focus:outline-hidden focus:ring-3",
+    "text-ellipsis overflow-hidden whitespace-nowrap", // Thêm để xử lý tràn nội dung
     value ? "text-gray-800 dark:text-white/90" : "text-gray-400 dark:text-gray-400",
     disabled
       ? "text-gray-500 border-gray-300 cursor-not-allowed dark:bg-gray-800 dark:text-gray-400 dark:border-gray-700"
@@ -85,9 +86,11 @@ export function Combobox({
             disabled={disabled}
             className={buttonClasses}
           >
-            {value
-              ? options.find((option) => option.value === value)?.label
-              : placeholder}
+            <span className="text-ellipsis overflow-hidden whitespace-nowrap">
+              {value
+                ? options.find((option) => option.value === value)?.label
+                : placeholder}
+            </span>
             <ChevronsUpDown className="ml-2 h-4 w-4 opacity-50" />
           </Button>
         </PopoverTrigger>
