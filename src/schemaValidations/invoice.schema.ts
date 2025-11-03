@@ -56,6 +56,7 @@ export const InvoiceFullData = z.object({
     // status: z.enum(["COMPLETED", "IN_PROGRESS"]),
     notes: z.string().nullable().optional(),
     created_at: z.string(),
+    diagnosis: z.string(),
     medications: z.array(PrescriptionDetailData),
     services: z.array(ServiceIndicationDetailData)
 })

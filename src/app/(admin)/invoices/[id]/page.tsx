@@ -93,7 +93,7 @@ export default function InvoiceDetailPreview({ params }: {
                                     </div>
                                     <div className="flex gap-2 w-full">
                                         <span className="font-medium">Chẩn đoán:</span>
-                                        <span>{'Khám tổng quát - Mụn trứng cá dạng nang, có viêm - Mức độ nặng, Khám tổng quát - Mụn trứng cá dạng nang, có viêm - Mức độ nặng'}</span>
+                                        <span>{invoice.diagnosis}</span>
                                     </div>
                                 </div>
                             </div>
