@@ -1,9 +1,9 @@
 import http from "@/lib/axios"
-import { MedicalRecordListResType, MedicalRecordResType, CreateMedicalRecordBodyType, UpdateMedicalRecordBodyType } from "@/schemaValidations/medicalRecord.schema";
+import { MedicalRecordListResType, MedicalRecordResType, CreateMedicalRecordBodyType, UpdateMedicalRecordBodyType, SkinImageListResType, SkinImageResType } from "@/schemaValidations/medicalRecord.schema";
 import { PrescriptionFullResType } from "@/schemaValidations/prescription.schema";
 import { ServiceIndicationFullResType } from "@/schemaValidations/serviceIndication.schema";
 
-const prefix = 'medical_records';
+const prefix = 'medical-records';
 
 const medicalRecordApiRequest = {
     getList: (
@@ -26,6 +26,12 @@ const medicalRecordApiRequest = {
     getPrescriptionByMRId: (medical_record_id: string) => http.get<PrescriptionFullResType>(`/${prefix}/${medical_record_id}/prescription`),
     
     getServiceIndicationByMRId: (medical_record_id: string) => http.get<ServiceIndicationFullResType>(`/${prefix}/${medical_record_id}/service-indication`),
+
+    uploadSkinImage: (medical_record_id: string, formData: FormData) => http.post<SkinImageResType>(`/${prefix}/${medical_record_id}/skin-images`, formData),
+
+    getSkinImageListByMRId: (medical_record_id: string) => http.get<SkinImageListResType>(`/${prefix}/${medical_record_id}/skin-images`),
+
+    deleteSkinImage: (image_id: string) => http.delete(`/${prefix}/skin-images/${image_id}`),
 };
 
 export default medicalRecordApiRequest;
