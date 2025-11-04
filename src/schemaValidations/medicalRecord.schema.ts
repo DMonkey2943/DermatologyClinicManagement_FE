@@ -82,7 +82,6 @@ export const SkinImageListRes = z.object({
     data: z.array(SkinImageData) || [],
     message: z.string(),
     success: z.boolean(),
-    meta: MetaData,
 })
 
 export type SkinImageListResType = z.TypeOf<typeof SkinImageListRes>

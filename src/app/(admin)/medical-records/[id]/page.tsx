@@ -10,6 +10,7 @@ import PrescriptionCard from './_component/PrescriptionCard';
 import medicalRecordApiRequest from '@/apiRequests/medicalRecord';
 import { MedicalRecordDataType } from '@/schemaValidations/medicalRecord.schema';
 import ServiceIndicationCard from './_component/ServiceIndicationCard';
+import SkinImagesCard from './_component/SkinImagesCard';
 
 export default function PatientDetai({ params }: {
   params: Promise<{ id: string }>
@@ -17,12 +18,8 @@ export default function PatientDetai({ params }: {
     const { id } = use(params);
     const [patientId, setPatientId] = useState<string | null>(null);
     const [doctorId, setDoctorId] = useState<string | null>(null);
-    // const [medicalRecordId, setMedicalRecordId] = useState<string | null>(null);
     const [patient, setPatient] = useState<PatientFullDataType>();
     const [medicalRecord, setMedicalRecord] = useState<MedicalRecordDataType>();
-    // const [prescription, setPrescription] = useState<PrescriptionFullDataType | null>();
-    // const [serviceIndication, setServiceIndication] = useState<ServiceIndicationFullDataType | null>();
-    // const patient_id = '793029ae-44d2-49b4-9fee-e8c077e59899';
 
     useEffect(() => {
         fetchMedicalRecordInfo();
@@ -42,8 +39,6 @@ export default function PatientDetai({ params }: {
             setMedicalRecord(mrData);
             setPatientId(mrData.patient_id);
             setDoctorId(mrData.doctor_id);
-            // await fetchPrescription(id);
-            // await fetchServiceIndication(id);
         } catch(error) {
             console.error('Lỗi lấy thông tin Appointment:', error);
         }
@@ -59,47 +54,6 @@ export default function PatientDetai({ params }: {
             console.error('Lỗi lấy thông tin Patients:', error);
         }
     };
-
-    // const fetchPrescription = async (medical_record_id: string) => {
-    //     try {
-    //         const {payload} = await medicalRecordApiRequest.getPrescriptionByMRId(medical_record_id);
-    //         const data = payload.data;
-    //         console.log(data);
-    //         setPrescription(data);
-    //     } catch (error) {
-    //         console.error('Lỗi lấy thông tin đơn thuốc:', error);
-    //     }
-    // };
-
-    // const fetchServiceIndication = async (medical_record_id: string) => {
-    //     try {
-    //         const {payload} = await medicalRecordApiRequest.getServiceIndicationByMRId(medical_record_id);
-    //         const data = payload.data;
-    //         console.log(data);
-    //         setServiceIndication(data);
-    //     } catch (error) {
-    //         console.error('Lỗi lấy thông tin phiếu chỉ định dịch vụ:', error);
-    //     }
-    // };
-
-    // const getMedicalRecordId = (mr_id: string) => {
-    //     console.log("medical_record_id: ", mr_id);
-    //     setMedicalRecordId(mr_id);
-    // }
-
-    // const handleCompleteMR = async () => {
-    //     try {
-    //         if (medicalRecordId) {
-    //             const {payload} = await medicalRecordApiRequest.update(medicalRecordId, {status: "COMPLETED"});
-    //             console.log(payload.data);
-    //             //Chuyển qua trang thông tin chi tiết phiên khám
-    //         } else {
-    //             alert("Bạn chưa lưu phiên khám!!")
-    //         }
-    //     } catch (e) {
-    //         console.error(e);
-    //     }
-    // }
     
 
     return (    
@@ -145,20 +99,11 @@ export default function PatientDetai({ params }: {
                             medicalRecordId={id}
                         />
                     </ComponentCard>
-                    {/* {medicalRecordId &&
-                        <> 
-                            <ComponentCard title="Kê đơn thuốc">           
-                                <PrescriptionForm
-                                medicalRecordId={medicalRecordId}
-                                />
-                            </ComponentCard>
-                            <ComponentCard title="Chỉ định dịch vụ">           
-                                <ServiceIndicationForm
-                                    medicalRecordId={medicalRecordId}
-                                />
-                            </ComponentCard>                            
-                        </>
-                    }                     */}
+                    <ComponentCard title="Ảnh da bệnh nhân">           
+                        <SkinImagesCard
+                            medicalRecordId={id}
+                        />
+                    </ComponentCard>
                 </div>
             </div>
         </div>
