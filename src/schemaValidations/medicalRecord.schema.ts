@@ -55,3 +55,34 @@ export const UpdateMedicalRecordBody = z.object({
 })
 
 export type UpdateMedicalRecordBodyType = z.TypeOf<typeof UpdateMedicalRecordBody>
+
+
+
+// ================================ SKIN IMAGE SCHEMAS ================================
+
+export const SkinImageData = z.object({
+    id: z.string(),
+    medical_record_id: z.string(),
+    image_type: z.enum(["FRONT", "LEFT", "RIGHT"]),
+    image_path: z.string(),
+    created_at: z.string(),
+})
+export type SkinImageDataType = z.TypeOf<typeof SkinImageData>
+
+export const SkinImageRes = z.object({
+    data: SkinImageData || null,
+    message: z.string(),
+    success: z.boolean()
+})
+
+export type SkinImageResType = z.TypeOf<typeof SkinImageRes>
+
+
+export const SkinImageListRes = z.object({
+    data: z.array(SkinImageData) || [],
+    message: z.string(),
+    success: z.boolean(),
+    meta: MetaData,
+})
+
+export type SkinImageListResType = z.TypeOf<typeof SkinImageListRes>
