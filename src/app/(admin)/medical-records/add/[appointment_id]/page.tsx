@@ -23,6 +23,7 @@ import PatientInfoCard from './_component/PatientInfoCard';
 import ExaminationTab from './_component/ExaminationTab';
 import PrescriptionTab from './_component/PrescriptionTab';
 import ServiceTab from './_component/ServiceTab';
+import SkinImagesTab from './_component/SkinImagesTab';
 
 import appointmentApiRequest from '@/apiRequests/appointment';
 import patientApiRequest from '@/apiRequests/patient';
@@ -31,7 +32,7 @@ import medicalRecordApiRequest from '@/apiRequests/medicalRecord';
 import { PatientFullDataType } from '@/schemaValidations/patient.schema';
 import MedicalRecordByPatientTable from '@/components/medical-records/MedicalRecordByPatientTable';
 // import { PrescriptionItem, ServiceItem } from '@/types/medical-record';
-import { MedicalRecordDataType } from '@/schemaValidations/medicalRecord.schema';
+import { MedicalRecordDataType, SkinImageDataType } from '@/schemaValidations/medicalRecord.schema';
 import { ServiceIndicationDetailDataType, ServiceItemType } from '@/schemaValidations/serviceIndication.schema';
 import { PrescriptionDetailDataType, PrescriptionItemType } from '@/schemaValidations/prescription.schema';
 import serviceIndicationApiRequest from '@/apiRequests/serviceIndication';
@@ -55,6 +56,7 @@ export default function AddMedicalRecordPage() {
 
   const [prescriptionItems, setPrescriptionItems] = useState<PrescriptionItemType[]>([]);
   const [serviceItems, setServiceItems] = useState<ServiceItemType[]>([]);
+  const [skinImages, setSkinImages] = useState<SkinImageDataType[]>([]);
 
   const [lastSaved, setLastSaved] = useState<string>();
   const [isSaving, setIsSaving] = useState(false);
@@ -176,6 +178,15 @@ export default function AddMedicalRecordPage() {
           }
         } catch {
           console.log("Chưa có chỉ định");
+        }
+
+        // Load skin images
+        try {
+          const { payload } = await medicalRecordApiRequest.getSkinImageListByMRId(mr.id);
+          console.log("SKIN IMAGE: ", payload);
+          setSkinImages(payload.data);
+        } catch {
+          console.log("Chưa có ảnh");
         }
 
         setPrescriptionId(prescriptionId);
@@ -323,13 +334,16 @@ export default function AddMedicalRecordPage() {
           />
 
           <Tabs defaultValue="examination" onValueChange={handleTabChange}>
-            <TabsList className="grid w-full grid-cols-3">
+            <TabsList className="grid w-full grid-cols-4">
               <TabsTrigger value="examination">Phiếu khám</TabsTrigger>
               <TabsTrigger value="prescription">
                 Kê đơn {prescriptionItems.length > 0 && <Badge className="ml-2">{prescriptionItems.length}</Badge>}
               </TabsTrigger>
               <TabsTrigger value="services">
                 Dịch vụ {serviceItems.length > 0 && <Badge className="ml-2">{serviceItems.length}</Badge>}
+              </TabsTrigger>
+              <TabsTrigger value="images">
+                Hình ảnh {skinImages.length > 0 && <Badge className="ml-2">{skinImages.length}</Badge>}
               </TabsTrigger>
             </TabsList>
 
@@ -365,6 +379,14 @@ export default function AddMedicalRecordPage() {
                 onItemsChange={setServiceItems}
                 onServiceIndicationIdChange={setServiceIndicationId}
                 onDirtyChange={setServiceDirty}
+              />
+            </TabsContent>
+
+            <TabsContent value="images">
+              <SkinImagesTab
+                medicalRecordId={medicalRecord.id}
+                images={skinImages}
+                onImagesChange={setSkinImages}
               />
             </TabsContent>
           </Tabs>
