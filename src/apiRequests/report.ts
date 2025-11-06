@@ -1,0 +1,43 @@
+// src/apiRequests/report.ts
+
+import http from "@/lib/axios"
+import { AppointmentStatsReportRes, DoctorStatsReportRes, MedicationStatsReportRes, PatientStatsReportRes, ReportPeriodRequest, RevenueReportRes, ServiceStatsReportRes } from "@/schemaValidations/report.schema";
+
+const prefix = 'reports';
+
+const reportApiRequest = {
+    getRevenueTotal: (
+        body: ReportPeriodRequest
+    ) => http.post<RevenueReportRes>(`/${prefix}/revenue/total`, body),
+
+    getRevenueMedications: (
+        body: ReportPeriodRequest
+    ) => http.post<RevenueReportRes>(`/${prefix}/revenue/medications`, body),
+
+    getRevenueServices: (
+        body: ReportPeriodRequest
+    ) => http.post<RevenueReportRes>(`/${prefix}/revenue/services`, body),
+
+    getPatientStats: (
+        body: ReportPeriodRequest
+    ) => http.post<PatientStatsReportRes>(`/${prefix}/patients`, body),
+
+    getAppointmentStats: (
+        body: ReportPeriodRequest
+    ) => http.post<AppointmentStatsReportRes>(`/${prefix}/appointments`, body),
+
+    getDoctorStats: (
+        body: ReportPeriodRequest
+    ) => http.post<DoctorStatsReportRes>(`/${prefix}/doctors`, body),
+
+    getMedicationStats: (
+        body: ReportPeriodRequest
+    ) => http.post<MedicationStatsReportRes>(`/${prefix}/medications`, body),
+
+    getServiceStats: (
+        body: ReportPeriodRequest
+    ) => http.post<ServiceStatsReportRes>(`/${prefix}/services`, body),
+
+};
+
+export default reportApiRequest;
