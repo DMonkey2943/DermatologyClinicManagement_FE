@@ -1,11 +1,15 @@
 // src/apiRequests/report.ts
 
 import http from "@/lib/axios"
-import { AppointmentStatsReportRes, DoctorStatsReportRes, MedicationStatsReportRes, PatientStatsReportRes, ReportPeriodRequest, RevenueReportRes, ServiceStatsReportRes } from "@/schemaValidations/report.schema";
+import { AppointmentStatsReportRes, DoctorStatsReportRes, MedicationStatsReportRes, PatientStatsReportRes, ReportPeriodRequest, RevenueComparisonRequest, RevenueComparisonRes, RevenueReportRes, ServiceStatsReportRes } from "@/schemaValidations/report.schema";
 
 const prefix = 'reports';
 
 const reportApiRequest = {
+    getRevenueComparison: (
+        body: RevenueComparisonRequest
+    ) => http.post<RevenueComparisonRes>(`/${prefix}/revenue/comparison`, body),
+
     getRevenueTotal: (
         body: ReportPeriodRequest
     ) => http.post<RevenueReportRes>(`/${prefix}/revenue/total`, body),

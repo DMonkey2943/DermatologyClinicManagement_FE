@@ -8,6 +8,34 @@ export interface ReportPeriodRequest {
     end_date?: string | null
 }
 
+export interface RevenueComparisonRequest {
+    period_type?: string | null; // week, month, year
+    reference_date?: string | null;
+}
+
+export interface RevenueDataPoint {
+    label: string;  //tên của điểm dữ liệu(Thứ 2, Tuần 1, Tháng 1, etc)
+    date: string;  //ngày đại diện
+    total: number;
+    medications: number;
+    services: number;
+}
+
+export interface RevenueComparisonReportData {
+    period_type: string;
+    start_date: string;
+    end_date: string;
+    data_points: Array<RevenueDataPoint>;
+    total_revenue: number;
+    total_medications: number;
+    total_services: number;
+}
+export interface RevenueComparisonRes {
+    data: RevenueComparisonReportData,
+    message: string,
+    success: boolean
+}
+
 export interface RevenueReport {
     total: number;
     start_date?: string;
@@ -48,8 +76,8 @@ export interface AppointmentStatsReport {
     counts_by_status: Record<string, number>;
     attendance_rate?: number;
     cancel_rate?: number;
-    avg_advance_days?: number;
-    popular_time_slot?: string;
+    // avg_advance_days?: number;
+    // popular_time_slot?: string;
 }
 export interface AppointmentStatsReportRes {
     data: AppointmentStatsReport,
