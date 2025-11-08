@@ -5,18 +5,11 @@ import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { useSidebar } from "../context/SidebarContext";
 import {
-  BoxCubeIcon,
   CalenderIcon,
   ChevronDownIcon,
   GridIcon,
   HorizontaLDots,
-  ListIcon,
-  PageIcon,
   PieChartIcon,
-  PlugInIcon,
-  TableIcon,
-  UserCircleIcon,
-  UserIcon,
   MedicationIcon,
   StethoscopeIcon,
   UsersGearIcon,
@@ -24,13 +17,14 @@ import {
   DollarLineIcon,
   DocsIcon,
 } from "../icons/index";
-import SidebarWidget from "./SidebarWidget";
+import { useAuth } from "@/context/AuthContext";
 
 type NavItem = {
   name: string;
   icon: React.ReactNode;
   path?: string;
   subItems?: { name: string; path: string; pro?: boolean; new?: boolean }[];
+  roles?: string[]; // Thêm thuộc tính roles để chỉ định vai trò được phép
 };
 
 const navItems: NavItem[] = [
@@ -38,112 +32,75 @@ const navItems: NavItem[] = [
     icon: <GridIcon />,
     name: "Dashboard",
     path: "/",
+    roles: ["ADMIN", "STAFF", "DOCTOR"], // Hiển thị cho mọi role
   },
   {
     icon: <PieChartIcon />,
     name: "Thống kê doanh thu",
     path: "/reports/revenue",
+    roles: ["ADMIN"], // Chỉ hiển thị cho ADMIN
   },
   {
     icon: <UsersGearIcon />,
     name: "Tài khoản",
     path: "/users",
+    roles: ["ADMIN"], // Chỉ hiển thị cho ADMIN
   },
   {
     icon: <HospitalUserIcon />,
     name: "Bệnh nhân",
     path: "/patients",
+    roles: ["ADMIN", "STAFF"], // Chỉ hiển thị cho ADMIN và STAFF
   },
   {
     icon: <CalenderIcon />,
     name: "Lịch hẹn",
     path: "/appointments",
+    roles: ["ADMIN", "STAFF", "DOCTOR"], // Hiển thị cho mọi role
   },
   {
     icon: <DocsIcon />,
     name: "Phiên khám",
     path: "/medical-records",
+    roles: ["ADMIN", "STAFF", "DOCTOR"], // Hiển thị cho mọi role
   },
   {
     icon: <DollarLineIcon />,
     name: "Hóa đơn",
     path: "/invoices",
+    roles: ["ADMIN", "STAFF", "DOCTOR"], // Hiển thị cho mọi role
   },
   {
     icon: <MedicationIcon />,
     name: "Thuốc",
     path: "/medications",
+    roles: ["ADMIN"], // Chỉ hiển thị cho ADMIN
   },
   {
     icon: <StethoscopeIcon />,
     name: "Dịch vụ điều trị",
     path: "/services",
+    roles: ["ADMIN"], // Chỉ hiển thị cho ADMIN
   },
-  // {
-  //   icon: <CalenderIcon />,
-  //   name: "Calendar",
-  //   path: "/calendar",
-  // },
-  // {
-  //   icon: <UserCircleIcon />,
-  //   name: "User Profile",
-  //   path: "/profile",
-  // },
-
-  // {
-  //   name: "Forms",
-  //   icon: <ListIcon />,
-  //   subItems: [{ name: "Form Elements", path: "/form-elements", pro: false }],
-  // },
-  // {
-  //   name: "Tables",
-  //   icon: <TableIcon />,
-  //   subItems: [{ name: "Basic Tables", path: "/basic-tables", pro: false }],
-  // },
-  // {
-  //   name: "Pages",
-  //   icon: <PageIcon />,
-  //   subItems: [
-  //     { name: "Blank Page", path: "/blank", pro: false },
-  //     { name: "404 Error", path: "/error-404", pro: false },
-  //   ],
-  // },
 ];
 
-const othersItems: NavItem[] = [
-  // {
-  //   icon: <PieChartIcon />,
-  //   name: "Charts",
-  //   subItems: [
-  //     { name: "Line Chart", path: "/line-chart", pro: false },
-  //     { name: "Bar Chart", path: "/bar-chart", pro: false },
-  //   ],
-  // },
-  // {
-  //   icon: <BoxCubeIcon />,
-  //   name: "UI Elements",
-  //   subItems: [
-  //     { name: "Alerts", path: "/alerts", pro: false },
-  //     { name: "Avatar", path: "/avatars", pro: false },
-  //     { name: "Badge", path: "/badge", pro: false },
-  //     { name: "Buttons", path: "/buttons", pro: false },
-  //     { name: "Images", path: "/images", pro: false },
-  //     { name: "Videos", path: "/videos", pro: false },
-  //   ],
-  // },
-  // {
-  //   icon: <PlugInIcon />,
-  //   name: "Authentication",
-  //   subItems: [
-  //     { name: "Sign In", path: "/signin", pro: false },
-  //     { name: "Sign Up", path: "/signup", pro: false },
-  //   ],
-  // },
-];
+const othersItems: NavItem[] = [];
 
 const AppSidebar: React.FC = () => {
   const { isExpanded, isMobileOpen, isHovered, setIsHovered } = useSidebar();
   const pathname = usePathname();
+  const { user } = useAuth();
+
+  // Hàm lọc navItems dựa trên role của user
+  const getFilteredNavItems = useCallback(
+    (items: NavItem[]): NavItem[] => {
+      if (!user?.role) return []; // Nếu không có user hoặc role, trả về mảng rỗng
+      return items.filter((item) =>
+        item.roles ? item.roles.includes(user.role) : true
+      );
+    },
+    [user?.role]
+  );
 
   const renderMenuItems = (
     navItems: NavItem[],
@@ -307,7 +264,7 @@ const AppSidebar: React.FC = () => {
     if (!submenuMatched) {
       setOpenSubmenu(null);
     }
-  }, [pathname,isActive]);
+  }, [pathname,isActive, user?.role]);
 
   useEffect(() => {
     // Set the height of the submenu items when the submenu is opened
@@ -400,7 +357,7 @@ const AppSidebar: React.FC = () => {
                   <HorizontaLDots />
                 )}
               </h2>
-              {renderMenuItems(navItems, "main")}
+              {renderMenuItems(getFilteredNavItems(navItems), "main")} {/* Sử dụng navItems đã lọc */}
             </div>
 
             {/* <div className="">
@@ -421,7 +378,6 @@ const AppSidebar: React.FC = () => {
             </div> */}
           </div>
         </nav>
-        {/* {isExpanded || isHovered || isMobileOpen ? <SidebarWidget /> : null} */}
       </div>
     </aside>
   );
