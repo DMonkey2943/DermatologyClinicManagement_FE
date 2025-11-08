@@ -22,7 +22,7 @@ import {
   UsersGearIcon,
   HospitalUserIcon,
   DollarLineIcon,
-  DocsIcon
+  DocsIcon,
 } from "../icons/index";
 import SidebarWidget from "./SidebarWidget";
 
@@ -38,6 +38,11 @@ const navItems: NavItem[] = [
     icon: <GridIcon />,
     name: "Dashboard",
     path: "/",
+  },
+  {
+    icon: <PieChartIcon />,
+    name: "Thống kê doanh thu",
+    path: "/reports/revenue",
   },
   {
     icon: <UsersGearIcon />,
@@ -71,7 +76,7 @@ const navItems: NavItem[] = [
   },
   {
     icon: <StethoscopeIcon />,
-    name: "Dịch vụ y tế",
+    name: "Dịch vụ điều trị",
     path: "/services",
   },
   // {

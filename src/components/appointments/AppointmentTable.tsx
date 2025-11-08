@@ -24,6 +24,7 @@ import {
   SelectContent,
   SelectItem,
 } from '@/components/ui/select';
+import { formatDate } from '@/lib/utils';
 
 interface AppointmentTableProps {
   appointments: AppointmentDataType[];
@@ -156,7 +157,7 @@ export default function AppointmentTable({ appointments, onEdit, isLoading, page
                     {appointment.doctor.full_name}
                   </TableCell>
                   <TableCell className="px-5 py-4 text-start text-theme-sm text-gray-800 dark:text-white/90">
-                    {appointment.appointment_date}
+                    {formatDate(appointment.appointment_date)}
                   </TableCell>
                   <TableCell className="px-5 py-4 text-start text-theme-sm text-gray-800 dark:text-white/90">
                     {appointment.appointment_time}
