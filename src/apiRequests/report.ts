@@ -1,7 +1,7 @@
 // src/apiRequests/report.ts
 
 import http from "@/lib/axios"
-import { AppointmentStatsReportRes, DoctorStatsReportRes, MedicationStatsReportRes, PatientStatsReportRes, ReportPeriodRequest, RevenueComparisonRequest, RevenueComparisonRes, RevenueReportRes, ServiceStatsReportRes } from "@/schemaValidations/report.schema";
+import { AppointmentStatsReportRes, DoctorStatsReportRes, MedicalRecordStatsReportRes, MedicationStatsReportRes, PatientStatsReportRes, ReportPeriodRequest, RevenueComparisonRequest, RevenueComparisonRes, RevenueReportRes, ServiceStatsReportRes } from "@/schemaValidations/report.schema";
 
 const prefix = 'reports';
 
@@ -42,6 +42,9 @@ const reportApiRequest = {
         body: ReportPeriodRequest
     ) => http.post<ServiceStatsReportRes>(`/${prefix}/services`, body),
 
+    getMedicalRecordStats: (
+        body: ReportPeriodRequest
+    ) => http.post<MedicalRecordStatsReportRes>(`/${prefix}/medical-records`, body),
 };
 
 export default reportApiRequest;

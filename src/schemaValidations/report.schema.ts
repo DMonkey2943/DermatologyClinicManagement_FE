@@ -49,6 +49,7 @@ export interface RevenueReportRes {
 
 export interface BreakdownItem {
     key: string | number;
+    name: string;
     value: number;
 }
 
@@ -124,6 +125,21 @@ export interface ServiceStatsReport {
 }
 export interface ServiceStatsReportRes {
     data: ServiceStatsReport,
+    message: string,
+    success: boolean
+}
+
+export interface PatientRecordItem {
+    patient_id: string
+    patient_name: string
+    record_count: number
+}
+export interface MedicalRecordStatsReport {
+    total_medical_records: number
+    top_patients: PatientRecordItem[]
+}
+export interface MedicalRecordStatsReportRes {
+    data: MedicalRecordStatsReport,
     message: string,
     success: boolean
 }
