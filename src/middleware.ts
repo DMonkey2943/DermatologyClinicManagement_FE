@@ -2,15 +2,12 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
 // ✅ Cấu hình route & role được phép
-const rolePermissions: Record<string, string[]> = {
+const rolePermissions: Record<string, string[]> = {  //Chỉ cần các route yêu cầu role
   '/users': ['ADMIN'],
-  '/patients/': ['ADMIN', 'STAFF'], // /patients/[id]
-  '/patients': ['ADMIN', 'DOCTOR', 'STAFF'],
-  '/appointments/': ['ADMIN', 'STAFF'],
+  '/reports/revenue': ['ADMIN'],
+  // '/patients/': ['ADMIN', 'STAFF'], // /patients/[id]
   '/medical-records/add': ['ADMIN', 'DOCTOR'],
-  '/medical-records': ['ADMIN', 'DOCTOR'],
   '/invoices/preview': ['ADMIN', 'STAFF'],
-  '/invoices': ['ADMIN', 'DOCTOR', 'STAFF'],
   '/medications': ['ADMIN'],
   '/services': ['ADMIN'],
 };

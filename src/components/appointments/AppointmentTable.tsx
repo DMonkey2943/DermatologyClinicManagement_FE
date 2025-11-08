@@ -25,6 +25,17 @@ import {
   SelectItem,
 } from '@/components/ui/select';
 import { formatDate } from '@/lib/utils';
+import { useAuth } from "@/context/AuthContext";
+import { MoreHorizontal, Edit } from "lucide-react";
+import { Button as ButtonUI } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  // DropdownMenuLabel,
+  // DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 interface AppointmentTableProps {
   appointments: AppointmentDataType[];
@@ -44,6 +55,8 @@ interface AppointmentTableProps {
 }
 
 export default function AppointmentTable({ appointments, onEdit, isLoading, page=0, pageSize=10, total=0, onPageChange, onPageSizeChange, onStatusChange }: AppointmentTableProps) {
+  const { user } = useAuth();
+  
   // Define badge color mapping based on status
   const getStatusColor = (status: string|null) => {
     switch (status) {
@@ -79,7 +92,7 @@ export default function AppointmentTable({ appointments, onEdit, isLoading, page
   const changeStatus = async (id: string, newStatus: string) => {
     try {
       const { payload } = await appointmentApiRequest.update(id, { status: newStatus });
-      toast.success('Cập nhật trạng thái lịch hẹn thành công');
+      toast.success(`Cập nhật trạng thái lịch hẹn của ${payload.data.patient.full_name} thành công`);
 
       // NEW: inform parent so it can update local state / re-render
       if (onStatusChange) {
@@ -108,37 +121,37 @@ export default function AppointmentTable({ appointments, onEdit, isLoading, page
             <TableHeader className="border-b border-gray-100 dark:border-white/[0.05]">
               <TableRow>
                 <TableCell
-                  isHeader
+                  //isHeader
                   className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
                 >
                   Bệnh nhân
                 </TableCell>
                 <TableCell
-                  isHeader
+                  //isHeader
                   className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
                 >
                   Bác sĩ
                 </TableCell>
                 <TableCell
-                  isHeader
+                  //isHeader
                   className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
                 >
                   Ngày hẹn
                 </TableCell>
                 <TableCell
-                  isHeader
+                  //isHeader
                   className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
                 >
                   Giờ hẹn
                 </TableCell>
                 <TableCell
-                  isHeader
+                  //isHeader
                   className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
                 >
                   Trạng thái
                 </TableCell>
                 <TableCell
-                  isHeader
+                  //isHeader
                   className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
                 >
                   Tùy chọn
@@ -165,43 +178,68 @@ export default function AppointmentTable({ appointments, onEdit, isLoading, page
 
                   {/* UPDATED: Status column -> show Badge when COMPLETED; otherwise a Select without COMPLETED option */}
                   <TableCell className="px-5 py-4 text-start text-theme-sm text-gray-800 dark:text-white/90">
-                    {appointment.status === 'COMPLETED' ? (
-                      <Badge size="sm" color={getStatusColor(appointment.status)}>{appointment.status}</Badge>
+                    {user?.role === "DOCTOR" ? (
+                      <Badge size="sm" color={getStatusColor(appointment.status)}>
+                        {appointment.status}
+                      </Badge>
                     ) : (
-                      <div className="max-w-xs">
-                        <Select
-                          value={appointment.status ?? ''}
-                          onValueChange={(val) => {
-                            // guard redundant but keep: appointment with COMPLETED will not reach here
-                            if (appointment.status === 'COMPLETED') return;
-                            void changeStatus(appointment.id, val);
-                          }}
-                        >
-                          <SelectTrigger className="h-8">
-                            <SelectValue>
-                              <span className={getStatusTextClass(appointment.status)}>
-                                {appointment.status ?? 'UNKNOWN'}
-                              </span>
-                            </SelectValue>
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="SCHEDULED">SCHEDULED</SelectItem>
-                            <SelectItem value="WAITING">WAITING</SelectItem>
-                            <SelectItem value="CANCELLED">CANCELLED</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
+                      appointment.status === 'COMPLETED' ? (
+                        <Badge size="sm" color={getStatusColor(appointment.status)}>{appointment.status}</Badge>
+                      ) : (
+                        <div className="max-w-xs">
+                          <Select
+                            value={appointment.status ?? ''}
+                            onValueChange={(val) => {
+                              // guard redundant but keep: appointment with COMPLETED will not reach here
+                              if (appointment.status === 'COMPLETED') return;
+                              void changeStatus(appointment.id, val);
+                            }}
+                          >
+                            <SelectTrigger className="h-8">
+                              <SelectValue>
+                                <span className={getStatusTextClass(appointment.status)}>
+                                  {appointment.status ?? 'UNKNOWN'}
+                                </span>
+                              </SelectValue>
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="SCHEDULED">SCHEDULED</SelectItem>
+                              <SelectItem value="WAITING">WAITING</SelectItem>
+                              <SelectItem value="CANCELLED">CANCELLED</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                      )
                     )}
                   </TableCell>
 
                   <TableCell className="px-5 py-4 text-start text-theme-xs text-gray-500 dark:text-gray-400">
                     <div className="flex gap-2">
-                      {appointment.status === 'WAITING' && 
+                      {["ADMIN", "STAFF"].includes(user?.role ?? "") && (
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <ButtonUI variant="ghost" size="icon" className="h-8 w-8 p-0">
+                              <MoreHorizontal className="h-4 w-4" />
+                              <span className="sr-only">Open menu</span>
+                            </ButtonUI>
+                          </DropdownMenuTrigger>
+
+                          <DropdownMenuContent align="end" className="w-40">
+                            <DropdownMenuItem
+                              onClick={() => onEdit(appointment)}
+                              className="flex items-center gap-2"
+                            >
+                              <Edit className="h-4 w-4" />
+                              <span>Sửa</span>
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      )}
+                      {["ADMIN", "DOCTOR"].includes(user?.role ?? "") && appointment.status === 'WAITING' && 
                         <Link href={`/medical-records/add/${appointment.id}`}>
                           <Button size="sm">Tạo phiên khám</Button>
                         </Link>
-                      }                      
-                      <Button size="sm" onClick={() => onEdit(appointment)}>Sửa</Button>
+                      }
                       {/* <Button size="sm" variant="destructive" onClick={() => onDelete(appointment.id)}>Xóa</Button> */}
                     </div>
                   </TableCell>

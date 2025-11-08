@@ -18,8 +18,10 @@ import { DoctorDataType } from '@/schemaValidations/user.schema';
 import { PatientDataType } from '@/schemaValidations/patient.schema';
 import patientApiRequest from '@/apiRequests/patient';
 import Combobox from '@/components/form/Combobox';
+import { useAuth } from "@/context/AuthContext";
 
 export default function AppointmentListPage() {
+  const { user } = useAuth();
   const [appointments, setAppointments] = useState<AppointmentDataType[]>([]);
   const [editingAppointment, setEditingAppointment] = useState<AppointmentDataType | null>(null);
   const [modalType, setModalType] = useState<'add' | 'edit' | null>(null);
@@ -244,7 +246,9 @@ export default function AppointmentListPage() {
                     <FunnelX className="w-4 h-4"/>
                   </Button>
                 </div>
-                <Button onClick={openAddModal}>+ Thêm lịch hẹn</Button>
+                {["ADMIN", "STAFF"].includes(user?.role ?? "") && (
+                  <Button onClick={openAddModal}>+ Thêm lịch hẹn</Button>
+                )}
               </div>
             </TabsContent>
             <TabsContent value="upcoming" />

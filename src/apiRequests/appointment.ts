@@ -18,9 +18,9 @@ const appointmentApiRequest = {
 
     getDetail: (id: string) => http.get<AppointmentResType>(`/${prefix}/${id}`),
 
-    create: (body: CreateAppointmentBodyType) => http.post<AppointmentDataType>(`/${prefix}/`, body),
+    create: (body: CreateAppointmentBodyType) => http.post<AppointmentResType>(`/${prefix}/`, body),
 
-    update: (id: string, body: UpdateAppointmentBodyType) => http.put<AppointmentDataType>(`/${prefix}/${id}`, body),
+    update: (id: string, body: UpdateAppointmentBodyType) => http.put<AppointmentResType>(`/${prefix}/${id}`, body),
 
     delete: (id: string) => http.delete(`/${prefix}/${id}`)
 };

@@ -30,12 +30,13 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { Button as ButtonUI } from "@/components/ui/button";
-import Button from '@/components/ui/button/Button';
+// import Button from '@/components/ui/button/Button';
 import Link from 'next/link'
 import { PatientDataType } from '@/schemaValidations/patient.schema';
 import CenteredSpinner from '../ui/spinner/CenteredSpinner';
 import PaginationControls from '../ui/pagination/PaginationControls';
 import { formatDate } from '@/lib/utils';
+import { useAuth } from "@/context/AuthContext";
 
 interface PatientTableProps {
   patients: PatientDataType[];
@@ -62,6 +63,7 @@ export default function PatientTable({
   onPageChange,
   onPageSizeChange,
 }: PatientTableProps) {
+  const { user } = useAuth();
   return (
     isLoading
     ?
@@ -170,38 +172,42 @@ export default function PatientTable({
                           <Edit className="h-4 w-4" />
                           <span>Sửa</span>
                         </DropdownMenuItem>
-                        <DropdownMenuItem asChild>
-                          <AlertDialog>
-                            <AlertDialogTrigger asChild>
-                              <button className="flex items-center gap-2 text-red-600 focus:text-red-700 w-full">
-                                <Trash2 className="h-4 w-4" />
-                                <span>Xóa</span>
-                              </button>
-                            </AlertDialogTrigger>
 
-                            <AlertDialogContent>
-                              <AlertDialogHeader>
-                                <AlertDialogTitle>
-                                  Xác nhận xoá tài khoản
-                                </AlertDialogTitle>
-                                <AlertDialogDescription>
-                                  Bạn có chắc chắn muốn xoá tài khoản{" "}
-                                  <strong>{patient.full_name}</strong>?  
-                                  Hành động này không thể hoàn tác.
-                                </AlertDialogDescription>
-                              </AlertDialogHeader>
-                              <AlertDialogFooter>
-                                <AlertDialogCancel>Huỷ</AlertDialogCancel>
-                                <AlertDialogAction
-                                  className="bg-red-600 hover:bg-red-700 text-white"
-                                  onClick={() => onDelete(patient.id)}
-                                >
-                                  Xoá
-                                </AlertDialogAction>
-                              </AlertDialogFooter>
-                            </AlertDialogContent>
-                          </AlertDialog>
-                        </DropdownMenuItem>
+                        {/* Chỉ hiển thị mục Xóa nếu là ADMIN */}
+                        {user?.role === "ADMIN" && (
+                          <DropdownMenuItem asChild>
+                            <AlertDialog>
+                              <AlertDialogTrigger asChild>
+                                <button className="flex items-center gap-2 text-red-600 focus:text-red-700 w-full">
+                                  <Trash2 className="h-4 w-4" />
+                                  <span>Xóa</span>
+                                </button>
+                              </AlertDialogTrigger>
+
+                              <AlertDialogContent>
+                                <AlertDialogHeader>
+                                  <AlertDialogTitle>
+                                    Xác nhận xoá tài khoản
+                                  </AlertDialogTitle>
+                                  <AlertDialogDescription>
+                                    Bạn có chắc chắn muốn xoá tài khoản{" "}
+                                    <strong>{patient.full_name}</strong>?  
+                                    Hành động này không thể hoàn tác.
+                                  </AlertDialogDescription>
+                                </AlertDialogHeader>
+                                <AlertDialogFooter>
+                                  <AlertDialogCancel>Huỷ</AlertDialogCancel>
+                                  <AlertDialogAction
+                                    className="bg-red-600 hover:bg-red-700 text-white"
+                                    onClick={() => onDelete(patient.id)}
+                                  >
+                                    Xoá
+                                  </AlertDialogAction>
+                                </AlertDialogFooter>
+                              </AlertDialogContent>
+                            </AlertDialog>
+                          </DropdownMenuItem>
+                        )}
                       </DropdownMenuContent>
                     </DropdownMenu>
                   </TableCell>

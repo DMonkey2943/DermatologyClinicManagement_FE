@@ -15,6 +15,17 @@ import { MedicalRecordDataType } from '@/schemaValidations/medicalRecord.schema'
 import { formatDateTime } from '@/lib/utils';
 import CenteredSpinner from '../ui/spinner/CenteredSpinner';
 import PaginationControls from '../ui/pagination/PaginationControls';
+import { MoreHorizontal, Eye } from "lucide-react";
+import { Button as ButtonUI } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  // DropdownMenuLabel,
+  // DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { useAuth } from "@/context/AuthContext";
 
 interface MedicalRecordTableProps {
   medical_records: MedicalRecordDataType[];
@@ -29,7 +40,8 @@ interface MedicalRecordTableProps {
 }
 
 export default function MedicalRecordTable({ medical_records, isLoading, page=0, pageSize=10, total=0, onPageChange, onPageSizeChange }: MedicalRecordTableProps) {
-  const getStatusColor = (status: string|null) => {
+  const { user } = useAuth();
+  const getStatusColor = (status: string | null) => {
     switch (status) {
       case 'IN_PROGRESS':
         return 'warning';
@@ -53,31 +65,31 @@ export default function MedicalRecordTable({ medical_records, isLoading, page=0,
             <TableHeader className="border-b border-gray-100 dark:border-white/[0.05]">
               <TableRow>
                 <TableCell
-                  isHeader
+                  //isHeader
                   className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
                 >
                   Ngày giờ khám
                 </TableCell>
                 <TableCell
-                  isHeader
+                  //isHeader
                   className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
                 >
                   Bệnh nhân
                 </TableCell>
                 <TableCell
-                  isHeader
+                  //isHeader
                   className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
                 >
                   Bác sĩ
                 </TableCell>
                 <TableCell
-                  isHeader
+                  //isHeader
                   className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
                 >
                   Trạng thái
                 </TableCell>
                 <TableCell
-                  isHeader
+                  //isHeader
                   className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
                 >
                   Tùy chọn
@@ -103,10 +115,24 @@ export default function MedicalRecordTable({ medical_records, isLoading, page=0,
                   </TableCell>
                   <TableCell className="px-5 py-4 text-start text-theme-xs text-gray-500 dark:text-gray-400">
                     <div className="flex gap-2">
-                      <Link href={`/medical-records/${medical_record.id}`}>
-                        <Button size="sm">Xem</Button>
-                      </Link>
-                      {medical_record.status === 'COMPLETED' && 
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <ButtonUI variant="ghost" size="icon" className="h-8 w-8 p-0">
+                            <MoreHorizontal className="h-4 w-4" />
+                            <span className="sr-only">Open menu</span>
+                          </ButtonUI>
+                        </DropdownMenuTrigger>
+
+                        <DropdownMenuContent align="end" className="w-40">
+                          <DropdownMenuItem asChild>
+                            <Link href={`/medical-records/${medical_record.id}`}>
+                                <Eye className="h-4 w-4" />
+                                <span>Xem chi tiết</span>
+                            </Link>
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                      {["ADMIN", "STAFF"].includes(user?.role ?? "") && medical_record.status === 'COMPLETED' && 
                         <Link href={`/invoices/preview/${medical_record.id}`}>
                           <Button size="sm">Tạo hóa đơn</Button>
                         </Link>
