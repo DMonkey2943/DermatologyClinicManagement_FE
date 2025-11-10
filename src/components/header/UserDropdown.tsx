@@ -11,6 +11,9 @@ import { toast } from "sonner";
 export default function UserDropdown() {
   const { user, signout } = useAuth();
 
+  // Environment variable for API base URL
+  const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://127.0.0.1:8000";
+
   const router = useRouter();
 
   const [isOpen, setIsOpen] = useState(false);
@@ -41,7 +44,9 @@ export default function UserDropdown() {
           <Image
             width={44}
             height={44}
-            src="/images/user/owner.jpg"
+            src={user?.avatar
+              ? `${API_BASE_URL}${user?.avatar}`
+              : "/images/user/avatar-default.png"}
             alt="User"
           />
         </span>

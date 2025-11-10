@@ -15,6 +15,7 @@ export const LoginRes = z.object({
             full_name: z.string(),
             phone_number: z.string(),
             email: z.string(),
+            avatar: z.string(),
             role: z.enum(["ADMIN", "STAFF", "DOCTOR"])
         }),
         access_token: z.string(),
