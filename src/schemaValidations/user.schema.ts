@@ -137,12 +137,16 @@ export const createUserSchema = z.object({
             }
             return age >= 18;
         }, "Tuổi phải lớn hơn hoặc bằng 18"),
-    gender: z.enum(["MALE", "FEMALE"], {
-        required_error: "Giới tính là bắt buộc",
-    }),
-    role: z.enum(["ADMIN", "STAFF", "DOCTOR"], {
-        required_error: "Vai trò là bắt buộc",
-    }),
+    gender: z
+        .enum(["MALE", "FEMALE"])
+        .refine((val) => val !== undefined, {
+            message: "Giới tính là bắt buộc",
+        }),
+    role: z
+        .enum(["ADMIN", "STAFF", "DOCTOR"])
+        .refine((val) => val !== undefined, {
+            message: "Vai trò là bắt buộc",
+        }),
     username: z.string().min(4, "Tên đăng nhập phải ít nhất 4 ký tự").max(50, "Tên đăng nhập không quá 50 ký tự"),
     password: z.string().min(8, "Mật khẩu phải ít nhất 8 ký tự").max(50, "Mật khẩu không quá 50 ký tự"),
 });

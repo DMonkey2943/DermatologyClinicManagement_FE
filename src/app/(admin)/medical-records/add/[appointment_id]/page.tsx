@@ -238,9 +238,12 @@ export default function AddMedicalRecordPage() {
     }
 
     await finalizeExamination();
+
+    await appointmentApiRequest.update(appointment_id as string, { status: "COMPLETED" });
   };
 
   const handleTabChange = async (newTab: string) => {
+    console.log(newTab);
     // Nếu chuyển từ tab prescription và có thay đổi chưa lưu
     if (prescriptionDirty) {
       try {

@@ -12,7 +12,12 @@ const medicationApiRequest = {
 
     update: (id: string, body: UpdateMedicationBodyType) => http.put<MedicationDataType>(`/${prefix}/${id}`, body),
 
-    delete: (id: string) => http.delete(`/${prefix}/${id}`)
+    delete: (id: string) => http.delete(`/${prefix}/${id}`),
+
+    getList_SCR: (
+        params: { skip?: number; limit?: number; q?: string } = { skip: 0, limit: 100, q: '' },
+        options: { headers?: Record<string, string> } = {}
+    ) => http.get<MedicationListResType>(`/${prefix}/`, { params, headers: options.headers }),
 };
 
 export default medicationApiRequest;

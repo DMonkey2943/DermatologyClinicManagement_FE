@@ -12,7 +12,12 @@ const serviceApiRequest = {
 
     update: (id: string, body: UpdateServiceBodyType) => http.put<ServiceDataType>(`/${prefix}/${id}`, body),
 
-    delete: (id: string) => http.delete(`/${prefix}/${id}`)
+    delete: (id: string) => http.delete(`/${prefix}/${id}`),
+
+    getList_SCR: (
+        params: { skip?: number; limit?: number; q?: string } = { skip: 0, limit: 100, q: '' },
+        options: { headers?: Record<string, string> } = {}
+    ) => http.get<ServiceListResType>(`/${prefix}/`, { params, headers: options.headers }),
 };
 
 export default serviceApiRequest;

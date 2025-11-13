@@ -32,6 +32,32 @@ const medicalRecordApiRequest = {
     getSkinImageListByMRId: (medical_record_id: string) => http.get<SkinImageListResType>(`/${prefix}/${medical_record_id}/skin-images`),
 
     deleteSkinImage: (image_id: string) => http.delete(`/${prefix}/skin-images/${image_id}`),
+
+    getByAppointment_SCR: (
+        appointment_id: string,
+        options: { headers?: Record<string, string> } = {}
+    ) => http.get<MedicalRecordResType>(`/${prefix}/by-appointment/${appointment_id}`, { headers: options.headers }),
+
+    create_SCR: (
+        body: CreateMedicalRecordBodyType,
+        options: { headers?: Record<string, string> } = {}
+    ) => http.post<MedicalRecordResType>(`/${prefix}/`, body, { headers: options.headers }),
+
+    getPrescriptionByMRId_SCR: (
+        medical_record_id: string,
+        options: { headers?: Record<string, string> } = {}
+    ) => http.get<PrescriptionFullResType>(`/${prefix}/${medical_record_id}/prescription`, { headers: options.headers }),
+
+    getServiceIndicationByMRId_SCR: (
+        medical_record_id: string,
+        options: { headers?: Record<string, string> } = {}
+    ) => http.get<ServiceIndicationFullResType>(`/${prefix}/${medical_record_id}/service-indication`, { headers: options.headers }),
+
+    getSkinImageListByMRId_SCR: (
+        medical_record_id: string,
+        options: { headers?: Record<string, string> } = {}
+    ) => http.get<SkinImageListResType>(`/${prefix}/${medical_record_id}/skin-images`, { headers: options.headers }),
+
 };
 
 export default medicalRecordApiRequest;

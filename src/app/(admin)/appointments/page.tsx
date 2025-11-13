@@ -14,7 +14,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { MultiSelect } from '@/components/ui/MultiSelect';
 import { FunnelX } from 'lucide-react';
 import userApiRequest from '@/apiRequests/user';
-import { DoctorDataType } from '@/schemaValidations/user.schema';
+import { UserDataType } from '@/schemaValidations/user.schema';
 import { PatientDataType } from '@/schemaValidations/patient.schema';
 import patientApiRequest from '@/apiRequests/patient';
 import Combobox from '@/components/form/Combobox';
@@ -45,7 +45,8 @@ export default function AppointmentListPage() {
     { value: 'CANCELLED', label: 'Đã hủy' },
   ];
 
-  const [doctors, setDoctors] = useState<DoctorDataType[]>([]);
+  // const [doctors, setDoctors] = useState<DoctorDataType[]>([]);
+  const [doctors, setDoctors] = useState<UserDataType[]>([]);
   const [patients, setPatients] = useState<PatientDataType[]>([]);
 
   useEffect(() => {
@@ -114,7 +115,7 @@ export default function AppointmentListPage() {
     setModalType('edit');
   };
 
-  const handleStatusChange = (id: string, newStatus: string) => {
+  const handleStatusChange = (id: string, newStatus: AppointmentDataType['status']) => {
     console.log("handleStatusChange - setAppointments");
     setAppointments((prev) =>
       prev.map((a) => (a.id === id ? { ...a, status: newStatus } : a))
@@ -190,8 +191,8 @@ export default function AppointmentListPage() {
                   <div className="w-48">                  
                     <Combobox
                       options={doctors.map(doctor => ({
-                        value: doctor.user.id,
-                        label: doctor.user.full_name,
+                        value: doctor.id,
+                        label: doctor.full_name,
                       }))}
                       placeholder="Chọn bác sĩ..."
                       onChange={setDoctorId}
@@ -227,7 +228,7 @@ export default function AppointmentListPage() {
                     <DatePicker
                       id="dob"
                       defaultDate={appointmentDate}
-                      onChange={(dates, currentDateString) => setAppointmentDate(currentDateString)}
+                      onChange={(dates, currentDateString) => setAppointmentDate(currentDateString ? new Date(currentDateString) : undefined)}
                       placeholder="Chọn ngày hẹn"
                     />
                     

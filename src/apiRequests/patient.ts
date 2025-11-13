@@ -14,7 +14,17 @@ const patientApiRequest = {
 
     update: (id: string, body: UpdatePatientBodyType) => http.put<PatientDataType>(`/${prefix}/${id}`, body),
 
-    delete: (id: string) => http.delete(`/${prefix}/${id}`)
+    delete: (id: string) => http.delete(`/${prefix}/${id}`),
+
+    getList_SCR: (
+        params: { skip?: number; limit?: number } = { skip: 0, limit: 100 },
+        options: { headers?: Record<string, string> } = {}
+    ) => http.get<PatientListResType>(`/${prefix}/`, { params, headers: options.headers }),
+
+    getDetail_SCR: (
+        id: string,
+        options: { headers?: Record<string, string> } = {}
+    ) => http.get<PatientResType>(`/${prefix}/${id}`, { headers: options.headers }),
 };
 
 export default patientApiRequest;

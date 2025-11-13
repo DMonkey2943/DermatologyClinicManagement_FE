@@ -4,20 +4,22 @@ import React, { useEffect, useState, use } from 'react';
 import PageBreadcrumb from '@/components/common/PageBreadCrumb';
 import ComponentCard from '@/components/common/ComponentCard';
 import patientApiRequest from '@/apiRequests/patient';
-import { PatientFullDataType } from '@/schemaValidations/patient.schema';
+
 import MedicalRecordCard from './_component/MedicalRecordCard';
 import PrescriptionCard from './_component/PrescriptionCard';
-import medicalRecordApiRequest from '@/apiRequests/medicalRecord';
-import { MedicalRecordDataType } from '@/schemaValidations/medicalRecord.schema';
 import ServiceIndicationCard from './_component/ServiceIndicationCard';
 import SkinImagesCard from './_component/SkinImagesCard';
+
+import medicalRecordApiRequest from '@/apiRequests/medicalRecord';
+import { MedicalRecordDataType } from '@/schemaValidations/medicalRecord.schema';
+import { PatientFullDataType } from '@/schemaValidations/patient.schema';
 
 export default function PatientDetai({ params }: {
   params: Promise<{ id: string }>
 }) {
     const { id } = use(params);
     const [patientId, setPatientId] = useState<string | null>(null);
-    const [doctorId, setDoctorId] = useState<string | null>(null);
+    // const [doctorId, setDoctorId] = useState<string | null>(null);
     const [patient, setPatient] = useState<PatientFullDataType>();
     const [medicalRecord, setMedicalRecord] = useState<MedicalRecordDataType>();
 
@@ -38,7 +40,7 @@ export default function PatientDetai({ params }: {
             console.log(mrData);
             setMedicalRecord(mrData);
             setPatientId(mrData.patient_id);
-            setDoctorId(mrData.doctor_id);
+            // setDoctorId(mrData.doctor_id);
         } catch(error) {
             console.error('Lỗi lấy thông tin Appointment:', error);
         }

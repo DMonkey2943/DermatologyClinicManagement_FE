@@ -31,6 +31,7 @@ export const PatientAgeChart: React.FC<PatientAgeChartProps> = ({ filter, ageDis
       try {
         setLoading(true)
         const response = await reportApiRequest.getPatientStats(filter)
+        console.log(ageDistribution);
 
         if (response.payload.data.age_distribution) {
           const ageData = response.payload.data.age_distribution

@@ -55,6 +55,8 @@ export default function PatientFormModal({
     gender: null,
     email: '',
     address: '',
+    medical_history: '',
+    allergies: '',
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -95,6 +97,19 @@ export default function PatientFormModal({
     }));
   };
 
+  const resetFormData = () => {
+    setFormData({
+      full_name: '',
+      phone_number: '',
+      dob: null,
+      gender: null,
+      email: '',
+      address: '',
+      medical_history: '',
+      allergies: '',
+    });
+  }
+
    const handleSubmit = async () => {
     setErrors({});
     setIsSubmitting(true);
@@ -129,6 +144,7 @@ export default function PatientFormModal({
       }
 
       // Thành công
+      resetFormData();
       onSuccess();
     } catch (err: any) {
       console.error('Submit error:', err);
@@ -138,7 +154,7 @@ export default function PatientFormModal({
         const errorPayload = err.payload.details;
         const validationErrors: ValidationErrors = {};
         errorPayload.forEach(({ field, msg }) => {
-          validationErrors[field] = msg;
+          validationErrors[field as keyof ValidationErrors] = msg;
         });
         setErrors(validationErrors);
         toast.error("Hãy kiểm tra lại dữ liệu trước khi Lưu!");
@@ -158,23 +174,14 @@ export default function PatientFormModal({
     if (!isSubmitting) {
       onClose();
     }
-    setFormData({
-      full_name: '',
-      phone_number: '',
-      dob: null,
-      gender: null,
-      email: '',
-      address: '',
-      allergies: '',
-      medical_history: '',
-    });
+    resetFormData();
   };
 
   return (
     <Modal
       isOpen={isOpen}
       onClose={handleClose}
-      className="max-w-[584px] p-5 lg:p-10"
+      className="max-w-[675px] p-5 lg:p-8"
     >
       <div className="p-6 space-y-4">
         <h2 className="text-xl font-bold">
@@ -192,7 +199,7 @@ export default function PatientFormModal({
               hint={errors.full_name}
             />
           </div>
-          <div className="col-span-1 sm:col-span-2">
+          <div className="col-span-1">
             <Label>SĐT</Label>
             <Input
               type="text"
@@ -201,6 +208,17 @@ export default function PatientFormModal({
               disabled={isSubmitting}
               error={!!errors.phone_number}
               hint={errors.phone_number}
+            />
+          </div>
+          <div className="col-span-1">
+            <Label>Email</Label>
+            <Input
+              type="email"
+              value={formData.email}
+              onChange={(e) => handleInputChange('email', e.target.value)}
+              disabled={isSubmitting}
+              error={!!errors.email}
+              hint={errors.email}
             />
           </div>
           <div className="col-span-1">
@@ -236,17 +254,6 @@ export default function PatientFormModal({
               placeholder="Chọn ngày sinh"
               error={!!errors.dob}
               hint={errors.dob}
-            />
-          </div>
-          <div className="col-span-1 sm:col-span-2">
-            <Label>Email</Label>
-            <Input
-              type="email"
-              value={formData.email}
-              onChange={(e) => handleInputChange('email', e.target.value)}
-              disabled={isSubmitting}
-              error={!!errors.email}
-              hint={errors.email}
             />
           </div>
           <div className="col-span-1 sm:col-span-2">

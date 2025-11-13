@@ -44,31 +44,31 @@ export default function MedicalRecordByPatientTable({ patient_id_props }: Medica
             <TableHeader className="border-b border-gray-100 dark:border-white/[0.05]">
               <TableRow>
                 <TableCell
-                  isHeader
+                  // isHeader
                   className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
                 >
                   Ngày giờ khám
                 </TableCell>
                 <TableCell
-                  isHeader
+                  // isHeader
                   className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
                 >
                   Bác sĩ
                 </TableCell>
                 <TableCell
-                  isHeader
+                  // isHeader
                   className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
                 >
                   Triệu chứng
                 </TableCell>
                 <TableCell
-                  isHeader
+                  // isHeader
                   className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
                 >
                   Chẩn đoán
                 </TableCell>
                 <TableCell
-                    isHeader
+                    // isHeader
                     className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
                 >
                     Tùy chọn

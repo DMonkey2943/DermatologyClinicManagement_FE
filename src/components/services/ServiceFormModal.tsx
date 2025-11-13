@@ -71,6 +71,14 @@ export default function ServiceFormModal({
     }));
   };
 
+  const resetFormData = () => {
+    setFormData({
+      name: '',
+      price: 0,
+      description: '',
+    });
+  }
+
   const handleSubmit = async () => {
     setErrors({});
     setIsSubmitting(true);
@@ -95,6 +103,7 @@ export default function ServiceFormModal({
       }
 
       // Thành công
+      resetFormData();
       onSuccess();
     } catch (err: any) {
       console.error('Error submitting form:', err);
@@ -103,7 +112,7 @@ export default function ServiceFormModal({
         const errorPayload = err.payload.details;
         const validationErrors: ValidationErrors = {};
         errorPayload.forEach(({ field, msg }) => {
-          validationErrors[field] = msg;
+          validationErrors[field as keyof ValidationErrors] = msg;
         });
         setErrors(validationErrors);
         toast.error("Hãy kiểm tra lại dữ liệu trước khi Lưu!");
@@ -123,11 +132,7 @@ export default function ServiceFormModal({
     if (!isSubmitting) {
       onClose();
     }
-    setFormData({
-      name: '',
-      price: 0,
-      description: '',
-    });
+    resetFormData();
   };
 
   return (

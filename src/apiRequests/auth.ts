@@ -12,6 +12,7 @@ const authApiRequest = {
     logout: () => {
         Cookies.remove('access_token');
         Cookies.remove('refresh_token');
+        Cookies.remove('role')
     }
 };
 

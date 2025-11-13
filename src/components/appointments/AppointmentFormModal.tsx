@@ -11,7 +11,7 @@ import appointmentApiRequest from '@/apiRequests/appointment';
 import userApiRequest from '@/apiRequests/user';
 import patientApiRequest from '@/apiRequests/patient';
 import { EntityError } from '@/lib/axios';
-import { DoctorDataType } from '@/schemaValidations/user.schema';
+import { UserDataType } from '@/schemaValidations/user.schema';
 import { PatientDataType } from '@/schemaValidations/patient.schema';
 import { useAuth } from '@/context/AuthContext';
 import { toast } from 'sonner';
@@ -62,7 +62,8 @@ export default function AppointmentFormModal({
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [patients, setPatients] = useState<PatientDataType[]>([]);
-  const [doctors, setDoctors] = useState<DoctorDataType[]>([]);
+  // const [doctors, setDoctors] = useState<DoctorDataType[]>([]);
+  const [doctors, setDoctors] = useState<UserDataType[]>([]);
   const { user } = useAuth();
   const [errors, setErrors] = useState<ValidationErrors>({}); // State để lưu lỗi 422
 
@@ -123,6 +124,17 @@ export default function AppointmentFormModal({
     }));
   };
 
+  const resetFormData = () => {
+    setFormData({
+      patient_id: '',
+      doctor_id: '',
+      appointment_date: null,
+      appointment_time: null,
+      // time_slot: '',
+      status: null,
+    });
+  }
+
   const handleSubmit = async () => {
     setErrors({});
 
@@ -170,6 +182,7 @@ export default function AppointmentFormModal({
       }
 
       // Thành công
+      resetFormData();
       onSuccess();
     } catch (err: any) {
       console.error('Error submitting form:', err);
@@ -178,7 +191,7 @@ export default function AppointmentFormModal({
         const errorPayload = err.payload.details;
         const validationErrors: ValidationErrors = {};
         errorPayload.forEach(({ field, msg }) => {
-          validationErrors[field] = msg;
+          validationErrors[field as keyof ValidationErrors] = msg;
         });
         setErrors(validationErrors);
         toast.error("Hãy kiểm tra lại dữ liệu trước khi Lưu!");
@@ -198,15 +211,7 @@ export default function AppointmentFormModal({
     if (!isSubmitting) {
       onClose();
     }
-    setFormData({
-      patient_id: '',
-      doctor_id: '',
-      // created_by: '',
-      appointment_date: null,
-      appointment_time: null,
-      // time_slot: '',
-      status: null,
-    });
+    resetFormData();
   };
 
   // Convert fetched data to Combobox options
@@ -216,8 +221,10 @@ export default function AppointmentFormModal({
   }));
 
   const doctorOptions = doctors.map(doctor => ({
-    value: doctor.user.id,
-    label: doctor.user.full_name,
+    // value: doctor.user.id,
+    // label: doctor.user.full_name,
+    value: doctor.id,
+    label: doctor.full_name,
   }));
 
   return (
@@ -269,7 +276,7 @@ export default function AppointmentFormModal({
             <Label>Thời gian khám</Label>
             <Input
               type="time"
-              value={formData.appointment_time}
+              value={formData.appointment_time ? formData.appointment_time : undefined}
               onChange={(e) => handleInputChange('appointment_time', e.target.value)}
               disabled={isSubmitting}
               error={!!errors.appointment_time}

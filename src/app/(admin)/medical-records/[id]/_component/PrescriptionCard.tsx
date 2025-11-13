@@ -42,7 +42,7 @@ export default function PrescriptionCard({
           Đơn thuốc ({prescription?.medications.length})
         </h3> */}
         
-        {!prescription ? (
+        {(!prescription || !prescription.medications) ? (
           <div className="text-center py-8 text-gray-500 bg-gray-50 rounded-lg">
             Không có đơn thuốc
           </div>

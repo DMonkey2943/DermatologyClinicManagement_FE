@@ -9,10 +9,33 @@ import {
   TableRow,
 } from '@/components/ui/table';
 // import Badge from '@/components/ui/badge/Badge';
-import Button from '@/components/ui/button/Button';
+// import Button from '@/components/ui/button/Button';
 import { ServiceDataType } from '@/schemaValidations/service.schema';
 import CenteredSpinner from '../ui/spinner/CenteredSpinner';
 import PaginationControls from '../ui/pagination/PaginationControls';
+import { useAuth } from "@/context/AuthContext";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  // DropdownMenuLabel,
+  // DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { MoreHorizontal, Edit, Trash2 } from "lucide-react";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import { Button as ButtonUI } from "@/components/ui/button";
+import { formatCurrency } from '@/lib/utils';
 
 interface ServiceTableProps {
   services: ServiceDataType[];
@@ -29,6 +52,7 @@ interface ServiceTableProps {
 }
 
 export default function ServiceTable({ services, onEdit, onDelete, isLoading, page=0, pageSize=10, total=0, onPageChange, onPageSizeChange }: ServiceTableProps) {
+  const { user } = useAuth();
   return (
     isLoading
       ?
@@ -42,19 +66,19 @@ export default function ServiceTable({ services, onEdit, onDelete, isLoading, pa
             <TableHeader className="border-b border-gray-100 dark:border-white/[0.05]">
               <TableRow>
                 <TableCell
-                  isHeader
+                  //isHeader
                   className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
                 >
                   Tên
                 </TableCell>
                 <TableCell
-                  isHeader
+                  //isHeader
                   className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
                 >
                   Giá
                 </TableCell>
                 <TableCell
-                  isHeader
+                  //isHeader
                   className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
                 >
                   Tùy chọn
@@ -70,13 +94,67 @@ export default function ServiceTable({ services, onEdit, onDelete, isLoading, pa
                     {service.name}
                   </TableCell>
                   <TableCell className="px-5 py-4 text-start text-theme-sm text-gray-800 dark:text-white/90">
-                    {service.price}
+                    {formatCurrency(service.price)}
                   </TableCell>
                   <TableCell className="px-5 py-4 text-start text-theme-xs text-gray-500 dark:text-gray-400">
-                    <div className="flex gap-2">
+                    {/* <div className="flex gap-2">
                       <Button size="sm" onClick={() => onEdit(service)}>Sửa</Button>
                       <Button size="sm" variant="destructive" onClick={() => onDelete(service.id)}>Xóa</Button>
-                    </div>
+                    </div> */}
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <ButtonUI variant="ghost" size="icon" className="h-8 w-8 p-0">
+                          <MoreHorizontal className="h-4 w-4" />
+                          <span className="sr-only">Open menu</span>
+                        </ButtonUI>
+                      </DropdownMenuTrigger>
+
+                      <DropdownMenuContent align="end" className="w-40">
+                        <DropdownMenuItem
+                          onClick={() => onEdit(service)}
+                          className="flex items-center gap-2"
+                        >
+                          <Edit className="h-4 w-4" />
+                          <span>Sửa</span>
+                        </DropdownMenuItem>
+
+                        {/* Chỉ hiển thị mục Xóa nếu là ADMIN */}
+                        {user?.role === "ADMIN" && (
+                          <DropdownMenuItem asChild>
+                            <AlertDialog>
+                              <AlertDialogTrigger asChild>
+                                <button className="flex items-center gap-2 text-red-600 focus:text-red-700 w-full">
+                                  <Trash2 className="h-4 w-4" />
+                                  <span>Xóa</span>
+                                </button>
+                              </AlertDialogTrigger>
+
+                              <AlertDialogContent>
+                                <AlertDialogHeader>
+                                  <AlertDialogTitle>
+                                    Xác nhận xoá dịch vụ
+                                  </AlertDialogTitle>
+                                  <AlertDialogDescription>
+                                    Bạn có chắc chắn muốn xoá dịch vụ{" "}
+                                    <strong>{service.name}</strong>?  
+                                    Hành động này không thể hoàn tác.
+                                  </AlertDialogDescription>
+                                </AlertDialogHeader>
+                                <AlertDialogFooter>
+                                  <AlertDialogCancel>Huỷ</AlertDialogCancel>
+                                  <AlertDialogAction
+                                    className="bg-red-600 hover:bg-red-700 text-white"
+                                    onClick={() => onDelete(service.id)}
+                                  >
+                                    Xoá
+                                  </AlertDialogAction>
+                                </AlertDialogFooter>
+                              </AlertDialogContent>
+                            </AlertDialog>
+                          </DropdownMenuItem>
+                        )}
+                      </DropdownMenuContent>
+                    </DropdownMenu>
                   </TableCell>
                 </TableRow>
               ))}

@@ -47,7 +47,6 @@ export default function MedicationFormModal({
     stock_quantity: 0,
     description: '',
   });
-
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errors, setErrors] = useState<ValidationErrors>({}); // State để lưu lỗi 422
 
@@ -78,7 +77,17 @@ export default function MedicationFormModal({
       ...prev,
       [field]: value
     }));
-  };
+  };  
+
+  const resetFormData = () => {
+    setFormData({
+      name: '',
+      dosage_form: '',
+      price: 0,
+      stock_quantity: 0,
+      description: '',
+    });
+  }
 
   const handleSubmit = async () => {
     setErrors({});
@@ -108,6 +117,7 @@ export default function MedicationFormModal({
       }
 
       // Thành công
+      resetFormData();
       onSuccess();
     } catch (err: any) {
       console.error('Error submitting form:', err);
@@ -116,7 +126,7 @@ export default function MedicationFormModal({
         const errorPayload = err.payload.details;
         const validationErrors: ValidationErrors = {};
         errorPayload.forEach(({ field, msg }) => {
-          validationErrors[field] = msg;
+          validationErrors[field as keyof ValidationErrors] = msg;
         });
         setErrors(validationErrors);
         toast.error("Hãy kiểm tra lại dữ liệu trước khi Lưu!");
@@ -136,13 +146,7 @@ export default function MedicationFormModal({
     if (!isSubmitting) {
       onClose();
     }
-    setFormData({
-      name: '',
-      dosage_form: '',
-      price: 0,
-      stock_quantity: 0,
-      description: '',
-    });
+    resetFormData();
   };
 
   return (

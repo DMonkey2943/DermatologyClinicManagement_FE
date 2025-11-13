@@ -51,7 +51,7 @@ interface AppointmentTableProps {
   onPageSizeChange?: (newSize: number) => void;
 
   // NEW: notify parent when status updated successfully
-  onStatusChange?: (id: string, newStatus: string) => void;
+  onStatusChange?: (id: string, newStatus: AppointmentDataType['status']) => void;
 }
 
 export default function AppointmentTable({ appointments, onEdit, isLoading, page=0, pageSize=10, total=0, onPageChange, onPageSizeChange, onStatusChange }: AppointmentTableProps) {
@@ -89,7 +89,7 @@ export default function AppointmentTable({ appointments, onEdit, isLoading, page
     }
   };
 
-  const changeStatus = async (id: string, newStatus: string) => {
+  const changeStatus = async (id: string, newStatus: AppointmentDataType['status']) => {
     try {
       const { payload } = await appointmentApiRequest.update(id, { status: newStatus });
       toast.success(`Cập nhật trạng thái lịch hẹn của ${payload.data.patient.full_name} thành công`);
@@ -192,7 +192,7 @@ export default function AppointmentTable({ appointments, onEdit, isLoading, page
                             onValueChange={(val) => {
                               // guard redundant but keep: appointment with COMPLETED will not reach here
                               if (appointment.status === 'COMPLETED') return;
-                              void changeStatus(appointment.id, val);
+                              void changeStatus(appointment.id, val as AppointmentDataType['status']);
                             }}
                           >
                             <SelectTrigger className="h-8">

@@ -111,35 +111,45 @@ export default function InvoiceDetailPreview({ params }: { params: Promise<{ id:
                       </tr>
                     </thead>
                     <tbody>
-                      <tr className="bg-gray-100">
-                        <td colSpan={5} className="border border-gray-800 px-2 py-1 font-semibold">
-                          Dịch vụ chẩn đoán - điều trị
-                        </td>
-                      </tr>
-                      {invoice.services.map((service, index) => (
-                        <tr key={`service-${service.id}`}>
-                          <td className="border border-gray-800 px-2 py-1 text-center">{index + 1}</td>
-                          <td className="border border-gray-800 px-2 py-1">{service.name}</td>
-                          <td className="border border-gray-800 px-2 py-1 text-center">{service.quantity}</td>
-                          <td className="border border-gray-800 px-2 py-1 text-right">{formatCurrency(service.unit_price)}</td>
-                          <td className="border border-gray-800 px-2 py-1 text-right">{formatCurrency(service.total_price)}</td>
-                        </tr>
-                      ))}
+                      {/* Hiển thị dịch vụ nếu invoice.services không phải null hoặc undefined */}
+                      {invoice.services && invoice.services.length > 0 && (
+                        <>
+                          <tr className="bg-gray-100">
+                            <td colSpan={5} className="border border-gray-800 px-2 py-1 font-semibold">
+                              Dịch vụ chẩn đoán - điều trị
+                            </td>
+                          </tr>
+                          {invoice.services.map((service, index) => (
+                            <tr key={`service-${service.id}`}>
+                              <td className="border border-gray-800 px-2 py-1 text-center">{index + 1}</td>
+                              <td className="border border-gray-800 px-2 py-1">{service.name}</td>
+                              <td className="border border-gray-800 px-2 py-1 text-center">{service.quantity}</td>
+                              <td className="border border-gray-800 px-2 py-1 text-right">{formatCurrency(service.unit_price)}</td>
+                              <td className="border border-gray-800 px-2 py-1 text-right">{formatCurrency(service.total_price)}</td>
+                            </tr>
+                          ))}
+                        </>
+                      )}
 
-                      <tr className="bg-gray-100">
-                        <td colSpan={5} className="border border-gray-800 px-2 py-1 font-semibold">Thuốc</td>
-                      </tr>
-                      {invoice.medications.map((medication, index) => (
-                        <tr key={`medication-${medication.id}`}>
-                          <td className="border border-gray-800 px-2 py-1 text-center">
-                            {invoice.services.length + index + 1}
-                          </td>
-                          <td className="border border-gray-800 px-2 py-1">{medication.name}</td>
-                          <td className="border border-gray-800 px-2 py-1 text-center">{medication.quantity}</td>
-                          <td className="border border-gray-800 px-2 py-1 text-right">{formatCurrency(medication.unit_price)}</td>
-                          <td className="border border-gray-800 px-2 py-1 text-right">{formatCurrency(medication.total_price)}</td>
-                        </tr>
-                      ))}
+                      {/* Hiển thị thuốc nếu invoice.medications không phải null hoặc undefined */}
+                      {invoice.medications && invoice.medications.length > 0 && (
+                        <>
+                          <tr className="bg-gray-100">
+                            <td colSpan={5} className="border border-gray-800 px-2 py-1 font-semibold">Thuốc</td>
+                          </tr>
+                          {invoice.medications.map((medication, index) => (
+                            <tr key={`medication-${medication.id}`}>
+                              <td className="border border-gray-800 px-2 py-1 text-center">
+                                {(invoice.services?.length || 0) + index + 1}
+                              </td>
+                              <td className="border border-gray-800 px-2 py-1">{medication.name}</td>
+                              <td className="border border-gray-800 px-2 py-1 text-center">{medication.quantity}</td>
+                              <td className="border border-gray-800 px-2 py-1 text-right">{formatCurrency(medication.unit_price)}</td>
+                              <td className="border border-gray-800 px-2 py-1 text-right">{formatCurrency(medication.total_price)}</td>
+                            </tr>
+                          ))}
+                        </>
+                      )}
 
                       <tr className="font-bold">
                         <td colSpan={4} className="border border-gray-800 px-2 py-2 text-right">Tổng cộng</td>

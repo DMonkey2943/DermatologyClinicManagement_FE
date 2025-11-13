@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
+// import React, { useState, useEffect } from 'react';
 import Label from '@/components/form/Label';
 import Badge from '@/components/ui/badge/Badge';
-import Input from '@/components/form/input/InputField';
+// import Input from '@/components/form/input/InputField';
 import { MedicalRecordDataType } from '@/schemaValidations/medicalRecord.schema';
 import { formatDateTime } from '@/lib/utils';
 
@@ -12,7 +12,7 @@ interface MedicalRecordCardProps {
 export default function MedicalRecordCard({
   medicalRecordData
 }: MedicalRecordCardProps) {
-  const getStatusColor = (status: string|null) => {
+  const getStatusColor = (status: MedicalRecordDataType['status'] | undefined) => {
     switch (status) {
       case 'IN_PROGRESS':
         return 'warning';

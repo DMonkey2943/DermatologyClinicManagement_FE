@@ -42,7 +42,7 @@ export default function ServiceIndicationCard({
           Đơn thuốc ({prescription?.medications.length})
         </h3> */}
         
-        {!serviceIndication ? (
+        {(!serviceIndication || !serviceIndication.services) ? (
           <div className="text-center py-8 text-gray-500 bg-gray-50 rounded-lg">
             Không có phiếu chỉ định dịch vụ
           </div>

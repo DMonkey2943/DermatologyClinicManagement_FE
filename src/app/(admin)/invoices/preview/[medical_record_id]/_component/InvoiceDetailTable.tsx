@@ -12,8 +12,8 @@ import {  PrescriptionFullDataType } from '@/schemaValidations/prescription.sche
 import { ServiceIndicationFullDataType } from '@/schemaValidations/serviceIndication.schema';
 
 interface InvoiceDetailTableProps {
-    serviceIndication: ServiceIndicationFullDataType;
-    prescription: PrescriptionFullDataType;
+    serviceIndication: ServiceIndicationFullDataType | null | undefined;
+    prescription: PrescriptionFullDataType | null | undefined;
     onSendData: (data: {
       serviceSubtotal: number;
       medicationSubtotal: number;
@@ -22,17 +22,17 @@ interface InvoiceDetailTableProps {
 }
 
 export default function InvoiceDetailTable({ serviceIndication, prescription, onSendData }: InvoiceDetailTableProps) {
-  const calculateTotal = (items) => {
-    return items.reduce((sum, item) => sum + (item.total_price), 0);
+  const calculateTotal = (items: any) => {
+    return items.reduce((sum: number, item: any) => sum + (item.total_price), 0);
   };
 
   // Tính tổng và memoize
   const { serviceSubtotal, medicationSubtotal, grandTotal } = useMemo(() => {
-    const serviceSubtotal = calculateTotal(serviceIndication.services);
-    const medicationSubtotal = calculateTotal(prescription.medications);
+    const serviceSubtotal = serviceIndication?.services ? calculateTotal(serviceIndication.services) : 0;
+    const medicationSubtotal = prescription?.medications ? calculateTotal(prescription.medications) : 0;
     const grandTotal = serviceSubtotal + medicationSubtotal;
     return { serviceSubtotal, medicationSubtotal, grandTotal };
-  }, [serviceIndication.services, prescription.medications]);
+  }, [serviceIndication?.services, prescription?.medications]);
 
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('vi-VN', {
@@ -69,20 +69,28 @@ export default function InvoiceDetailTable({ serviceIndication, prescription, on
                 Dịch vụ chẩn đoán - điều trị
               </TableCell>
             </TableRow>
-            {serviceIndication.services.map((item, index) => (
-              <TableRow key={`service-${item.id}`}>
-                <TableCell className="text-center">{index + 1}</TableCell>
-                <TableCell>{item.name}</TableCell>
-                <TableCell className="text-center">{item.quantity}</TableCell>
-                <TableCell>{"Gói"}</TableCell>
-                <TableCell className="text-right text-xs md:text-sm">
-                  {formatCurrency(item.unit_price)}
-                </TableCell>
-                <TableCell className="text-right font-medium text-xs md:text-sm">
-                  {formatCurrency(item.total_price)}
+            {!serviceIndication || !serviceIndication.services || serviceIndication.services.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={6} className="text-center text-gray-500">
+                  Không có chỉ định dịch vụ
                 </TableCell>
               </TableRow>
-            ))}
+            ) : (
+              serviceIndication.services.map((item, index) => (
+                <TableRow key={`service-${item.id}`}>
+                  <TableCell className="text-center">{index + 1}</TableCell>
+                  <TableCell>{item.name}</TableCell>
+                  <TableCell className="text-center">{item.quantity}</TableCell>
+                  <TableCell>{"Gói"}</TableCell>
+                  <TableCell className="text-right text-xs md:text-sm">
+                    {formatCurrency(item.unit_price)}
+                  </TableCell>
+                  <TableCell className="text-right font-medium text-xs md:text-sm">
+                    {formatCurrency(item.total_price)}
+                  </TableCell>
+                </TableRow>
+              ))
+            )}
             
             {/* Thuốc */}
             <TableRow className="bg-green-50">
@@ -90,9 +98,16 @@ export default function InvoiceDetailTable({ serviceIndication, prescription, on
                 Thuốc
               </TableCell>
             </TableRow>
-            {prescription.medications.map((item, index) => (
+            {!prescription || !prescription.medications || prescription.medications.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={6} className="text-center text-gray-500">
+                  Không có kê thuốc
+                </TableCell>
+              </TableRow>
+            ) : (
+            prescription.medications.map((item, index) => (
               <TableRow key={`medicine-${item.id}`}>
-                <TableCell className="text-center">{serviceIndication.services.length + index + 1}</TableCell>
+                <TableCell className="text-center">{serviceIndication?.services?.length ? serviceIndication.services.length : 0 + index + 1}</TableCell>
                 <TableCell>{item.name}</TableCell>
                 <TableCell className="text-center">{item.quantity}</TableCell>
                 <TableCell>{item.dosage_form}</TableCell>
@@ -103,7 +118,7 @@ export default function InvoiceDetailTable({ serviceIndication, prescription, on
                   {formatCurrency(item.total_price)}
                 </TableCell>
               </TableRow>
-            ))}
+            )))}
             
             {/* Tổng cộng */}
             <TableRow className="bg-gray-100 font-bold">

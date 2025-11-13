@@ -142,37 +142,16 @@ export default function InvoiceDetailPreview({ params }: {
             }
 
             console.log(newInvoice);
-            await invoiceApiRequest.create(newInvoice);
+            const { payload } = await invoiceApiRequest.create(newInvoice);
+            const invoice_id = payload.data.id;
             toast.success("Tạo hóa đơn thanh toán thành công");
-            router.push(`/invoices`);
+            router.push(`/invoices/${invoice_id}`);
             router.refresh();
         } catch (err) {
             console.log("Error submitting invoice: ", err);
             toast.error("Có lỗi xảy ra, vui lòng thử lại!");
         }
-    }
-
-    // const getMedicalRecordId = (mr_id: string) => {
-    //     console.log("medical_record_id: ", mr_id);
-    //     setMedicalRecordId(mr_id);
-    // }
-
-    // const handleCompleteMR = async () => {
-    //     try {
-    //         if (medicalRecordId) {
-    //             const {payload} = await medicalRecordApiRequest.update(medicalRecordId, {status: "COMPLETED"});
-    //             console.log(payload.data);
-    //             //Chuyển sang trang chi tiết phiên khám
-    //             router.push(`/medical-records/${medicalRecordId}`);
-    //             router.refresh();
-    //         } else {
-    //             alert("Bạn chưa lưu phiên khám!!")
-    //         }
-    //     } catch (e) {
-    //         console.error(e);
-    //     }
-    // }
-    
+    }    
 
     return (    
         <div>
@@ -184,7 +163,7 @@ export default function InvoiceDetailPreview({ params }: {
                     <h1 className="text-2xl md:text-3xl font-bold text-blue-900 mb-2">
                         HÓA ĐƠN THANH TOÁN
                     </h1>
-                    <p className="text-gray-600 text-sm md:text-base">Phòng Khám Đa Khoa ABC</p>
+                    <p className="text-gray-600 text-sm md:text-base">Phòng Khám Chuyên Khoa Da Liễu ForSkin</p>
                     {/* <Separator className="mt-4" /> */}
                     </div>
 
@@ -214,7 +193,7 @@ export default function InvoiceDetailPreview({ params }: {
                     }
 
                     {
-                        (serviceIndication && prescription) &&
+                        (serviceIndication || prescription) &&
                         <InvoiceDetailTable
                             serviceIndication={serviceIndication}
                             prescription={prescription}

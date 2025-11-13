@@ -8,15 +8,15 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import Badge from '@/components/ui/badge/Badge';
-import Button from '@/components/ui/button/Button';
+// import Badge from '@/components/ui/badge/Badge';
+// import Button from '@/components/ui/button/Button';
 import Link from 'next/link';
 import { formatCurrency, formatDateTime } from '@/lib/utils';
 import { InvoiceDataType } from '@/schemaValidations/invoice.schema';
 import CenteredSpinner from '../ui/spinner/CenteredSpinner';
 import PaginationControls from '../ui/pagination/PaginationControls';
-import { useAuth } from "@/context/AuthContext";
-import { MoreHorizontal, Edit, Eye } from "lucide-react";
+// import { useAuth } from "@/context/AuthContext";
+import { MoreHorizontal, Eye } from "lucide-react";
 import { Button as ButtonUI } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -40,7 +40,7 @@ interface InvoiceTableProps {
 }
 
 export default function InvoiceTable({ invoices, isLoading, page=0, pageSize=10, total=0, onPageChange, onPageSizeChange }: InvoiceTableProps) {
-  const { user } = useAuth();
+  // const { user } = useAuth();
   return (
     isLoading
       ?
@@ -54,31 +54,31 @@ export default function InvoiceTable({ invoices, isLoading, page=0, pageSize=10,
             <TableHeader className="border-b border-gray-100 dark:border-white/[0.05]">
               <TableRow>
                 <TableCell
-                  isHeader
+                  //isHeader
                   className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
                 >
                   Ngày giờ
                 </TableCell>
                 <TableCell
-                  isHeader
+                  //isHeader
                   className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
                 >
                   Bệnh nhân
                 </TableCell>
                 <TableCell
-                  isHeader
+                  //isHeader
                   className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
                 >
                   Bác sĩ
                 </TableCell>
                 <TableCell
-                  isHeader
+                  //isHeader
                   className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
                 >
                   Thành tiền
                 </TableCell>
                 <TableCell
-                  isHeader
+                  //isHeader
                   className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
                 >
                   Tùy chọn

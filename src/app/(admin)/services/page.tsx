@@ -69,7 +69,7 @@ export default function ServiceListPage() {
     }
 
     const handleDelete = async (id: string) => {
-        if (confirm('Bạn có chắc chắn xoá dịch vụ này?')) {
+        // if (confirm('Bạn có chắc chắn xoá dịch vụ này?')) {
           try {
             await serviceApiRequest.delete(id);
             toast.success("Xóa dịch vụ thành công");
@@ -78,7 +78,7 @@ export default function ServiceListPage() {
             console.error('Lỗi xóa Service: ', error);
             toast.error("Có lỗi xảy ra, vui lòng thử lại!");
           }
-        }
+        // }
     };
   
     const handleFormSubmit = async () => {

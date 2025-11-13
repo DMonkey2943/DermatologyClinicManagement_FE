@@ -69,7 +69,7 @@ export default function MedicationListPage() {
   };
 
   const handleDelete = async (id: string) => {
-    if (confirm('Bạn có chắc chắn xoá Medication này?')) {
+    // if (confirm('Bạn có chắc chắn xoá Medication này?')) {
       setIsLoading(true);
       try {
         await medicationApiRequest.delete(id);
@@ -81,7 +81,7 @@ export default function MedicationListPage() {
       } finally {
         setIsLoading(false);
       }
-    }
+    // }
   };
 
   const handleFormSubmit = async () => {

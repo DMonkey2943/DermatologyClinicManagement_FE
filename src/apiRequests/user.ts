@@ -24,9 +24,15 @@ const userApiRequest = {
     delete: (id: string) => http.delete(`/users/${id}`),
 
     // DOCTORS
+    // getDoctorList: (
+    //     params: { skip?: number; limit?: number } = { skip: 0, limit: 100 }
+    // ) => http.get<DoctorListResType>('/doctors/', { params }),
     getDoctorList: (
         params: { skip?: number; limit?: number } = { skip: 0, limit: 100 }
-    ) => http.get<DoctorListResType>('/doctors/', { params }), 
+    ) => http.get<UserListResType>('/doctors/', { params }), 
+
+    getDoctorList_SCR: (options: { headers?: Record<string, string> } = {}) =>
+        http.get<DoctorListResType>(`/doctors`, { headers: options.headers }),
 };
 
 export default userApiRequest;

@@ -31,12 +31,12 @@ export default function NavigationLoading() {
     };
   }, []);
 
-//   if (!isLoading) return null;
+  if (!isLoading) return null;
 
-//   return (
-//     <div className="fixed inset-0 flex items-center justify-center bg-black/30 z-[999999]">
-//       <div className="h-10 w-10 border-4 border-t-transparent border-white rounded-full animate-spin" />
-//     </div>
-//   );
-    return null;
+  return (
+    <div className="fixed inset-0 flex items-center justify-center bg-black/30 z-[999999]">
+      <div className="h-10 w-10 border-4 border-t-transparent border-white rounded-full animate-spin" />
+    </div>
+  );
+    // return null;
 }

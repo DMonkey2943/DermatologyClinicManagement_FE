@@ -57,8 +57,8 @@ export const InvoiceFullData = z.object({
     notes: z.string().nullable().optional(),
     created_at: z.string(),
     diagnosis: z.string(),
-    medications: z.array(PrescriptionDetailData),
-    services: z.array(ServiceIndicationDetailData)
+    medications: z.array(PrescriptionDetailData).nullable(),
+    services: z.array(ServiceIndicationDetailData).nullable(),
 })
 export type InvoiceFullDataType = z.TypeOf<typeof InvoiceFullData>
 

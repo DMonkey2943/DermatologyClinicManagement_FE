@@ -116,7 +116,7 @@ export default function UserFormModal({
         const errorPayload = err.payload.details;
         const validationErrors: ValidationErrors = {};
         errorPayload.forEach(({ field, msg }) => {
-          validationErrors[field] = msg;
+          validationErrors[field as keyof ValidationErrors] = msg;
         });
         setErrors(validationErrors);
         toast.error("Hãy kiểm tra lại dữ liệu trước khi Lưu!");

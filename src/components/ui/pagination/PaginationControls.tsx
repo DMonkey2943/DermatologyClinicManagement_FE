@@ -2,6 +2,7 @@
 
 import React from 'react';
 import Button from '@/components/ui/button/Button';
+import { ChevronsLeft, ChevronsRight } from 'lucide-react';
 
 interface PaginationControlsProps {
   page: number; // Trang hiện tại (zero-based)
@@ -41,11 +42,12 @@ export default function PaginationControls({
         <div className="flex gap-2">
           <Button
             size="sm"
-            variant="ghost"
+            variant="outline"
             onClick={() => onPageChange(Math.max(0, page - 1))}
             disabled={page <= 0}
           >
-            Prev
+            {/* Prev */}
+            <ChevronsLeft/>
           </Button>
           <div className="flex items-center px-2">
             <span className="text-theme-sm text-gray-600 dark:text-gray-400">
@@ -54,11 +56,12 @@ export default function PaginationControls({
           </div>
           <Button
             size="sm"
-            variant="ghost"
+            variant="outline"
             onClick={() => onPageChange(Math.min(totalPages - 1, page + 1))}
             disabled={page >= totalPages - 1}
           >
-            Next
+            {/* Next */}
+            <ChevronsRight/>
           </Button>
         </div>
 

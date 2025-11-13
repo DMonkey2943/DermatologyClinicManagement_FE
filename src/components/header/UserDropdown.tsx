@@ -20,9 +20,9 @@ export default function UserDropdown() {
 
   const handleLogout = async () => {
     // console.log('Logging out user');
+    router.push("/signin");
     await signout();  // Gọi logout từ context: xóa cookie, setUser(null), và redirect
     toast.success("Đăng xuất thành công")
-    router.push("/signin");
     router.refresh();
   };
 

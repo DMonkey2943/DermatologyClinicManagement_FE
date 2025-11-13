@@ -135,7 +135,13 @@ export default function PrescriptionTab({ medicalRecordId, prescriptionId, items
         <Popover open={open} onOpenChange={setOpen}>
           <PopoverTrigger asChild>
             <Button variant="outline" className="flex-1 justify-between">
-              {selected?.name || "Chọn thuốc..."} <ChevronsUpDown className="h-4 w-4" />
+              <span
+                className="max-w-[250px] truncate" // Giới hạn chiều rộng và cắt ngắn
+                title={selected?.name || "Chọn thuốc..."} // Hiển thị toàn bộ tên khi hover
+              >
+                {selected?.name || "Chọn thuốc..."}
+              </span>
+              <ChevronsUpDown className="h-4 w-4" />
             </Button>
           </PopoverTrigger>
           <PopoverContent className="w-80 p-0">
@@ -144,9 +150,17 @@ export default function PrescriptionTab({ medicalRecordId, prescriptionId, items
               <CommandEmpty>Không tìm thấy</CommandEmpty>
               <CommandGroup className="max-h-64 overflow-auto">
                 {medications.map(m => (
-                  <CommandItem key={m.id} onSelect={() => { setSelected(m); setOpen(false); }}>
-                    <Check className={`mr-2 h-4 w-4 ${selected?.id === m.id ? "opacity-100" : "opacity-0"}`} />
-                    {m.name}
+                  <CommandItem
+                    key={m.id}
+                    onSelect={() => {
+                      setSelected(m);
+                      setOpen(false);
+                    }}
+                  >
+                    <Check
+                      className={`mr-2 h-4 w-4 ${selected?.id === m.id ? "opacity-100" : "opacity-0"}`}
+                    />
+                    {m.name} {/* Giữ nguyên, không cắt ngắn */}
                   </CommandItem>
                 ))}
               </CommandGroup>

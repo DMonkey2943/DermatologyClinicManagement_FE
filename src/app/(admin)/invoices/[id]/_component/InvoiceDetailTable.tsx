@@ -7,7 +7,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import {  PrescriptionDetailDataType } from '@/schemaValidations/prescription.schema';
 import { ServiceIndicationDetailDataType } from '@/schemaValidations/serviceIndication.schema';
 import { formatCurrency } from '@/lib/utils';

@@ -12,6 +12,11 @@ const invoiceApiRequest = {
     getDetail: (id: string) => http.get<InvoiceFullResType>(`/${prefix}/${id}`),
 
     create: (body: CreateInvoiceBodyType) => http.post<InvoiceResType>(`/${prefix}/`, body),
+
+    getDetail_SCR: (
+        id: string,
+        options: { headers?: Record<string, string> } = {}
+    ) => http.get<InvoiceFullResType>(`/${prefix}/${id}`, { headers: options.headers }),
 };
 
 export default invoiceApiRequest;

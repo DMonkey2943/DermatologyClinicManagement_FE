@@ -42,6 +42,8 @@ import { EntityError, HttpError } from "@/lib/axios";
 import { useRouter } from 'next/navigation';
 import { useRef, useState } from "react";
 
+type CreateUserFormData = z.infer<typeof createUserSchema>;
+
 export default function CreateUserPage() {
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [avatarFile, setAvatarFile] = useState<File | null>(null);

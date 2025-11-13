@@ -31,6 +31,7 @@ export const PatientGenderChart: React.FC<PatientGenderChartProps> = ({ filter, 
       try {
         setLoading(true)
         const response = await reportApiRequest.getPatientStats(filter)
+        console.log(genderDistribution);
         
         if (response.payload.data.gender_distribution) {
           const genderData = response.payload.data.gender_distribution

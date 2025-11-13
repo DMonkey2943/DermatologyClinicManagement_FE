@@ -39,11 +39,11 @@ export default function SignInForm() {
       const currentUser = res.payload.data.user;
       // console.log('Logged in user:', currentUser);
       setUser(currentUser); // Cập nhật user trong AuthContext
-      toast.success("Đăng nhập thành công");
       // Nếu login thành công
       if (currentUser.id) {
         router.push("/"); // Redirect về trang home
       }
+      toast.success("Đăng nhập thành công");
     } catch (err) {
       if (err instanceof EntityError) {
         // Xử lý lỗi 422
