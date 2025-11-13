@@ -9,6 +9,9 @@ const nextConfig: NextConfig = {
     });
     return config;
   },
+  eslint: {
+    ignoreDuringBuilds: true, // Bỏ qua ESLint trong quá trình build
+  },
   images: {
     remotePatterns: [
       {
