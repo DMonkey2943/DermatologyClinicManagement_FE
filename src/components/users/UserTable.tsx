@@ -185,7 +185,7 @@ export default function UserTable({
 
                         <DropdownMenuItem asChild>
                           <Link
-                            href={`/users/${user.id}/edit`}
+                            href={`/admin/users/${user.id}/edit`}
                             className="flex items-center gap-2"
                           >
                             <Edit className="h-4 w-4" />

@@ -116,7 +116,7 @@ export default function ClientCreateUserPage() {
     try {
         await userApiRequest.createWithAvatar(formData);
         toast.success("Thêm tài khoản mới thành công");        
-        router.push(`/users`);
+        router.push(`/admin/users`);
         router.refresh();
     } catch (err: any) {
         console.error('Submit error:', err);              

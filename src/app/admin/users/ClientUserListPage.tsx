@@ -138,7 +138,7 @@ export default function ClientUserListPage() {
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
           <div className="flex items-center gap-2">
             {/* <Button onClick={openAddModal}>+ Thêm tài khoản</Button> */}
-            <Link href={`/users/add`}>
+            <Link href={`/admin/users/add`}>
               <Button >+ Thêm tài khoản</Button>
             </Link>
           </div>

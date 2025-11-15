@@ -5,10 +5,10 @@ import PageBreadcrumb from '@/components/common/PageBreadCrumb';
 import ComponentCard from '@/components/common/ComponentCard';
 import patientApiRequest from '@/apiRequests/patient';
 
-import MedicalRecordCard from './_component/MedicalRecordCard';
-import PrescriptionCard from './_component/PrescriptionCard';
-import ServiceIndicationCard from './_component/ServiceIndicationCard';
-import SkinImagesCard from './_component/SkinImagesCard';
+import MedicalRecordCard from '@/components/medical-records/detail/MedicalRecordCard';
+import PrescriptionCard from '@/components/medical-records/detail/PrescriptionCard';
+import ServiceIndicationCard from '@/components/medical-records/detail/ServiceIndicationCard';
+import SkinImagesCard from '@/components/medical-records/detail/SkinImagesCard';
 
 import medicalRecordApiRequest from '@/apiRequests/medicalRecord';
 import { MedicalRecordDataType } from '@/schemaValidations/medicalRecord.schema';

@@ -12,7 +12,7 @@ import { UserFKDataType } from '@/schemaValidations/user.schema';
 import { PrescriptionFullDataType } from '@/schemaValidations/prescription.schema';
 import { ServiceIndicationFullDataType } from '@/schemaValidations/serviceIndication.schema';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import InvoiceDetailTable from './_component/InvoiceDetailTable';
+import InvoiceDetailTable from '@/components/invoices/preview/InvoiceDetailTable';
 import invoiceApiRequest from '@/apiRequests/invoice';
 import { useAuth } from "@/context/AuthContext";
 import { toast } from 'sonner';
@@ -62,11 +62,11 @@ export default function ClientInvoicePreviewPage({ params }: { params: { medical
 
             if(data.status === 'IN_PROGRESS') {
                 toast.error("Chỉ có thể tạo hóa đơn khi phiên khám đã hoàn thành!");
-                router.push('/medical-records');
+                router.push('/staff/medical-records');
                 return;
             } else if(data.status === 'PAID') {
                 toast.error("Đã tồn tại hóa đơn cho phiên khám này!");
-                router.push('/invoices');
+                router.push('/staff/invoices');
                 return;
             }
             
@@ -143,7 +143,7 @@ export default function ClientInvoicePreviewPage({ params }: { params: { medical
             const { payload } = await invoiceApiRequest.create(newInvoice);
             const invoice_id = payload.data.id;
             toast.success("Tạo hóa đơn thanh toán thành công");
-            router.push(`/invoices/${invoice_id}`);
+            router.push(`/staff/invoices/${invoice_id}`);
             router.refresh();
         } catch (err) {
             console.log("Error submitting invoice: ", err);

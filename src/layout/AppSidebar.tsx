@@ -22,8 +22,8 @@ import { useAuth } from "@/context/AuthContext";
 type NavItem = {
   name: string;
   icon: React.ReactNode;
-  path?: string;
-  subItems?: { name: string; path: string; pro?: boolean; new?: boolean }[];
+  basePath?: string; // Thay path bằng basePath
+  subItems?: { name: string; basePath: string; pro?: boolean; new?: boolean }[]; // Thay path bằng basePath trong subItems
   roles?: string[]; // Thêm thuộc tính roles để chỉ định vai trò được phép
 };
 
@@ -31,55 +31,55 @@ const navItems: NavItem[] = [
   {
     icon: <GridIcon />,
     name: "Dashboard",
-    path: "/",
+    basePath: "/",
     roles: ["ADMIN", "STAFF", "DOCTOR"], // Hiển thị cho mọi role
   },
   {
     icon: <PieChartIcon />,
     name: "Thống kê doanh thu",
-    path: "/reports/revenue",
+    basePath: "/statistics/revenue",
     roles: ["ADMIN"], // Chỉ hiển thị cho ADMIN
   },
   {
     icon: <UsersGearIcon />,
     name: "Tài khoản",
-    path: "/users",
+    basePath: "/users",
     roles: ["ADMIN"], // Chỉ hiển thị cho ADMIN
   },
   {
     icon: <HospitalUserIcon />,
     name: "Bệnh nhân",
-    path: "/patients",
+    basePath: "/patients",
     roles: ["ADMIN", "STAFF"], // Chỉ hiển thị cho ADMIN và STAFF
   },
   {
     icon: <CalenderIcon />,
     name: "Lịch hẹn",
-    path: "/appointments",
+    basePath: "/appointments",
     roles: ["ADMIN", "STAFF", "DOCTOR"], // Hiển thị cho mọi role
   },
   {
     icon: <DocsIcon />,
     name: "Phiên khám",
-    path: "/medical-records",
+    basePath: "/medical-records",
     roles: ["ADMIN", "STAFF", "DOCTOR"], // Hiển thị cho mọi role
   },
   {
     icon: <DollarLineIcon />,
     name: "Hóa đơn",
-    path: "/invoices",
+    basePath: "/invoices",
     roles: ["ADMIN", "STAFF", "DOCTOR"], // Hiển thị cho mọi role
   },
   {
     icon: <MedicationIcon />,
     name: "Thuốc",
-    path: "/medications",
+    basePath: "/medications",
     roles: ["ADMIN"], // Chỉ hiển thị cho ADMIN
   },
   {
     icon: <StethoscopeIcon />,
     name: "Dịch vụ điều trị",
-    path: "/services",
+    basePath: "/services",
     roles: ["ADMIN"], // Chỉ hiển thị cho ADMIN
   },
 ];
@@ -101,6 +101,14 @@ const AppSidebar: React.FC = () => {
     },
     [user?.role]
   );
+
+  const getPrefixedPath = (basePath: string, role: string | undefined): string => {
+    // if (!role || basePath === "/")  // Không thêm tiền tố cho Dashboard hoặc nếu không có role
+    if (!role)
+      return basePath;
+    const prefix = role.toLowerCase(); // Chuyển role thành chữ thường: admin, doctor, staff
+    return `/${prefix}${basePath}`;
+  };
 
   const renderMenuItems = (
     navItems: NavItem[],
@@ -146,17 +154,17 @@ const AppSidebar: React.FC = () => {
               )}
             </button>
           ) : (
-            nav.path && (
+            nav.basePath && (
               <Link
-                href={nav.path}
+                href={getPrefixedPath(nav.basePath, user?.role)} // Sử dụng getPrefixedPath
                 prefetch
                 className={`menu-item group ${
-                  isActive(nav.path) ? "menu-item-active" : "menu-item-inactive"
+                  isActive(nav.basePath) ? "menu-item-active" : "menu-item-inactive"
                 }`}
               >
                 <span
                   className={`${
-                    isActive(nav.path)
+                    isActive(nav.basePath)
                       ? "menu-item-icon-active"
                       : "menu-item-icon-inactive"
                   }`}
@@ -186,10 +194,10 @@ const AppSidebar: React.FC = () => {
                 {nav.subItems.map((subItem) => (
                   <li key={subItem.name}>
                     <Link
-                      href={subItem.path}
+                      href={getPrefixedPath(subItem.basePath, user?.role)} // Sử dụng getPrefixedPath cho subItem
                       prefetch
                       className={`menu-dropdown-item ${
-                        isActive(subItem.path)
+                        isActive(subItem.basePath)
                           ? "menu-dropdown-item-active"
                           : "menu-dropdown-item-inactive"
                       }`}
@@ -199,7 +207,7 @@ const AppSidebar: React.FC = () => {
                         {subItem.new && (
                           <span
                             className={`ml-auto ${
-                              isActive(subItem.path)
+                              isActive(subItem.basePath)
                                 ? "menu-dropdown-badge-active"
                                 : "menu-dropdown-badge-inactive"
                             } menu-dropdown-badge `}
@@ -210,7 +218,7 @@ const AppSidebar: React.FC = () => {
                         {subItem.pro && (
                           <span
                             className={`ml-auto ${
-                              isActive(subItem.path)
+                              isActive(subItem.basePath)
                                 ? "menu-dropdown-badge-active"
                                 : "menu-dropdown-badge-inactive"
                             } menu-dropdown-badge `}
@@ -240,7 +248,13 @@ const AppSidebar: React.FC = () => {
   const subMenuRefs = useRef<Record<string, HTMLDivElement | null>>({});
 
   // const isActive = (path: string) => path === pathname;
-   const isActive = useCallback((path: string) => path === pathname, [pathname]);
+  const isActive = useCallback(
+    (basePath: string) => {
+      const prefixedPath = getPrefixedPath(basePath, user?.role);
+      return prefixedPath === pathname;
+    },
+    [pathname, user?.role]
+  );
 
   useEffect(() => {
     // Check if the current path matches any submenu item
@@ -250,7 +264,7 @@ const AppSidebar: React.FC = () => {
       items.forEach((nav, index) => {
         if (nav.subItems) {
           nav.subItems.forEach((subItem) => {
-            if (isActive(subItem.path)) {
+            if (isActive(subItem.basePath)) { // Sử dụng basePath
               setOpenSubmenu({
                 type: menuType as "main" | "others",
                 index,

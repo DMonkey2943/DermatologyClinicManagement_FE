@@ -18,12 +18,12 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 
-import PageHeader from './_component/PageHeader';
-import PatientInfoCard from './_component/PatientInfoCard';
-import ExaminationTab from './_component/ExaminationTab';
-import PrescriptionTab from './_component/PrescriptionTab';
-import ServiceTab from './_component/ServiceTab';
-import SkinImagesTab from './_component/SkinImagesTab';
+import PageHeader from '@/components/medical-records/add/PageHeader';
+import PatientInfoCard from '@/components/medical-records/add/PatientInfoCard';
+import ExaminationTab from '@/components/medical-records/add/ExaminationTab';
+import PrescriptionTab from '@/components/medical-records/add/PrescriptionTab';
+import ServiceTab from '@/components/medical-records/add/ServiceTab';
+import SkinImagesTab from '@/components/medical-records/add/SkinImagesTab';
 
 import appointmentApiRequest from '@/apiRequests/appointment';
 import patientApiRequest from '@/apiRequests/patient';
@@ -99,7 +99,7 @@ export default function ClientAddMedicalRecordPage({ params }: { params: { appoi
         // console.log(apt.message);
         if (apt.data.status !== 'WAITING') {
           toast.error("Lịch hẹn không hợp lệ");
-          router.push('/appointments');
+          router.push('/doctor/appointments');
           return;
         }
 
@@ -196,7 +196,7 @@ export default function ClientAddMedicalRecordPage({ params }: { params: { appoi
       } catch (err) {
         console.error(err);
         toast.error("Không thể tạo phiên khám");
-        router.push('/appointments');
+        router.push('/doctor/appointments');
       }
     };
     init();
@@ -226,7 +226,7 @@ export default function ClientAddMedicalRecordPage({ params }: { params: { appoi
       });
 
       toast.success("Hoàn thành phiên khám!");
-      router.push(`/medical-records/${medicalRecord.id}`);
+      router.push(`/doctor/medical-records/${medicalRecord.id}`);
     } catch {
       toast.error("Lỗi hoàn thành");
     }

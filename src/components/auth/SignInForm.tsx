@@ -40,8 +40,12 @@ export default function SignInForm() {
       // console.log('Logged in user:', currentUser);
       setUser(currentUser); // Cập nhật user trong AuthContext
       // Nếu login thành công
-      if (currentUser.id) {
-        router.push("/"); // Redirect về trang home
+      if (currentUser.role == 'ADMIN') {
+        router.push("admin/"); // Redirect về trang home
+      } else if (currentUser.role == 'DOCTOR') {
+        router.push("doctor/"); // Redirect về trang home
+      } else if (currentUser.role == 'STAFF') {
+        router.push("staff/"); // Redirect về trang home
       }
       toast.success("Đăng nhập thành công");
     } catch (err) {

@@ -11,11 +11,11 @@ import {
 // import Badge from '@/components/ui/badge/Badge';
 // import Button from '@/components/ui/button/Button';
 import Link from 'next/link';
-import { formatCurrency, formatDateTime } from '@/lib/utils';
+import { formatCurrency, formatDateTime, getPrefixedPath } from '@/lib/utils';
 import { InvoiceDataType } from '@/schemaValidations/invoice.schema';
 import CenteredSpinner from '../ui/spinner/CenteredSpinner';
 import PaginationControls from '../ui/pagination/PaginationControls';
-// import { useAuth } from "@/context/AuthContext";
+import { useAuth } from "@/context/AuthContext";
 import { MoreHorizontal, Eye } from "lucide-react";
 import { Button as ButtonUI } from "@/components/ui/button";
 import {
@@ -40,7 +40,7 @@ interface InvoiceTableProps {
 }
 
 export default function InvoiceTable({ invoices, isLoading, page=0, pageSize=10, total=0, onPageChange, onPageSizeChange }: InvoiceTableProps) {
-  // const { user } = useAuth();
+  const { user } = useAuth();
   return (
     isLoading
       ?
@@ -117,7 +117,7 @@ export default function InvoiceTable({ invoices, isLoading, page=0, pageSize=10,
 
                       <DropdownMenuContent align="end" className="w-40">
                         <DropdownMenuItem asChild>
-                          <Link href={`/invoices/${invoice.id}`}>
+                          <Link href={getPrefixedPath(`/invoices/${invoice.id}`, user?.role)}>
                               <Eye className="h-4 w-4" />
                               <span>Xem chi tiết</span>
                           </Link>

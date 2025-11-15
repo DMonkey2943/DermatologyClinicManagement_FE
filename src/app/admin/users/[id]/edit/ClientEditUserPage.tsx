@@ -157,7 +157,7 @@ export default function ClientEditUserPage({ params }: { params: { id: string } 
     try {
       await userApiRequest.updateWithAvatar(id, formData);
       toast.success("Cập nhật tài khoản thành công");
-      router.push(`/users`);
+      router.push(`/admin/users`);
       router.refresh();
     } catch (err: any) {
       console.error("Submit error:", err);

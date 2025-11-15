@@ -2,8 +2,8 @@ import ClientAddMedicalRecordPage from "./ClientAddMedicalRecordPage";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Chỉnh sửa tài khoản | ForSkin - Phòng khám da liễu",
-  description: "Trang Chỉnh sửa tài khoản",
+  title: "Tạo phiên khám | ForSkin - Phòng khám da liễu",
+  description: "Trang Tạo phiên khám",
 };
 
 export default async function AddMedicalRecordPage({ params }: { params: Promise<{ appointment_id: string }> }) {

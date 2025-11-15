@@ -12,7 +12,7 @@ import Badge from '@/components/ui/badge/Badge';
 import Button from '@/components/ui/button/Button';
 import Link from 'next/link';
 import { MedicalRecordDataType } from '@/schemaValidations/medicalRecord.schema';
-import { formatDateTime } from '@/lib/utils';
+import { formatDateTime, getPrefixedPath } from '@/lib/utils';
 import CenteredSpinner from '../ui/spinner/CenteredSpinner';
 import PaginationControls from '../ui/pagination/PaginationControls';
 import { MoreHorizontal, Eye } from "lucide-react";
@@ -125,7 +125,7 @@ export default function MedicalRecordTable({ medical_records, isLoading, page=0,
 
                         <DropdownMenuContent align="end" className="w-40">
                           <DropdownMenuItem asChild>
-                            <Link href={`/medical-records/${medical_record.id}`}>
+                            <Link href={getPrefixedPath(`/medical-records/${medical_record.id}`, user?.role)}>
                                 <Eye className="h-4 w-4" />
                                 <span>Xem chi tiết</span>
                             </Link>
@@ -133,7 +133,7 @@ export default function MedicalRecordTable({ medical_records, isLoading, page=0,
                         </DropdownMenuContent>
                       </DropdownMenu>
                       {["ADMIN", "STAFF"].includes(user?.role ?? "") && medical_record.status === 'COMPLETED' && 
-                        <Link href={`/invoices/preview/${medical_record.id}`}>
+                        <Link href={getPrefixedPath(`/invoices/preview/${medical_record.id}`, user?.role)}>
                           <Button size="sm">Tạo hóa đơn</Button>
                         </Link>
                       }

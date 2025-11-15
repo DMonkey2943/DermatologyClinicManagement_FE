@@ -88,13 +88,7 @@ export const Modal: React.FC<ModalProps> = ({
             </svg>
           </button>
         )}
-        <div
-          className={`${
-            isFullscreen ? "h-full" : "max-h-[80vh] overflow-y-auto"
-          }`} // Thêm max-height và overflow-y-auto
-        >
-          {children}
-        </div>
+        <div>{children}</div>
       </div>
     </div>
   );

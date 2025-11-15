@@ -24,7 +24,7 @@ import {
   SelectContent,
   SelectItem,
 } from '@/components/ui/select';
-import { formatDate } from '@/lib/utils';
+import { formatDate, getPrefixedPath } from '@/lib/utils';
 import { useAuth } from "@/context/AuthContext";
 import { MoreHorizontal, Edit } from "lucide-react";
 import { Button as ButtonUI } from "@/components/ui/button";
@@ -236,7 +236,7 @@ export default function AppointmentTable({ appointments, onEdit, isLoading, page
                         </DropdownMenu>
                       )}
                       {["ADMIN", "DOCTOR"].includes(user?.role ?? "") && appointment.status === 'WAITING' && 
-                        <Link href={`/medical-records/add/${appointment.id}`}>
+                        <Link href={getPrefixedPath(`/medical-records/add/${appointment.id}`, user?.role)}>
                           <Button size="sm">Tạo phiên khám</Button>
                         </Link>
                       }

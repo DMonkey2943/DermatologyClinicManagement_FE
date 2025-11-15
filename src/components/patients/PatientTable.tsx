@@ -35,7 +35,7 @@ import Link from 'next/link'
 import { PatientDataType } from '@/schemaValidations/patient.schema';
 import CenteredSpinner from '../ui/spinner/CenteredSpinner';
 import PaginationControls from '../ui/pagination/PaginationControls';
-import { formatDate } from '@/lib/utils';
+import { formatDate, getPrefixedPath } from '@/lib/utils';
 import { useAuth } from "@/context/AuthContext";
 
 interface PatientTableProps {
@@ -157,7 +157,7 @@ export default function PatientTable({
 
                         <DropdownMenuItem asChild>
                           <Link
-                            href={`/patients/${patient.id}`}
+                            href={getPrefixedPath(`/patients/${patient.id}`, user?.role)}
                             className="flex items-center gap-2"
                           >
                             <Eye className="h-4 w-4" />
