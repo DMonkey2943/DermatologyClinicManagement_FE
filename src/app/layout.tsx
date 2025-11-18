@@ -1,9 +1,10 @@
+// src/app/layout.tsx
 import { Montserrat } from 'next/font/google';
 import './globals.css';
 
 import { SidebarProvider } from '@/context/SidebarContext';
 import { ThemeProvider } from '@/context/ThemeContext';
-import { AuthProvider } from '@/context/AuthContext';
+// import { AuthProvider } from '@/context/AuthContext';
 import { Toaster } from "@/components/ui/sonner"
 
 const montserrat = Montserrat({
@@ -20,10 +21,10 @@ export default function RootLayout({
     <html lang="vi">
       <body className={`${montserrat.className} dark:bg-gray-900`}>
         <ThemeProvider>
-          <AuthProvider>
+          {/* <AuthProvider> */}
             <SidebarProvider>{children}</SidebarProvider>
             <Toaster />
-          </AuthProvider>
+          {/* </AuthProvider> */}
         </ThemeProvider>
       </body>
     </html>

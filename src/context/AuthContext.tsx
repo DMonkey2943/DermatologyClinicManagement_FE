@@ -1,8 +1,10 @@
+// src/context/AuthContext.tsx
 'use client';
 
 import { createContext, useContext, useState, useEffect } from 'react';
 import { UserDataType } from '@/schemaValidations/user.schema';
 import authApiRequest from '@/apiRequests/auth';
+import Cookies from 'js-cookie';
 
 interface AuthContextType {
   user: UserDataType | null;
@@ -21,20 +23,45 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   // Kiểm tra trạng thái đăng nhập khi tải trang
   useEffect(() => {
-    async function fetchCurrentUser() {
-      try {
-        const res = await authApiRequest.getCurrentUser();
-        const currentUser = res.payload.data;
-        console.log('Fetched current user:', currentUser);
-        setUser(currentUser);
-      } catch (error) {
-        console.error('Failed to fetch current user: ', error);
-        setUser(null);
-      } finally {
-        setIsLoading(false);
+    // async function fetchCurrentUser() {
+    //   try {
+    //     const res = await authApiRequest.getCurrentUser();
+    //     const currentUser = res.payload.data;
+    //     console.log('Fetched current user:', currentUser);
+    //     setUser(currentUser);
+    //   } catch (error) {
+    //     console.error('Failed to fetch current user: ', error);
+    //     setUser(null);
+    //   } finally {
+    //     setIsLoading(false);
+    //   }
+    // }
+    // fetchCurrentUser();
+
+    const checkAuth = async () => {
+      if (typeof window !== 'undefined') {
+        const token = Cookies.get('access_token');
+        const refreshToken = Cookies.get('refresh_token');
+
+        if (token && refreshToken) {
+          try {
+            const res = await authApiRequest.getCurrentUser();
+            const currentUser = res.payload.data;
+            console.log('Fetched current user:', currentUser);
+            setUser(currentUser);
+          } catch (error) {
+            console.error('Failed to fetch current user: ', error);
+            setUser(null);
+          }
+          // finally {
+          //   setIsLoading(false);
+          // }
+        }
       }
-    }
-    fetchCurrentUser();
+      setIsLoading(false);
+    };
+
+    checkAuth();
   }, []);
     
   const signout = async () => {
@@ -59,7 +86,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
 export function useAuth() {
   const context = useContext(AuthContext);
-  if (context === undefined) {
+  if (!context) {
     throw new Error('useAuth must be used within an AuthProvider');
   }
   return context;

@@ -6,10 +6,11 @@ import Button from "@/components/ui/button/Button";
 import { EyeCloseIcon, EyeIcon } from "@/icons";
 import { useRouter } from "next/navigation";
 import React, { useState } from "react";
-import { useAuth } from '@/context/AuthContext';
+// import { useAuth } from '@/context/AuthContext';
 import { EntityError, UnauthorizedError } from '@/lib/axios';
 import authApiRequest from "@/apiRequests/auth";
 import { toast } from "sonner";
+import Cookies from 'js-cookie';
 
 export default function SignInForm() {
   const [showPassword, setShowPassword] = useState(false);
@@ -20,7 +21,7 @@ export default function SignInForm() {
   const [errors, setErrors] = useState<{ username?: string; password?: string }>({}); // State để lưu lỗi 422
   const [unauthorizedErrors, setUnauthorizedErrors] = useState(""); // State để lưu lỗi 422
   const router = useRouter();
-  const { setUser } = useAuth(); // Lấy setUser từ useAuth
+  // const { setUser } = useAuth(); // Lấy setUser từ useAuth
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -36,9 +37,14 @@ export default function SignInForm() {
     try {
       const res = await authApiRequest.login({username, password})
       
+      const { access_token, refresh_token } = res.payload.data;
+      Cookies.set('access_token', access_token);
+      Cookies.set('refresh_token', refresh_token);
+      
       const currentUser = res.payload.data.user;
+      Cookies.set('role', currentUser.role);
       // console.log('Logged in user:', currentUser);
-      setUser(currentUser); // Cập nhật user trong AuthContext
+      // setUser(currentUser); // Cập nhật user trong AuthContext
       // Nếu login thành công
       if (currentUser.role == 'ADMIN') {
         router.push("admin/"); // Redirect về trang home
