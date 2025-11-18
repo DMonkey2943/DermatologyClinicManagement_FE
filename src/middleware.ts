@@ -1,61 +1,96 @@
+// src/middleware.ts
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
-// ✅ Cấu hình route & role được phép
-const rolePermissions: Record<string, string[]> = {  //Chỉ cần các route yêu cầu role
-  '/users': ['ADMIN'],
-  '/reports/revenue': ['ADMIN'],
-  // '/patients/': ['ADMIN', 'STAFF'], // /patients/[id]
-  '/medical-records/add': ['ADMIN', 'DOCTOR'],
-  '/invoices/preview': ['ADMIN', 'STAFF'],
-  '/medications': ['ADMIN'],
-  '/services': ['ADMIN'],
-};
-
-// ✅ Hàm kiểm tra quyền
-function isAuthorized(pathname: string, userRole: string | undefined): boolean {
-  for (const [route, allowedRoles] of Object.entries(rolePermissions)) {
-    if (pathname.startsWith(route)) {
-      return allowedRoles.includes(userRole || '');
-    }
-  }
-  return true; // Route không có trong config => không cần kiểm tra quyền
-}
+// Các route cần bảo vệ
+const USER_ROUTES = ['/admin', '/doctor', '/staff'];
+const PATIENT_ROUTES = ['/patient'];
 
 export function middleware(request: NextRequest) {
-  const accessToken = request.cookies.get('access_token')?.value;
-  const userRole = request.cookies.get('role')?.value; // cookie 'role' do backend set
-  const pathname = request.nextUrl.pathname;
+  const { pathname } = request.nextUrl;
 
-  // Nếu đã login mà vẫn vào /signin => redirect về trang chủ
-  if (pathname === '/signin' && accessToken) {
-    return NextResponse.redirect(new URL('/', request.url));
+  // Lấy token
+  const userToken = request.cookies.get('access_token')?.value;
+  const patientToken = request.cookies.get('patient_access_token')?.value;
+  const userRole = request.cookies.get('role')?.value?.toUpperCase();
+
+  // =================================================================
+  // 1. Nếu đã đăng nhập (bất kỳ loại nào) mà vào trang login → redirect phù hợp
+  // =================================================================
+  if (pathname === '/signin' || pathname === '/signin-patient') {
+    if (userToken && userRole) {
+      // Nhân viên đã đăng nhập
+      const redirectMap: Record<string, string> = {
+        ADMIN: '/admin',
+        DOCTOR: '/doctor',
+        STAFF: '/staff',
+      };
+      const redirectUrl = redirectMap[userRole];
+      return NextResponse.redirect(new URL(redirectUrl, request.url));
+    }
+
+    if (patientToken) {
+      // Bệnh nhân đã đăng nhập
+      return NextResponse.redirect(new URL('/patient', request.url));
+    }
+
+    // Chưa đăng nhập → cho vào trang login bình thường
+    return NextResponse.next();
   }
 
-  // Nếu chưa đăng nhập và không phải /signin => chuyển đến /signin
-  if (!accessToken && pathname !== '/signin') {
-    return NextResponse.redirect(new URL('/signin', request.url));
+  // =================================================================
+  // 2. Bảo vệ route nhân viên (chỉ cho user token)
+  // =================================================================
+  const isUserRoute = USER_ROUTES.some(route => pathname.startsWith(route));
+  if (isUserRoute) {
+    if (!userToken) {
+      // Chưa đăng nhập nhân viên → về trang login nhân viên
+      return NextResponse.redirect(new URL('/signin', request.url));
+    }
+    if (patientToken) {
+      // Có token bệnh nhân nhưng vào route nhân viên → không cho phép
+      return NextResponse.redirect(new URL('/patient', request.url));
+    }
+
+    // Có user token → kiểm tra quyền theo role (nếu cần)
+    // (Tùy chọn: thêm kiểm tra role chi tiết hơn)
+    return NextResponse.next();
   }
 
-  // Nếu có token, kiểm tra quyền
-  if (accessToken && !isAuthorized(pathname, userRole)) {
-    return NextResponse.redirect(new URL('/error-404', request.url));
+  // =================================================================
+  // 3. Bảo vệ route bệnh nhân (chỉ cho patient token)
+  // =================================================================
+  const isPatientRoute = PATIENT_ROUTES.some(route => pathname.startsWith(route));
+  if (isPatientRoute) {
+    if (!patientToken) {
+      // Chưa đăng nhập bệnh nhân → về trang login bệnh nhân
+      return NextResponse.redirect(new URL('/signin-patient', request.url));
+    }
+    if (userToken) {
+      // Có token nhân viên nhưng vào route bệnh nhân → không cho phép
+      return NextResponse.redirect(new URL('/', request.url));
+    }
+
+    // Có patient token → cho vào
+    return NextResponse.next();
   }
 
-  // Cho phép đi tiếp
+  // =================================================================
+  // 4. Các route khác (public, api, static...) → cho qua
+  // =================================================================
   return NextResponse.next();
 }
 
-// ✅ Chỉ áp dụng middleware cho các route người dùng
+// Áp dụng middleware cho tất cả route trừ file tĩnh
 export const config = {
   matcher: [
     /*
-     * Match tất cả các request trừ:
+     * Match tất cả request trừ:
+     * - api (api routes)
      * - _next/static (static files)
-     * - _next/image (image optimization)
+     * - _next/image (image optimization files)
      * - favicon.ico
-     * - public folder
      */
-    '/((?!_next/static|_next/image|favicon.ico|public|api).*)',
+    '/((?!api|_next/static|_next/image|favicon.ico).*)',
   ],
 };
