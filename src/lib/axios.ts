@@ -93,6 +93,15 @@ const handleLogout = () => {
     // console.log("handleLogout in axios.ts");
   }
 }
+const handlePatientLogout = () => {
+  if (isClient()) {
+    Cookies.remove('patient_access_token')
+    Cookies.remove('patient_refresh_token')
+    Cookies.remove('role')
+    location.href = '/signin-patient'
+    // console.log("handleLogout in axios.ts");
+  }
+}
 
 // Tạo instance Axios với cấu hình mặc định
 const api = axios.create({
@@ -192,41 +201,29 @@ api.interceptors.response.use(
     ) {
       originalRequest._retry = true // Đánh dấu để tránh loop refresh
       // CASE 1: API của bệnh nhân → refresh patient token
-      if (url.includes('/patient-auth') || url.includes('/patient-')) {
+      if (url.includes('patient-auth') || url.includes('patient-')) {
         if (!patientRefreshRequest) {
-          const patientRefreshToken = Cookies.get('patient_refresh_token'); // ← cần backend hỗ trợ
-
+          const patientRefreshToken = Cookies.get('patient_refresh_token')
           if (patientRefreshToken) {
-            patientRefreshRequest = api.post('/patient-auth/refresh', {
-              refresh_token: patientRefreshToken,
-            });
-          } else {
-            // Không có refresh token → logout bệnh nhân
-            Cookies.remove('patient_access_token');
-            Cookies.remove('patient_refresh_token');
-            if (window.location.pathname.startsWith('/patient')) {
-              window.location.href = '/patient/signin';
+            patientRefreshRequest = api.post('/patient-auth/refresh', { refresh_token: patientRefreshToken })
+            try {
+              const refreshResponse = await patientRefreshRequest
+              const { access_token } = refreshResponse.data
+              console.log("patient_access_token from /patient-auth/refresh", access_token);
+              Cookies.set('patient_access_token', access_token /*, { expires: new Date(expiresAt) } */)
+              Cookies.set('role', 'PATIENT')
+              originalRequest.headers.Authorization = `Bearer ${access_token}`
+              return api(originalRequest) // Retry request gốc với token mới
+            } catch (refreshError) {
+              handlePatientLogout()
+              console.log(refreshError);
+              throw refreshError
+            } finally {
+              patientRefreshRequest = null
             }
-            return Promise.reject(error);
+          } else {
+            handlePatientLogout()
           }
-        }
-
-        try {
-          const refreshResponse = await patientRefreshRequest;
-          const { access_token } = refreshResponse.data.data; // tùy cấu trúc response
-          Cookies.set('patient_access_token', access_token);
-
-          originalRequest.headers.Authorization = `Bearer ${access_token}`;
-          return api(originalRequest);
-        } catch (refreshError) {
-          Cookies.remove('patient_access_token');
-          Cookies.remove('patient_refresh_token');
-          if (window.location.pathname.startsWith('/patient')) {
-            window.location.href = '/signin-patient';
-          }
-          throw refreshError;
-        } finally {
-          patientRefreshRequest = null;
         }
       }
       // CASE 2: API của nhân viên → refresh token như cũ
