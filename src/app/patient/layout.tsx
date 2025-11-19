@@ -1,5 +1,6 @@
 // src/app/(patients)/patient/layout.tsx
 import { PatientAuthProvider } from '@/context/PatientAuthContext';
+import PatientAppHeader from "@/layout/PatientAppHeader";
 // import PatientSidebar from '@/components/patient/PatientSidebar';
 
 export default function PatientsLayout({
@@ -15,7 +16,7 @@ export default function PatientsLayout({
 
         {/* Main content */}
         <div className="flex-1 flex flex-col">
-          {/* <PatientHeader /> */}
+          <PatientAppHeader />
           <main className="flex-1 p-6">
             {children}
           </main>
