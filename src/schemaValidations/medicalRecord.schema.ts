@@ -1,6 +1,9 @@
 import z from 'zod';
 import { MetaData, UserFKData } from './user.schema';
 import { PatientFKData } from './patient.schema';
+import { PrescriptionFullData } from './prescription.schema';
+import { ServiceIndicationFullData } from './serviceIndication.schema';
+import { InvoiceData } from './invoice.schema';
 
 export const MedicalRecordData = z.object({
     id: z.string(),
@@ -85,3 +88,32 @@ export const SkinImageListRes = z.object({
 })
 
 export type SkinImageListResType = z.TypeOf<typeof SkinImageListRes>
+
+
+// FOR PATIENT
+export const MedicalRecordFullData = z.object({
+    id: z.string(),
+    appointment_id: z.string(),
+    patient_id: z.string(),
+    patient: PatientFKData,
+    doctor_id: z.string(),
+    doctor: UserFKData,
+    symptoms: z.string().nullable().optional(),
+    diagnosis: z.string().nullable().optional(),
+    status: z.enum(["COMPLETED", "IN_PROGRESS", "PAID"]),
+    notes: z.string().nullable().optional(),
+    created_at: z.string(), 
+    prescriptions: z.array(PrescriptionFullData).default([]),
+    service_indications: z.array(ServiceIndicationFullData).default([]),
+    skin_images: z.array(SkinImageData).default([]),
+    invoices: z.array(InvoiceData).default([])
+})
+export type MedicalRecordFullDataType = z.TypeOf<typeof MedicalRecordFullData>
+
+export const MedicalRecordFullRes = z.object({
+    data: MedicalRecordFullData || null,
+    message: z.string(),
+    success: z.boolean()
+})
+
+export type MedicalRecordFullResType = z.TypeOf<typeof MedicalRecordFullRes>
