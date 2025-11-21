@@ -8,6 +8,7 @@ import { Plus, Search, Calendar } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { AppointmentDataType } from '@/schemaValidations/appointment.schema'
 import patientAppointmentApiRequest from '@/apiRequests/patient/appointment'
+import AppointmentFormModal from '@/components/appointments/patient/AppointmentFormModal'
 // import Link from 'next/link'
 
 
@@ -42,23 +43,19 @@ export default function AppointmentsPage() {
   const [searchTerm, setSearchTerm] = useState('')
   const [filterStatus, setFilterStatus] = useState('ALL')
   const [appointments, setAppointments] = useState<AppointmentDataType[]>([]);
+  const [modalType, setModalType] = useState<'add' | null>(null);
   
-  useEffect(() => {
-    const fetchAppointments = async () => {
-      const { payload } = await patientAppointmentApiRequest.getList();
-      const appointmentList = payload.data;
-    //   console.log(appointmentList);
-      setAppointments(appointmentList);
-    };
-    
+  useEffect(() => {    
     fetchAppointments();
   }, []);
 
-//   const filteredAppointments = mockAppointments.filter((apt) => {
-//     const matchesSearch = apt.appointmentDate.includes(searchTerm) || apt.doctor.toLowerCase().includes(searchTerm.toLowerCase())
-//     const matchesStatus = filterStatus === 'ALL' || apt.status === filterStatus
-//     return matchesSearch && matchesStatus
-//   })
+  
+  const fetchAppointments = async () => {
+    const { payload } = await patientAppointmentApiRequest.getList();
+    const appointmentList = payload.data;
+  //   console.log(appointmentList);
+    setAppointments(appointmentList);
+  };
 
   const filteredAppointments = appointments.filter((apt) => {
     const matchesSearch = apt.appointment_date.includes(searchTerm) || apt.doctor.full_name.toLowerCase().includes(searchTerm.toLowerCase())
@@ -66,8 +63,32 @@ export default function AppointmentsPage() {
     return matchesSearch && matchesStatus
   })
 
+  const openAddModal = () => {
+    // setEditingAppointment(null);
+    setModalType('add');
+    // setPage(0);
+  };
+  const closeModal = () => {
+    // setEditingAppointment(null);
+    setModalType(null);
+  };
+
+  const handleFormSubmit = async () => {
+    closeModal();
+    
+    console.log("handleFormSubmit - setAppointments");
+    await fetchAppointments(); // Sử dụng currentTab để fetch đúng tab
+  };
+
   return (
     <div className="min-h-screen bg-background">
+      <AppointmentFormModal
+        isOpen={!!modalType}
+        onClose={closeModal}
+        onSuccess={handleFormSubmit}
+        editingAppointment={null}
+        modalType={modalType}
+      />
 
       <main className="container mx-auto px-4 py-6 md:py-10">
         {/* Header */}
@@ -76,7 +97,7 @@ export default function AppointmentsPage() {
             <h1 className="text-3xl font-bold text-foreground mb-2">Lịch hẹn</h1>
             <p className="text-muted-foreground">Quản lý tất cả cuộc hẹn khám chữa bệnh của bạn</p>
           </div>
-          <Button className="gap-2 w-full md:w-auto">
+          <Button onClick={openAddModal} className="gap-2 w-full md:w-auto">
             <Plus size={18} />
             Đặt lịch hẹn mới
           </Button>

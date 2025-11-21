@@ -64,3 +64,20 @@ export const UpdateAppointmentBody = z.object({
 })
 
 export type UpdateAppointmentBodyType = z.TypeOf<typeof UpdateAppointmentBody>
+
+
+
+
+
+
+// FOR PATIENT
+export const PatientCreateAppointmentBody = z.object({
+    doctor_id: z.string(),
+    appointment_date: z.string().date(),
+    appointment_time: z.string().regex(/^([01]\d|2[0-3]):[0-5]\d:[0-5]\d$/, {
+        message: 'Giờ hẹn không hợp lệ (e.g., "12:00:00")',
+    }),
+    created_by: z.string(),
+})
+
+export type PatientCreateAppointmentBodyType = z.TypeOf<typeof PatientCreateAppointmentBody>
