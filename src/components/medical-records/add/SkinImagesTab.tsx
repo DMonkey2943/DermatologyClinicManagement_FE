@@ -11,6 +11,7 @@ import Image from "next/image"
 import { X, Upload, ImageIcon, Plus, Loader2 } from "lucide-react"
 import medicalRecordApiRequest from "@/apiRequests/medicalRecord"
 import type { SkinImageDataType } from "@/schemaValidations/medicalRecord.schema"
+import predictAcneSeverityApiRequest from "@/apiRequests/predictAcneSeverity"
 
 type ImagePosition = "LEFT" | "RIGHT" | "FRONT"
 
@@ -43,6 +44,13 @@ export default function SkinImagesTab({ medicalRecordId, images, onImagesChange 
     RIGHT: null,
     FRONT: null,
   })
+  const [aiResults, setAiResults] = useState<Record<ImagePosition, string>>({
+    LEFT: "",
+    RIGHT: "",
+    FRONT: "",
+  }); // theo position
+
+  const [aiLoading, setAiLoading] = useState<Set<ImagePosition>>(new Set());
 
   const [isUploading, setIsUploading] = useState(false)
 
@@ -125,6 +133,12 @@ export default function SkinImagesTab({ medicalRecordId, images, onImagesChange 
       updatedImages = updatedImages
         .filter((i) => i.image_type !== position)
         .concat(res.payload.data)
+      
+      // XÓA KẾT QUẢ AI CŨ CỦA VỊ TRÍ NÀY
+      setAiResults(prev => ({
+        ...prev,
+        [position]: ""  // hoặc delete prev[position] nếu muốn
+      }));
 
       // Đánh dấu để xóa preview sau
       positionsToClear.push(position)
@@ -180,6 +194,38 @@ export default function SkinImagesTab({ medicalRecordId, images, onImagesChange 
   const triggerFileInput = (position: ImagePosition) => {
     fileInputRefs.current[position]?.click()
   }
+
+  const analyzeWithAI = async (image: SkinImageDataType) => {
+    const position = image.image_type as ImagePosition;
+    setAiLoading(prev => new Set(prev).add(position));
+
+    try {
+      const res = await predictAcneSeverityApiRequest.fromImagePath({
+        image_path: image.image_path
+      });
+
+      const data = res.payload.data;
+
+      if (res.status === 200) {
+        setAiResults(prev => ({
+          ...prev,
+          [position]: data.severity_display
+        }));
+        toast.success(`AI: ${data.severity_display}`);
+      } else {
+        setAiResults(prev => ({ ...prev, [position]: "Lỗi phân tích" }));
+        toast.error("AI không thể phân tích ảnh này");
+      }
+    } catch (err) {
+      setAiResults(prev => ({ ...prev, [position]: "Không xác định" }));
+    } finally {
+      setAiLoading(prev => {
+        const next = new Set(prev);
+        next.delete(position);
+        return next;
+      });
+    }
+  };
 
   return (
     <Card className="border border-gray-200 shadow-sm">
@@ -323,7 +369,35 @@ export default function SkinImagesTab({ medicalRecordId, images, onImagesChange 
                         <X className="h-4 w-4" />
                       </Button>
                     </div>
-                    <p className="text-sm font-medium text-gray-700">{positionLabels[position]}</p>
+                    <div className="flex justify-between items-center mt-2">
+                      <p className="text-sm font-medium text-gray-700">
+                        {positionLabels[position]}
+                      </p>
+
+                      {/* Hiển thị kết quả AI theo position */}
+                      {aiLoading.has(position) ? (
+                        <span className="text-xs text-blue-600 animate-pulse">Đang phân tích...</span>
+                      ) : aiResults[position] ? (
+                        <span className={`text-xs font-semibold px-2 py-1 rounded ${
+                          aiResults[position].toLowerCase().includes('nặng') ? 'bg-red-100 text-red-800' :
+                          aiResults[position].toLowerCase().includes('trung bình') ? 'bg-orange-100 text-orange-800' :
+                          aiResults[position].toLowerCase().includes('nhẹ') ? 'bg-yellow-100 text-yellow-800' :
+                          'bg-green-100 text-green-800'
+                        }`}>
+                          {aiResults[position]}
+                        </span>
+                      ) : (
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => image && analyzeWithAI(image)}
+                          className="text-xs h-7"
+                        >
+                          AI phân tích
+                        </Button>
+                      )}
+                    </div>
+                    {/* <p className="text-sm font-medium text-gray-700">{positionLabels[position]}</p> */}
                   </div>
                 ) : (
                   <div
