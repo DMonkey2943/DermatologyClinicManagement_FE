@@ -179,6 +179,7 @@ export default function DoctorCalendarPage() {
               events={events}
               eventClick={handleEventClick}
               eventContent={eventContent} // Quan trọng: truncate + tooltip
+              eventDisplay="block" // <-- Thêm dòng này để backgroundColor/borderColor hoạt động ở view tháng
               slotMinTime="11:00:00"
               slotMaxTime="22:00:00"
               slotDuration="00:30:00"
@@ -191,13 +192,27 @@ export default function DoctorCalendarPage() {
               editable={false}
               selectable={false}
               locale="vi"
+              titleRangeSeparator=" - "
+              views={{
+                dayGridMonth: {
+                  // Hiển thị MM/YYYY cho view tháng, ví dụ: 07/2025
+                  titleFormat: { month: "2-digit", year: "numeric" },
+                },
+                timeGridWeek: {
+                  // Hiển thị khoảng ngày dưới dạng DD/MM/YYYY - DD/MM/YYYY
+                  titleFormat: { day: "2-digit", month: "2-digit", year: "numeric" },
+                },
+                timeGridDay: {
+                  // Hiển thị ngày dưới dạng DD/MM/YYYY
+                  titleFormat: { day: "2-digit", month: "2-digit", year: "numeric" },
+                },
+              }}
               buttonText={{
                 today: "Hôm nay",
                 month: "Tháng",
                 week: "Tuần",
                 day: "Ngày",
               }}
-              titleFormat={{ year: "numeric", month: "long" }}
               dayHeaderFormat={{ weekday: "long" }}
               eventTimeFormat={{ hour: "2-digit", minute: "2-digit" }}
               slotLabelFormat={{ hour: "2-digit", minute: "2-digit" }}
