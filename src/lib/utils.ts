@@ -40,3 +40,15 @@ export const formatCurrency = (amount: number) => {
     currency: 'VND'
   }).format(amount);
 };
+
+/**
+ * Tạo đường dẫn với tiền tố dựa trên role của người dùng
+ * @param basePath Đường dẫn cơ bản (ví dụ: "/patients/123")
+ * @param role Role của người dùng (ví dụ: "ADMIN", "DOCTOR", "STAFF")
+ * @returns Đường dẫn đầy đủ với tiền tố (ví dụ: "/admin/patients/123")
+ */
+export const getPrefixedPath = (basePath: string, role: string | undefined): string => {
+  if (!role) return basePath; // Không thêm tiền tố cho Dashboard hoặc nếu không có role
+  const prefix = role.toLowerCase(); // Chuyển role thành chữ thường: admin, doctor, staff
+  return `/${prefix}${basePath}`;
+};

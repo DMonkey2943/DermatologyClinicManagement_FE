@@ -27,7 +27,7 @@ const getStatusLabel = (status: string) => {
   const labels: Record<string, string> = {
     PAID: 'Đã thanh toán',
     IN_PROGRESS: 'Đang khám',
-    CANCELLED: 'Đã hủy',
+    COMPLETED: 'Đã hoàn thành',
   }
   return labels[status] || status
 }
@@ -36,14 +36,14 @@ export default function MedicalHistoryPage() {
   const [medicalRecords, setMedicalRecords] = useState<MedicalRecordDataType[]>([]);
   
   useEffect(() => {
-    const fetchAppointments = async () => {
+    const fetchMedicalRecords = async () => {
       const { payload } = await patientMedicalRecordApiRequest.getList();
       const data = payload.data;
       // console.log(data);
       setMedicalRecords(data);
     };
     
-    fetchAppointments();
+    fetchMedicalRecords();
   }, []);
 
   return (

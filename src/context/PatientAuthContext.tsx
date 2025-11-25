@@ -43,6 +43,10 @@ export function PatientAuthProvider({ children }: { children: React.ReactNode })
           setPatient(null);
         }
       }
+      // else {
+      //   signout();
+      //   window.location.href = '/signin-patient';
+      // }
       setIsLoading(false);
     };
 
@@ -54,7 +58,7 @@ export function PatientAuthProvider({ children }: { children: React.ReactNode })
     Cookies.remove('patient_refresh_token');
     Cookies.remove('role');
     setPatient(null);
-    window.location.href = '/patient/signin';
+    // window.location.href = '/signin-patient';
   };
 
   return (
