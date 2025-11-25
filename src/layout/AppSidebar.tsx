@@ -54,9 +54,23 @@ const navItems: NavItem[] = [
   },
   {
     icon: <CalenderIcon />,
+    name: "Lịch khám",
+    // basePath: "/schedules",
+    roles: ["DOCTOR"], // Chỉ hiển thị cho DOCTOR
+    subItems: [{
+      name: "Dạng danh sách",
+      basePath: "/schedules",
+    },
+    {
+      name: "Dạng lịch",
+      basePath: "/schedules/calendar",
+    }]
+  },
+  {
+    icon: <CalenderIcon />,
     name: "Lịch hẹn",
     basePath: "/appointments",
-    roles: ["ADMIN", "STAFF", "DOCTOR"], // Hiển thị cho mọi role
+    roles: ["ADMIN", "STAFF"], // Chỉ hiển thị cho ADMIN và STAFF
   },
   {
     icon: <DocsIcon />,
