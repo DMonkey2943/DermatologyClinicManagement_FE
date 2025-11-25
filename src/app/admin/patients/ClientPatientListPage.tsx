@@ -62,12 +62,12 @@ export default function ClientPatientListPage() {
     }
   };
 
-  const handleEdit = async (patient_id: string) => {
-    const { payload } = await patientApiRequest.getDetail(patient_id);
-    const patient = payload.data;
-    setEditingPatient(patient);
-    setModalType('edit');
-  };
+  // const handleEdit = async (patient_id: string) => {
+  //   const { payload } = await patientApiRequest.getDetail(patient_id);
+  //   const patient = payload.data;
+  //   setEditingPatient(patient);
+  //   setModalType('edit');
+  // };
 
   const handleDelete = async (id: string) => {
     // if (confirm('Bạn có chắc chắn xoá bệnh nhân này?')) {
@@ -148,7 +148,7 @@ export default function ClientPatientListPage() {
       </div>
       <PatientTable 
         patients={patients} 
-        onEdit={handleEdit} 
+        // onEdit={handleEdit} 
         onDelete={handleDelete} 
         isLoading={isLoading}
         // Truyền props phân trang vào UserTable

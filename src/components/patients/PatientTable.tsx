@@ -40,7 +40,7 @@ import { useAuth } from "@/context/AuthContext";
 
 interface PatientTableProps {
   patients: PatientDataType[];
-  onEdit: (id: string) => void;
+  // onEdit: (id: string) => void;
   onDelete: (id: string) => void;
   isLoading: boolean;
 
@@ -54,7 +54,7 @@ interface PatientTableProps {
 
 export default function PatientTable({
   patients,
-  onEdit,
+  // onEdit,
   onDelete,
   isLoading,
   page = 0,
@@ -165,12 +165,22 @@ export default function PatientTable({
                           </Link>
                         </DropdownMenuItem>
 
-                        <DropdownMenuItem
+                        {/* <DropdownMenuItem
                           onClick={() => onEdit(patient.id)}
                           className="flex items-center gap-2"
                         >
                           <Edit className="h-4 w-4" />
                           <span>Sửa</span>
+                        </DropdownMenuItem> */}
+
+                        <DropdownMenuItem asChild>
+                          <Link
+                            href={getPrefixedPath(`/patients/${patient.id}/edit`, user?.role)}
+                            className="flex items-center gap-2"
+                          >
+                            <Edit className="h-4 w-4" />
+                            <span>Sửa</span>
+                          </Link>
                         </DropdownMenuItem>
 
                         {/* Chỉ hiển thị mục Xóa nếu là ADMIN */}

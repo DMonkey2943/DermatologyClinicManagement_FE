@@ -283,7 +283,7 @@ export default function ClientEditPatientPage({ params }: { params: { id: string
                           <FormItem>
                             <FormLabel>Số điện thoại</FormLabel>
                             <FormControl>
-                              <Input placeholder="0901234567" {...field} />
+                              <Input placeholder="0901234567" {...field} value={field.value as string} />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -299,7 +299,7 @@ export default function ClientEditPatientPage({ params }: { params: { id: string
                           <FormItem>
                             <FormLabel>Email</FormLabel>
                             <FormControl>
-                              <Input type="email" placeholder="patient@example.com" {...field} />
+                              <Input type="email" placeholder="patient@example.com" {...field}  value={field.value as string}/>
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -394,7 +394,7 @@ export default function ClientEditPatientPage({ params }: { params: { id: string
                           <FormItem>
                             <FormLabel>Địa chỉ</FormLabel>
                             <FormControl>
-                              <Input placeholder="Địa chỉ" {...field} />
+                              <Input placeholder="Địa chỉ" {...field} value={field.value as string} />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -411,7 +411,7 @@ export default function ClientEditPatientPage({ params }: { params: { id: string
                             <FormLabel>Tiền sử bệnh</FormLabel>
                             <FormControl>
                               {/* changed: use Textarea instead of Input */}
-                              <Textarea {...field} />
+                              <Textarea {...field} value={field.value as string} />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -426,7 +426,7 @@ export default function ClientEditPatientPage({ params }: { params: { id: string
                             <FormLabel>Di ứng</FormLabel>
                             <FormControl>
                               {/* changed: use Textarea instead of Input */}
-                              <Textarea {...field} />
+                              <Textarea {...field} value={field.value as string} />
                             </FormControl>
                             <FormMessage />
                           </FormItem>

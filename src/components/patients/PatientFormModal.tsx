@@ -25,8 +25,8 @@ export interface PatientFormData {
   gender?: 'MALE' | 'FEMALE' | null;
   email?: string;
   address?: string;
-  medical_history?: string;
-  allergies?: string;
+  // medical_history?: string;
+  // allergies?: string;
 }
 
 export interface ValidationErrors {
@@ -36,8 +36,8 @@ export interface ValidationErrors {
   dob?: string;
   gender?: string;
   address?: string;
-  medical_history?: string;
-  allergies?: string;
+  // medical_history?: string;
+  // allergies?: string;
   _form?: string;
 }
 
@@ -55,8 +55,8 @@ export default function PatientFormModal({
     gender: null,
     email: '',
     address: '',
-    medical_history: '',
-    allergies: '',
+    // medical_history: '',
+    // allergies: '',
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -72,8 +72,8 @@ export default function PatientFormModal({
         dob: editingPatient.dob || null,
         email: editingPatient.email || '',
         address: editingPatient.address || '',
-        medical_history: editingPatient.medical_history || '',
-        allergies: editingPatient.allergies || '',
+        // medical_history: editingPatient.medical_history || '',
+        // allergies: editingPatient.allergies || '',
       });
     } else if (modalType === 'add') {
       setFormData({
@@ -83,8 +83,8 @@ export default function PatientFormModal({
         gender: 'MALE',
         email: '',
         address: '',
-        medical_history: '',
-        allergies: '',
+        // medical_history: '',
+        // allergies: '',
       });
     }
     setErrors({});
@@ -105,8 +105,8 @@ export default function PatientFormModal({
       gender: null,
       email: '',
       address: '',
-      medical_history: '',
-      allergies: '',
+      // medical_history: '',
+      // allergies: '',
     });
   }
 
@@ -123,8 +123,8 @@ export default function PatientFormModal({
           dob: formData.dob,
           address: formData.address,
           ...(formData.email && { email: formData.email }),
-          medical_history: formData.medical_history,
-          allergies: formData.allergies,
+          // medical_history: formData.medical_history,
+          // allergies: formData.allergies,
         };
         await patientApiRequest.update(editingPatient.id, updateData);
         toast.success("Cập nhật bệnh nhân thành công");
@@ -132,12 +132,13 @@ export default function PatientFormModal({
         const newData = {
           full_name: formData.full_name,
           phone_number: formData.phone_number,
+          // password: formData.password ?? null,
           gender: formData.gender,
           dob: formData.dob,
           address: formData.address,
           ...(formData.email && { email: formData.email }),
-          medical_history: formData.medical_history,
-          allergies: formData.allergies,
+          // medical_history: formData.medical_history,
+          // allergies: formData.allergies,
         };
         await patientApiRequest.create(newData);
         toast.success("Thêm bệnh nhân mới thành công");
@@ -221,6 +222,17 @@ export default function PatientFormModal({
               hint={errors.email}
             />
           </div>
+          {/* <div className="col-span-1">
+            <Label>Mật khẩu</Label>
+            <Input
+              type="password"
+              value={formData.password}
+              onChange={(e) => handleInputChange('password', e.target.value)}
+              disabled={isSubmitting}
+              error={!!errors.password}
+              hint={errors.password}
+            />
+          </div> */}
           <div className="col-span-1">
             <Label>Giới tính</Label>
             <div className="flex gap-4 pt-3">
@@ -267,7 +279,7 @@ export default function PatientFormModal({
               hint={errors.address}
             />
           </div>
-          <div className="col-span-1 sm:col-span-2">
+          {/* <div className="col-span-1 sm:col-span-2">
             <Label>Tiền sử bệnh lý</Label>
             <Input
               type="text"
@@ -288,7 +300,7 @@ export default function PatientFormModal({
               error={!!errors.allergies}
               hint={errors.allergies}
             />
-          </div>
+          </div> */}
         </div>
         <div className="flex justify-end gap-2">
           <Button 
