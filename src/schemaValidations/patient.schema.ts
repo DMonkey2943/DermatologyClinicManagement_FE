@@ -41,6 +41,7 @@ export const PatientFullData = z.object({
     current_medications: z.string().nullable().optional(),
     current_condition: z.string().nullable().optional(),
     notes: z.string().nullable().optional(),
+    password: z.string().nullable().optional(),
 })
 export type PatientFullDataType = z.TypeOf<typeof PatientFullData>
 
@@ -76,11 +77,11 @@ export const CreatePatientBody = z.object({
 export type CreatePatientBodyType = z.TypeOf<typeof CreatePatientBody>
 
 export const UpdatePatientBody = z.object({
-    full_name: z.string().nullable(),
+    full_name: z.string().nullable().optional(),
     dob: z.string().date().nullable().optional(),
     gender: z.enum(["MALE", "FEMALE"]).nullable().optional(),
-    phone_number: z.string().nullable(),
-    // password: z.string().nullable().optional(),
+    phone_number: z.string().nullable().optional(),
+    password: z.string().nullable().optional(),
     email: z.string().nullable().optional(),
     address: z.string().nullable().optional(),
     medical_history: z.string().nullable().optional(),
