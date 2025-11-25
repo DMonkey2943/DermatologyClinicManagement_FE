@@ -80,7 +80,7 @@ export const UpdatePatientBody = z.object({
     dob: z.string().date().nullable().optional(),
     gender: z.enum(["MALE", "FEMALE"]).nullable().optional(),
     phone_number: z.string().nullable(),
-    password: z.string().nullable().optional(),
+    // password: z.string().nullable().optional(),
     email: z.string().nullable().optional(),
     address: z.string().nullable().optional(),
     medical_history: z.string().nullable().optional(),
@@ -95,3 +95,39 @@ export const PatientFKData = z.object({
 })
 
 export type PatientFKDataType = z.TypeOf<typeof PatientFKData>
+
+
+const PHONE_REGEX = /^(032|033|034|035|036|037|038|039|096|097|098|086|083|084|085|081|082|088|091|094|070|079|077|076|078|090|093|089|056|058|092|059|099)[0-9]{7}$/;
+const today = new Date();
+today.setHours(0, 0, 0, 0);
+export const editPatientSchema = z.object({
+    full_name: z.string().min(1, "Họ và tên không được để trống").max(80, "Họ và tên không được vượt quá 80 ký tự"),
+    dob: z.string().refine((val) => {
+        const date = new Date(val);
+        return !isNaN(date.getTime());
+    }, "Ngày sinh không hợp lệ")
+        .refine((val) => {
+            const date = new Date(val);
+            return date <= today;
+        }, "Ngày sinh không được lớn hơn hôm nay")
+        .refine((val) => {
+            const birthDate = new Date(val);
+            let age = today.getFullYear() - birthDate.getFullYear();
+            const m = today.getMonth() - birthDate.getMonth();
+            if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+                age--;
+            }
+            return age >= 5;
+        }, "Tuổi phải lớn hơn hoặc bằng 5"),
+    gender: z
+        .enum(["MALE", "FEMALE"])
+        .refine((val) => val !== undefined, {
+            message: "Giới tính là bắt buộc",
+    }),
+    phone_number: z.string().regex(PHONE_REGEX, "Số điện thoại không hợp lệ").nullable(),
+    email: z.string().email("Email không hợp lệ").nullable(),
+    address: z.string().max(100, "Địa chỉ không được vượt quá 100 ký tự").nullable(),
+    medical_history: z.string().max(200, "Tiền sử bệnh không được vượt quá 200 ký tự").nullable(),
+    allergies: z.string().max(200, "Dị ứng không được vượt quá 200 ký tự").nullable(),
+});
+export type EditPatientFormData = z.TypeOf<typeof editPatientSchema>;
