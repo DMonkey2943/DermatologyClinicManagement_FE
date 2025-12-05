@@ -8,6 +8,8 @@ import Backdrop from "@/layout/Backdrop";
 import NavigationLoading from "@/layout/NavigationLoading";
 import React from "react";
 
+export const dynamic = 'force-dynamic'
+
 export default function UsersLayout({
   children,
 }: {

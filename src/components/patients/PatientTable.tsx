@@ -197,10 +197,10 @@ export default function PatientTable({
                               <AlertDialogContent>
                                 <AlertDialogHeader>
                                   <AlertDialogTitle>
-                                    Xác nhận xoá tài khoản
+                                    Xác nhận xoá bệnh nhân
                                   </AlertDialogTitle>
                                   <AlertDialogDescription>
-                                    Bạn có chắc chắn muốn xoá tài khoản{" "}
+                                    Bạn có chắc chắn muốn xoá bệnh nhân{" "}
                                     <strong>{patient.full_name}</strong>?  
                                     Hành động này không thể hoàn tác.
                                   </AlertDialogDescription>

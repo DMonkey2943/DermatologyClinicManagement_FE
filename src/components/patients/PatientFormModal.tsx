@@ -110,9 +110,15 @@ export default function PatientFormModal({
     });
   }
 
-   const handleSubmit = async () => {
+  const handleSubmit = async () => {
     setErrors({});
     setIsSubmitting(true);
+    
+    if (formData.full_name.trim() === '' || formData.phone_number.trim() === '') {
+      toast.error("Vui lòng điền đầy đủ các trường bắt buộc");
+      setIsSubmitting(false);
+      return;
+    }
 
     try {
       if (modalType === 'edit' && editingPatient) {
@@ -190,7 +196,7 @@ export default function PatientFormModal({
         </h2>
         <div className="grid grid-cols-1 gap-x-6 gap-y-5 sm:grid-cols-2">
           <div className="col-span-1 sm:col-span-2">
-            <Label>Tên</Label>
+            <Label>Tên <span className="text-error-500">*</span></Label>
             <Input
               type="text"
               value={formData.full_name}
@@ -201,7 +207,7 @@ export default function PatientFormModal({
             />
           </div>
           <div className="col-span-1">
-            <Label>SĐT</Label>
+            <Label>SĐT <span className="text-error-500">*</span></Label>
             <Input
               type="text"
               value={formData.phone_number}

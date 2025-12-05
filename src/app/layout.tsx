@@ -12,6 +12,8 @@ const montserrat = Montserrat({
   weight: ['400', '500', '700'],
 });
 
+export const dynamic = 'force-dynamic'
+
 export default function RootLayout({
   children,
 }: {

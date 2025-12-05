@@ -315,7 +315,7 @@ export default function AppointmentFormModal({
                 onChange={(value) => handleInputChange('status', value)}
                 disabled={isSubmitting}
               />
-              <Radio
+              {/* <Radio
                 id="status-completed"
                 name="status"
                 value="COMPLETED"
@@ -323,16 +323,18 @@ export default function AppointmentFormModal({
                 label="Hoàn thành"
                 onChange={(value) => handleInputChange('status', value)}
                 disabled={isSubmitting}
-              />
-              <Radio
-                id="status-cancelled"
-                name="status"
-                value="CANCELLED"
-                checked={formData.status === 'CANCELLED'}
-                label="Hủy bỏ"
-                onChange={(value) => handleInputChange('status', value)}
-                disabled={isSubmitting}
-              />
+              /> */}
+              { modalType === 'edit' &&                
+                <Radio
+                  id="status-cancelled"
+                  name="status"
+                  value="CANCELLED"
+                  checked={formData.status === 'CANCELLED'}
+                  label="Hủy bỏ"
+                  onChange={(value) => handleInputChange('status', value)}
+                  disabled={isSubmitting}
+                />
+              }
             </div>
           </div>
         </div>

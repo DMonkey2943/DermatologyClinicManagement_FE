@@ -36,6 +36,7 @@ import { UserDataType } from '@/schemaValidations/user.schema';
 import CenteredSpinner from '../ui/spinner/CenteredSpinner';
 import PaginationControls from '../ui/pagination/PaginationControls';
 import { Button as ButtonUI } from "@/components/ui/button";
+import { ROLE_LABEL_MAP } from '@/lib/utils';
 
 interface UserTableProps {
   users: UserDataType[];
@@ -65,6 +66,13 @@ export default function UserTable({
   onPageChange,
   onPageSizeChange,
 }: UserTableProps) {
+  
+  
+    const getRoleLabel = (role: UserDataType['role'] | null | undefined): string => {
+      if (!role) return 'Không xác định';
+      return ROLE_LABEL_MAP[role] || role;
+    };
+
   return (
     isLoading
       ?
@@ -161,7 +169,7 @@ export default function UserTable({
                     {user.phone_number}
                   </TableCell>
                   <TableCell className="px-5 py-4 text-start text-theme-sm text-gray-500 dark:text-gray-400">
-                    <Badge size="sm" color="info">{user.role}</Badge>
+                    <Badge size="sm" color="info">{getRoleLabel(user.role)}</Badge>
                   </TableCell>
                   {/* <TableCell className="px-5 py-4 text-start text-theme-xs text-gray-500 dark:text-gray-400">
                     <div className="flex gap-2">

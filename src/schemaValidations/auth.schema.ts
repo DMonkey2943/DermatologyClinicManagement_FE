@@ -28,7 +28,8 @@ export const LoginRes = z.object({
 export type LoginResType = z.TypeOf<typeof LoginRes>
 
 export const PatientLoginBody = z.object({
-    phone_number: z.string(),
+    // phone_number: z.string(),
+    email: z.string().email(),
     password: z.string().min(8).max(100)
 }).strict()
 
@@ -39,7 +40,8 @@ export const PatientLoginRes = z.object({
         user: z.object({
             id: z.string(),
             full_name: z.string(),
-            phone_number: z.string(),
+            phone_number: z.string().nullable(),
+            email: z.string(),
         }),
         access_token: z.string(),
         refresh_token: z.string(),

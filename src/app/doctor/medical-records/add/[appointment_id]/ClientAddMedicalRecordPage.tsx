@@ -329,7 +329,7 @@ export default function ClientAddMedicalRecordPage({ params }: { params: { appoi
 
         <div className="lg:col-span-2 space-y-6">
           <PageHeader
-            patientName={patient.full_name}
+            // patientName={patient.full_name}
             lastSaved={lastSaved}
             isSaving={isSaving}
             onComplete={handleComplete}

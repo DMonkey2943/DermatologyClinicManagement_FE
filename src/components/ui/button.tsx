@@ -20,6 +20,17 @@ const buttonVariants = cva(
         ghost:
           "hover:bg-accent hover:text-accent-foreground dark:hover:bg-accent/50",
         link: "text-primary underline-offset-4 hover:underline",
+        // SUCCESS - Xanh lá (Bootstrap style)
+        success:
+          "bg-emerald-600 text-white hover:bg-emerald-700 focus-visible:ring-emerald-500/30 dark:bg-emerald-500 dark:hover:bg-emerald-400 dark:text-white shadow-theme-xs",
+
+        // WARNING - Vàng cam (rất nổi bật & an toàn cho mắt)
+        warning:
+          "bg-amber-500 text-amber-950 hover:bg-amber-600 focus-visible:ring-amber-500/30 shadow-theme-xs disabled:bg-amber-300 dark:bg-amber-400 dark:hover:bg-amber-300 dark:text-amber-950",
+
+        // INFO - Xanh nhạt cyan (hiện đại, dịu mắt)
+        info:
+          "bg-cyan-600 text-white hover:bg-cyan-700 focus-visible:ring-cyan-500/30 shadow-theme-xs dark:bg-cyan-500 dark:hover:bg-cyan-400 dark:text-white",
       },
       size: {
         default: "h-9 px-4 py-2 has-[>svg]:px-3",

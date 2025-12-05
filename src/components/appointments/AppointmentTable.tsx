@@ -24,7 +24,7 @@ import {
   SelectContent,
   SelectItem,
 } from '@/components/ui/select';
-import { formatDate, getPrefixedPath } from '@/lib/utils';
+import { formatDate, getPrefixedPath, APPOINTMENT_STATUS_LABEL_MAP } from '@/lib/utils';
 import { useAuth } from "@/context/AuthContext";
 import { MoreHorizontal, Edit } from "lucide-react";
 import { Button as ButtonUI } from "@/components/ui/button";
@@ -89,6 +89,11 @@ export default function AppointmentTable({ appointments, onEdit, isLoading, page
     }
   };
 
+  const getStatusLabel = (status: AppointmentDataType['status'] | null | undefined): string => {
+    if (!status) return 'Không xác định';
+    return APPOINTMENT_STATUS_LABEL_MAP[status] || status;
+  };
+
   const changeStatus = async (id: string, newStatus: AppointmentDataType['status']) => {
     try {
       const { payload } = await appointmentApiRequest.update(id, { status: newStatus });
@@ -126,12 +131,12 @@ export default function AppointmentTable({ appointments, onEdit, isLoading, page
                 >
                   Bệnh nhân
                 </TableCell>
-                <TableCell
+                {/* <TableCell
                   //isHeader
                   className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
                 >
                   Bác sĩ
-                </TableCell>
+                </TableCell> */}
                 <TableCell
                   //isHeader
                   className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
@@ -164,11 +169,22 @@ export default function AppointmentTable({ appointments, onEdit, isLoading, page
               {appointments.map((appointment) => (
                 <TableRow key={appointment.id}>
                   <TableCell className="px-5 py-4 text-start text-theme-sm text-gray-800 dark:text-white/90">
-                    {appointment.patient.full_name}
+                    <Link href={getPrefixedPath(`/patients/${appointment.patient_id}`, user?.role)}>
+                      <div className="flex items-center gap-3">
+                      <div>
+                        <span className="block font-medium text-gray-800 text-theme-sm dark:text-white/90">
+                          {appointment.patient.full_name}
+                        </span>
+                        <span className="block text-gray-500 text-theme-xs dark:text-gray-400">
+                          {appointment.patient.phone_number}
+                        </span>
+                      </div>
+                    </div>                      
+                    </Link>
                   </TableCell>
-                  <TableCell className="px-5 py-4 text-start text-theme-sm text-gray-800 dark:text-white/90">
+                  {/* <TableCell className="px-5 py-4 text-start text-theme-sm text-gray-800 dark:text-white/90">
                     {appointment.doctor.full_name}
-                  </TableCell>
+                  </TableCell> */}
                   <TableCell className="px-5 py-4 text-start text-theme-sm text-gray-800 dark:text-white/90">
                     {formatDate(appointment.appointment_date)}
                   </TableCell>
@@ -180,11 +196,11 @@ export default function AppointmentTable({ appointments, onEdit, isLoading, page
                   <TableCell className="px-5 py-4 text-start text-theme-sm text-gray-800 dark:text-white/90">
                     {user?.role === "DOCTOR" ? (
                       <Badge size="sm" color={getStatusColor(appointment.status)}>
-                        {appointment.status}
+                        {getStatusLabel(appointment.status)}
                       </Badge>
                     ) : (
                       appointment.status === 'COMPLETED' ? (
-                        <Badge size="sm" color={getStatusColor(appointment.status)}>{appointment.status}</Badge>
+                        <Badge size="sm" color={getStatusColor(appointment.status)}>{getStatusLabel(appointment.status)}</Badge>
                       ) : (
                         <div className="max-w-xs">
                           <Select
@@ -198,14 +214,14 @@ export default function AppointmentTable({ appointments, onEdit, isLoading, page
                             <SelectTrigger className="h-8">
                               <SelectValue>
                                 <span className={getStatusTextClass(appointment.status)}>
-                                  {appointment.status ?? 'UNKNOWN'}
+                                  {getStatusLabel(appointment.status)}
                                 </span>
                               </SelectValue>
                             </SelectTrigger>
                             <SelectContent>
-                              <SelectItem value="SCHEDULED">SCHEDULED</SelectItem>
-                              <SelectItem value="WAITING">WAITING</SelectItem>
-                              <SelectItem value="CANCELLED">CANCELLED</SelectItem>
+                              <SelectItem value="SCHEDULED">{getStatusLabel('SCHEDULED')}</SelectItem>
+                              <SelectItem value="WAITING">{getStatusLabel('WAITING')}</SelectItem>
+                              <SelectItem value="CANCELLED">{getStatusLabel('CANCELLED')}</SelectItem>
                             </SelectContent>
                           </Select>
                         </div>

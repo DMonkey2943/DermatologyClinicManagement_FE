@@ -68,6 +68,17 @@ export default function PrescriptionTab({ medicalRecordId, prescriptionId, items
       setError("Vui lòng nhập đầy đủ");
       return;
     }
+
+    if (Number(quantity) <= 0) {
+      setError(`Số lượng không hợp lệ`);
+      return;
+    }
+
+    if (Number(quantity) > selected.stock_quantity) {
+      setError(`Số lượng vượt quá tồn kho (${selected.stock_quantity})`);
+      return;
+    }
+
     if (items.find(i => i.medication_id === selected.id)) {
       setError("Thuốc đã được thêm");
       return;
@@ -155,19 +166,39 @@ export default function PrescriptionTab({ medicalRecordId, prescriptionId, items
                     onSelect={() => {
                       setSelected(m);
                       setOpen(false);
+                      setError(""); // reset lỗi khi chọn thuốc khác
                     }}
+                    className="flex flex-col items-start py-2"
                   >
-                    <Check
-                      className={`mr-2 h-4 w-4 ${selected?.id === m.id ? "opacity-100" : "opacity-0"}`}
-                    />
-                    {m.name} {/* Giữ nguyên, không cắt ngắn */}
+                    <div className="flex items-center">
+                      <Check
+                        className={`mr-2 h-4 w-4 ${selected?.id === m.id ? "opacity-100" : "opacity-0"}`}
+                      />
+                      <span>{m.name}</span>
+                    </div>
+
+                    {/* Tồn kho */}
+                    <span className="text-xs opacity-70 ml-6">
+                      Tồn kho: {m.stock_quantity}
+                    </span>
                   </CommandItem>
                 ))}
               </CommandGroup>
             </Command>
           </PopoverContent>
         </Popover>
-        <Input placeholder="SL" type="number" value={quantity} onChange={e => setQuantity(e.target.value)} className="w-20" />
+        <Input
+          placeholder="SL"
+          type="number"
+          value={quantity}
+          onChange={e => {
+            setQuantity(e.target.value);
+            if (selected && Number(e.target.value) <= selected.stock_quantity) {
+              setError("");
+            }
+          }}
+          className="w-20"
+        />
         <Textarea placeholder="Cách dùng" value={dosage} onChange={e => setDosage(e.target.value)} className="flex-1" rows={1} />
         <Button onClick={handleAdd} size="icon"><Plus /></Button>
       </div>
@@ -178,16 +209,21 @@ export default function PrescriptionTab({ medicalRecordId, prescriptionId, items
           <TableRow>
             <TableHead>Thuốc</TableHead>
             <TableHead className="w-24">SL</TableHead>
-            <TableHead>Cách dùng</TableHead>
+            {/* <TableHead>Cách dùng</TableHead> */}
             <TableHead className="w-12"></TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {items.map((item, i) => (
             <TableRow key={i}>
-              <TableCell>{item.name}</TableCell>
+              <TableCell>
+                <div className="flex flex-col">
+                  <span className="font-medium">{item.name}</span>
+                  <span className="text-xs opacity-80 mt-1">{item.dosage}</span>
+                </div>
+              </TableCell>
               <TableCell>{item.quantity}</TableCell>
-              <TableCell>{item.dosage}</TableCell>
+              {/* <TableCell>{item.dosage}</TableCell> */}
               <TableCell>
                 <Button size="sm" variant="ghost" onClick={() => onItemsChange(items.filter((_, idx) => idx !== i))}>
                   <Trash2 className="h-4 w-4" />

@@ -18,9 +18,10 @@ export default function SignInForm() {
   const [isLoading, setIsLoading] = useState(false);
   // const [isChecked, setIsChecked] = useState(false);
   // const [username, setUsername] = useState("");
-  const [phoneNumber, setPhoneNumber] = useState("");
+  // const [phoneNumber, setPhoneNumber] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [errors, setErrors] = useState<{ phone_number?: string; password?: string }>({}); // State để lưu lỗi 422
+  const [errors, setErrors] = useState<{ email?: string; password?: string }>({}); // State để lưu lỗi 422
   const [unauthorizedErrors, setUnauthorizedErrors] = useState(""); // State để lưu lỗi 422
   const router = useRouter();
   // const { setUser } = useAuth(); // Lấy setUser từ useAuth
@@ -38,7 +39,11 @@ export default function SignInForm() {
     setUnauthorizedErrors("");
 
     try {
-      const {payload} = await patientAuthApiRequest.login({phone_number: phoneNumber, password})
+      const { payload } = await patientAuthApiRequest.login({
+        // phone_number: phoneNumber,
+        email,
+        password
+      })
       
       const { access_token, refresh_token } = payload.data;
       Cookies.set('patient_access_token', access_token);
@@ -50,9 +55,9 @@ export default function SignInForm() {
       if (err instanceof EntityError) {
         // Xử lý lỗi 422
         const errorPayload = err.payload.details;
-        const newErrors: { phone_number?: string; password?: string } = {};
+        const newErrors: { email?: string; password?: string } = {};
         errorPayload.forEach(({ field, msg }) => {
-          if (field === 'phone_number' || field === 'password') {
+          if (field === 'email' || field === 'password') {
             newErrors[field] = msg; // Lưu lỗi theo field
           }
         });
@@ -79,7 +84,7 @@ export default function SignInForm() {
               Đăng nhập tài khoản bệnh nhân
             </h1>
             <p className="text-sm text-gray-500 dark:text-gray-400">
-              Nhập SĐT và mật khẩu để đăng nhập vào hệ thống!
+              Nhập email và mật khẩu để đăng nhập vào hệ thống!
             </p>
             {unauthorizedErrors && (
               <p
@@ -91,7 +96,7 @@ export default function SignInForm() {
           </div>
           <form onSubmit={handleLogin}>
             <div className="space-y-6">
-              <div>
+              {/* <div>
                 <Label>
                   Số điện thoại <span className="text-error-500">*</span>
                 </Label>
@@ -102,6 +107,19 @@ export default function SignInForm() {
                   onChange={(e) => setPhoneNumber(e.target.value)}
                   error={!!errors.phone_number} // Hiển thị trạng thái lỗi
                   hint={errors.phone_number} // Hiển thị message lỗi
+                />
+              </div> */}
+              <div>
+                <Label>
+                  Email <span className="text-error-500">*</span>
+                </Label>
+                <Input
+                  placeholder="Nhập email"
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  error={!!errors.email} // Hiển thị trạng thái lỗi
+                  hint={errors.email} // Hiển thị message lỗi
                 />
               </div>
               <div>

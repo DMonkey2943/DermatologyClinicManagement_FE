@@ -37,6 +37,7 @@ import { ServiceIndicationDetailDataType, ServiceItemType } from '@/schemaValida
 import { PrescriptionDetailDataType, PrescriptionItemType } from '@/schemaValidations/prescription.schema';
 import serviceIndicationApiRequest from '@/apiRequests/serviceIndication';
 import prescriptionApiRequest from '@/apiRequests/prescription';
+import { ClipboardList, Pill, Stethoscope, Images } from "lucide-react";
 
 export default function ClientAddMedicalRecordPage({ params }: { params: { appointment_id: string } }) {
   const { appointment_id } = params;
@@ -329,7 +330,7 @@ export default function ClientAddMedicalRecordPage({ params }: { params: { appoi
 
         <div className="lg:col-span-2 space-y-6">
           <PageHeader
-            patientName={patient.full_name}
+            // patientName={patient.full_name}
             lastSaved={lastSaved}
             isSaving={isSaving}
             onComplete={handleComplete}
@@ -338,15 +339,24 @@ export default function ClientAddMedicalRecordPage({ params }: { params: { appoi
 
           <Tabs defaultValue="examination" onValueChange={handleTabChange}>
             <TabsList className="grid w-full grid-cols-4">
-              <TabsTrigger value="examination">Phiếu khám</TabsTrigger>
-              <TabsTrigger value="prescription">
-                Kê đơn {prescriptionItems.length > 0 && <Badge className="ml-2">{prescriptionItems.length}</Badge>}
+              <TabsTrigger className='flex items-center gap-2' value="examination">
+                <ClipboardList className="w-4 h-4" />
+                Phiếu khám
               </TabsTrigger>
-              <TabsTrigger value="services">
-                Dịch vụ {serviceItems.length > 0 && <Badge className="ml-2">{serviceItems.length}</Badge>}
+              <TabsTrigger className='flex items-center gap-2' value="prescription">
+                <Pill className="w-4 h-4" />
+                Kê đơn
+                {prescriptionItems.length > 0 && <Badge className="ml-2">{prescriptionItems.length}</Badge>}
               </TabsTrigger>
-              <TabsTrigger value="images">
-                Hình ảnh {skinImages.length > 0 && <Badge className="ml-2">{skinImages.length}</Badge>}
+              <TabsTrigger className='flex items-center gap-2' value="services">
+                <Stethoscope className="w-4 h-4" />
+                Dịch vụ
+                {serviceItems.length > 0 && <Badge className="ml-2">{serviceItems.length}</Badge>}
+              </TabsTrigger>
+              <TabsTrigger className='flex items-center gap-2' value="images">
+                <Images className="w-4 h-4" />
+                Hình ảnh
+                {skinImages.length > 0 && <Badge className="ml-2">{skinImages.length}</Badge>}
               </TabsTrigger>
             </TabsList>
 

@@ -7,111 +7,125 @@ import {
   TableCell,
   TableHeader,
   TableRow,
+  TableHead,
 } from '@/components/ui/table';
-// import Badge from '@/components/ui/badge/Badge';
-import Button from '@/components/ui/button/Button';
+import { Button } from "@/components/ui/button"
 import Link from 'next/link';
+import { Eye } from 'lucide-react';
 import { MedicalRecordDataType } from '@/schemaValidations/medicalRecord.schema';
 import medicalRecordApiRequest from '@/apiRequests/medicalRecord';
-import { formatDateTime } from '@/lib/utils';
+import { formatDateTime, getPrefixedPath } from '@/lib/utils';
 import PaginationControls from '../ui/pagination/PaginationControls';
+import { useAuth } from '@/context/AuthContext';
 
-interface MedicalRecordByPatientProps {
+interface Props {
   patient_id_props: string;
 }
 
-export default function MedicalRecordByPatientTable({ patient_id_props }: MedicalRecordByPatientProps) {
-    const [medicalRecords, setMedicalRecords] = useState<MedicalRecordDataType[]>();
-    
-    // Thêm state phân trang
-    const [page, setPage] = useState<number>(0); // zero-based
-    const [pageSize, ] = useState<number>(5);
-    const [total, setTotal] = useState<number>(0);
+export default function MedicalRecordByPatientTable({ patient_id_props }: Props) {
+  const { user } = useAuth();
+  const [medicalRecords, setMedicalRecords] = useState<MedicalRecordDataType[]>([]);
 
-    useEffect(() => {
-        fetchMedicalRecordsByPatient();
-    }, [page, pageSize]);
-    
-    const fetchMedicalRecordsByPatient = async () => {
-        try {
-            const {payload} = await medicalRecordApiRequest.getListByPatient(patient_id_props, {skip: page * pageSize, limit: pageSize});
-            const medicalRecordList = payload.data;
-            console.log(medicalRecordList);
-            setMedicalRecords(medicalRecordList);
-            const totalFromPayload =  payload.meta?.total;
-            setTotal(Number(totalFromPayload) || medicalRecordList.length);
+  const [page, setPage] = useState(0);
+  const [pageSize] = useState(5);
+  const [total, setTotal] = useState(0);
 
-            // Nếu trang hiện tại vượt quá tổng trang sau khi cập nhật total => đưa về trang cuối cùng hợp lệ
-            const totalPages = Math.max(1, Math.ceil(Number(totalFromPayload || medicalRecordList.length) / pageSize));
-            if (page > totalPages - 1) {
-                setPage(totalPages - 1);
-            }
-        } catch (error) {
-            console.error('Lỗi lấy thông tin medicalRecords:', error);
-        }
-    };
+  useEffect(() => {
+    fetchMedicalRecordsByPatient();
+  }, [page, pageSize]);
 
-    // Handlers phân trang được truyền xuống UserTable
-    const handlePageChange = (newPage: number) => {
-        setPage(newPage);
-    };
+  const fetchMedicalRecordsByPatient = async () => {
+    try {
+      const { payload } = await medicalRecordApiRequest.getListByPatient(
+        patient_id_props,
+        { skip: page * pageSize, limit: pageSize }
+      );
 
-    // const handlePageSizeChange = (newSize: number) => {
-    //     setPageSize(newSize);
-    //     setPage(0); // quay về trang đầu khi thay đổi pageSize
-    // };
+      const data = payload.data;
+      setMedicalRecords(data);
 
+      const totalFromPayload = payload.meta?.total ?? data.length;
+      setTotal(totalFromPayload);
+
+      const totalPages = Math.ceil(totalFromPayload / pageSize);
+      if (page >= totalPages) setPage(totalPages - 1);
+    } catch (error) {
+      console.error('Lỗi lấy thông tin medicalRecords:', error);
+    }
+  };
 
   return (
-    <div className="overflow-hidden rounded-xl border border-gray-200 bg-white dark:border-white/[0.05] dark:bg-white/[0.03]">
+    <div className="overflow-hidden rounded-xl border bg-card shadow-sm">
+      <div className="p-4 font-semibold text-lg">Lịch sử khám bệnh</div>
       <div className="max-w-full overflow-x-auto">
-        <div className="">
-          <Table>
-            {/* Table Header */}
-            <TableHeader className="border-b border-gray-100 dark:border-white/[0.05]">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead className="px-5 py-3 text-center w-20">Xem</TableHead>
+              <TableHead className="px-5 py-3 w-40">Ngày khám</TableHead>
+              <TableHead className="px-5 py-3">Chẩn đoán & Triệu chứng</TableHead>
+            </TableRow>
+          </TableHeader>
+
+          <TableBody>
+            {medicalRecords.length === 0 ? (
               <TableRow>
-                <TableCell
-                //   isHeader
-                  className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
-                >
-                  Lịch sử khám bệnh
-                </TableCell>
-                <TableCell
-                //   isHeader
-                  className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
-                >
-                  Tùy chọn
+                <TableCell colSpan={3} className="py-6 text-center text-sm text-muted-foreground">
+                  Chưa có lịch sử khám bệnh
                 </TableCell>
               </TableRow>
-            </TableHeader>
-
-            {/* Table Body */}
-            <TableBody className="divide-y divide-gray-100 dark:divide-white/[0.05]">
-              {medicalRecords?.map((medical_record) => (
-                <TableRow key={medical_record.id}>
-                  <TableCell className="px-5 py-4 text-start text-theme-sm text-gray-800 dark:text-white/90">
-                    {formatDateTime(medical_record.created_at)}
+            ) : (
+              medicalRecords.map((record) => (
+                <TableRow key={record.id} className="hover:bg-muted/40 transition">
+                  {/* Nút icon xem */}
+                  <TableCell className="px-5 py-4 text-center">
+                    <Link href={getPrefixedPath(`/medical-records/${record.id}`, user?.role)}>
+                      <Button size="icon" variant="ghost" className="h-8 w-8">
+                        <Eye className="w-4 h-4" />
+                      </Button>
+                    </Link>
                   </TableCell>
-                  <TableCell className="px-5 py-4 text-start text-theme-xs text-gray-500 dark:text-gray-400">
-                    <div className="flex gap-2">
-                      <Link href={`/medical-records/${medical_record.id}`}>
-                        <Button size="sm">Xem</Button>
-                      </Link>
+                  
+                  {/* Ngày khám */}
+                  <TableCell className="px-5 py-4 text-sm font-medium">
+                    {formatDateTime(record.created_at)}
+                  </TableCell>
+
+                  {/* Cột chẩn đoán + triệu chứng */}
+                  <TableCell className="px-5 py-4">
+                    <div className="flex flex-col space-y-1 
+                                    max-w-48 sm:max-w-64 lg:max-w-80 
+                                    overflow-hidden">
+
+                      {/* Diagnosis: full text, wrap */}
+                      <div className="text-sm font-medium break-words">
+                        {record.diagnosis ?? '---'}
+                      </div>
+
+                      {/* Symptoms: smaller + truncated */}
+                      <div
+                        className="text-xs opacity-70 truncate"
+                        title={record.symptoms ?? ''}
+                      >
+                        {record.symptoms ?? '---'}
+                      </div>
                     </div>
                   </TableCell>
+
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </div>
+              ))
+            )}
+          </TableBody>
+        </Table>
       </div>
-        <PaginationControls
-          page={page}
-          pageSize={pageSize}
-          total={total}
-          onPageChange={handlePageChange}
-        //   onPageSizeChange={handlePageSizeChange}
-        />
+
+      {/* Pagination */}
+      <PaginationControls
+        page={page}
+        pageSize={pageSize}
+        total={total}
+        onPageChange={setPage}
+      />
     </div>
   );
 }

@@ -93,6 +93,7 @@ export type UpdatePatientBodyType = z.TypeOf<typeof UpdatePatientBody>
 export const PatientFKData = z.object({
     id: z.string(),
     full_name: z.string(),
+    phone_number: z.string(),
 })
 
 export type PatientFKDataType = z.TypeOf<typeof PatientFKData>
@@ -125,8 +126,8 @@ export const editPatientSchema = z.object({
         .refine((val) => val !== undefined, {
             message: "Giới tính là bắt buộc",
     }),
-    phone_number: z.string().regex(PHONE_REGEX, "Số điện thoại không hợp lệ").nullable(),
-    email: z.string().email("Email không hợp lệ").nullable(),
+    phone_number: z.string().regex(PHONE_REGEX, "Số điện thoại không hợp lệ"),
+    // email: z.string().email("Email không hợp lệ").nullable().optional(),
     address: z.string().max(100, "Địa chỉ không được vượt quá 100 ký tự").nullable(),
     medical_history: z.string().max(200, "Tiền sử bệnh không được vượt quá 200 ký tự").nullable(),
     allergies: z.string().max(200, "Dị ứng không được vượt quá 200 ký tự").nullable(),

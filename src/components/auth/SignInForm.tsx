@@ -33,6 +33,13 @@ export default function SignInForm() {
      // Reset lỗi trước khi gọi API
     setErrors({});
     setUnauthorizedErrors("");
+    
+    if (!username || !password) {
+      if (!username) setErrors({ ...errors, username: "Vui lòng nhập username" });
+      if (!password) setErrors({ ...errors, password: "Vui lòng nhập mật khẩu" });
+      setIsLoading(false);
+      return;
+    }
 
     try {
       const res = await authApiRequest.login({username, password})

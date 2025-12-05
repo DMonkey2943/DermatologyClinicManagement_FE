@@ -1,3 +1,6 @@
+import { AppointmentDataType } from "@/schemaValidations/appointment.schema"
+import { MedicalRecordDataType } from "@/schemaValidations/medicalRecord.schema"
+import { UserDataType } from "@/schemaValidations/user.schema"
 import { clsx, type ClassValue } from "clsx"
 import { twMerge } from "tailwind-merge"
 
@@ -52,3 +55,50 @@ export const getPrefixedPath = (basePath: string, role: string | undefined): str
   const prefix = role.toLowerCase(); // Chuyển role thành chữ thường: admin, doctor, staff
   return `/${prefix}${basePath}`;
 };
+
+export const APPOINTMENT_STATUS_LABEL_MAP: Record<AppointmentDataType['status'], string> = {
+  SCHEDULED: 'Đã đặt lịch',
+  WAITING: 'Đang chờ khám',
+  COMPLETED: 'Đã hoàn thành',
+  CANCELLED: 'Đã hủy',
+};
+
+export const ROLE_LABEL_MAP: Record<UserDataType['role'], string> = {
+  ADMIN: 'Chủ phòng khám',
+  STAFF: 'Nhân viên',
+  DOCTOR: 'Bác sĩ',
+};
+
+export const MR_STATUS_LABEL_MAP: Record<MedicalRecordDataType['status'], string> = {
+  COMPLETED: 'Đã hoàn thành',
+  IN_PROGRESS: 'Đang khám',
+  PAID: 'Đã thanh toán',
+};
+
+// Hàm tạo mật khẩu ngẫu nhiên với độ dài và độ phức tạp nhất định
+export function generateSecurePassword(length: number = 8): string {
+  const lowercase = "abcdefghijklmnopqrstuvwxyz";
+  const uppercase = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+  const numbers = "0123456789";
+  const symbols = "!@#$%^&*";
+
+  // Đảm bảo có ít nhất 1 ký tự của mỗi loại
+  let password = [
+    uppercase[Math.floor(Math.random() * uppercase.length)],
+    lowercase[Math.floor(Math.random() * lowercase.length)],
+    numbers[Math.floor(Math.random() * numbers.length)],
+    symbols[Math.floor(Math.random() * symbols.length)],
+  ].join("");
+
+  // Điền nốt các ký tự còn lại ngẫu nhiên từ tất cả các tập
+  const allChars = lowercase + uppercase + numbers + symbols;
+  for (let i = password.length; i < length; i++) {
+    password += allChars[Math.floor(Math.random() * allChars.length)];
+  }
+
+  // Xáo trộn lại để không bị pattern cố định ở đầu
+  return password
+    .split("")
+    .sort(() => Math.random() - 0.5)
+    .join("");
+}

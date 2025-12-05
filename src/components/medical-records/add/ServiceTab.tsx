@@ -60,6 +60,11 @@ export default function ServiceTab({ medicalRecordId, serviceIndicationId, items
 
   const handleAdd = () => {
     if (!selected || !quantity) return;
+
+    if (Number(quantity) <= 0) {
+      // setError(`Số lượng không hợp lệ`);
+      return;
+    }
     if (items.find(i => i.service_id === selected.id)) return;
 
     onItemsChange([...items, { service_id: selected.id, name: selected.name, quantity: Number(quantity) }]);

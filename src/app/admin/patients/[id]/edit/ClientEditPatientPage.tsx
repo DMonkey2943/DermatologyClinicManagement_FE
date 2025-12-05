@@ -26,8 +26,8 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
-import { cn } from "@/lib/utils";
-import { CalendarIcon } from "lucide-react";
+import { cn, generateSecurePassword } from "@/lib/utils";
+import { CalendarIcon, RefreshCw } from "lucide-react";
 import patientApiRequest from "@/apiRequests/patient";
 import { toast } from "sonner";
 import { EntityError, HttpError } from "@/lib/axios";
@@ -51,7 +51,7 @@ export default function ClientEditPatientPage({ params }: { params: { id: string
       dob: "",
       gender: "MALE",
       phone_number: "",
-      email: "",
+      // email: "",
       address: "",
       medical_history: "",
       allergies: "",
@@ -75,7 +75,7 @@ export default function ClientEditPatientPage({ params }: { params: { id: string
           dob: patient.dob || "",
           gender: patient.gender || "MALE",
           phone_number: patient.phone_number || "",
-          email: patient.email || "",
+          // email: patient.email || "",
           address: patient.address || "",
           medical_history: patient.medical_history || "",
           allergies: patient.allergies || "",
@@ -131,6 +131,12 @@ export default function ClientEditPatientPage({ params }: { params: { id: string
     modalForm.setValue("email", patientDetail?.email || "");
   }
 
+  const handleCloseModal = () => {
+    if (!modalForm.formState.isSubmitting) {
+      setShowCreateAccountModal(false);      
+    }
+  };
+
   // Modal submit handler
   const handleCreateAccount = async (data: { email: string; password: string }) => {
     if (!data.email || !data.password) {
@@ -153,41 +159,47 @@ export default function ClientEditPatientPage({ params }: { params: { id: string
       <div className="container mx-auto p-4 md:p-6 max-w-4xl">
         <Card>
           <CardHeader>
-            <CardTitle className="text-2xl">Chỉnh sửa bệnh nhân</CardTitle>
+            <CardTitle className="text-2xl">Cập nhật thông tin bệnh nhân</CardTitle>
           </CardHeader>
           <CardContent>
             {isLoading ? 'Đang tải...' : (
               <>
                 {/* Nút tạo tài khoản bệnh nhân */}
-                {patientDetail?.password == null && (
-                  <div className="mb-4">
-                    <Button
-                      type="button"
-                      variant="primary"
-                      onClick={handleOpenModal}
-                    >
-                      + Tạo tài khoản bệnh nhân
-                    </Button>
-                  </div>
-                )}
+                <div className="mb-4">
+                  <Button
+                    type="button"
+                    variant="success"
+                    onClick={handleOpenModal}
+                  >
+                    {patientDetail?.password ? (
+                      "+ Tạo lại tài khoản bệnh nhân"
+                    ) : (
+                      "+ Tạo tài khoản bệnh nhân"
+                    )}
+                  </Button>
+                </div>
+                
 
                 {/* Modal tạo tài khoản */}
                 <Modal
                   isOpen={showCreateAccountModal}
-                  onClose={() => setShowCreateAccountModal(false)}                  
+                  onClose={handleCloseModal}                  
                   className="max-w-[584px] p-5 lg:p-10"
                 >
                   <div className="p-6 space-y-4">
                     <h2 className="text-xl font-bold">
-                      Tạo tài khoản bệnh nhân
+                      {patientDetail?.password ? (
+                        "Tạo lại tài khoản bệnh nhân"
+                      ) : (
+                        "Tạo tài khoản bệnh nhân"
+                      )}
                     </h2>
-                    {/* <div className="grid grid-cols-1 gap-x-6 gap-y-5 sm:grid-cols-2"> */}
                       <form
                         onSubmit={modalForm.handleSubmit(handleCreateAccount)}
                         className="grid grid-cols-1 gap-x-6 gap-y-5 sm:grid-cols-2"
                       >
                         <div className="col-span-1 sm:col-span-2">
-                          <label className="block mb-1 font-medium">Email</label>
+                          <label className="block mb-1 font-medium">Email<span className="text-error-500">*</span></label>
                           <Input
                             type="email"
                             placeholder="Email"
@@ -198,12 +210,36 @@ export default function ClientEditPatientPage({ params }: { params: { id: string
                           )}
                         </div>
                         <div className="col-span-1 sm:col-span-2">
-                          <label className="block mb-1 font-medium">Mật khẩu</label>
-                          <Input
+                          <label className="block mb-1 font-medium">Mật khẩu<span className="text-error-500">*</span></label>
+                          {/* <Input
                             type="password"
                             placeholder="Mật khẩu"
                             {...modalForm.register("password", { required: "Mật khẩu không được để trống" })}
-                          />
+                          /> */}
+                          <div className="relative">
+                            <Input
+                              type="password"
+                              placeholder="Mật khẩu"
+                              {...modalForm.register("password", { required: "Mật khẩu không được để trống" })}
+                              className="pr-12" // Để chừa chỗ cho icon
+                            />
+                            {/* Nút tạo mật khẩu ngẫu nhiên */}
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="icon"
+                              className="absolute right-1 top-1/2 -translate-y-1/2 h-8 w-8 hover:bg-muted"
+                              onClick={() => {
+                                const newPassword = generateSecurePassword(8);
+                                modalForm.setValue("password", newPassword, { shouldValidate: true });
+                                // Optional: hiện toast thông báo đã tạo
+                                toast.success("Đã tạo mật khẩu ngẫu nhiên!");
+                              }}
+                              title="Tạo mật khẩu ngẫu nhiên"
+                            >
+                              <RefreshCw className="h-4 w-4" />
+                            </Button>
+                          </div>
                           {modalForm.formState.errors.password && (
                             <span className="text-sm text-red-500">{modalForm.formState.errors.password.message}</span>
                           )}
@@ -217,45 +253,7 @@ export default function ClientEditPatientPage({ params }: { params: { id: string
                           {modalForm.formState.isSubmitting ? "Đang tạo..." : "Tạo"}
                         </Button>
                       </form>
-                    {/* </div> */}
                   </div>
-                  {/* <div className="p-6 min-w-[320px] max-w-[400px]">
-                    <h2 className="text-xl font-semibold mb-4">Tạo tài khoản bệnh nhân</h2>
-                    <form
-                      onSubmit={modalForm.handleSubmit(handleCreateAccount)}
-                      className="space-y-4"
-                    >
-                      <div>
-                        <label className="block mb-1 font-medium">Email</label>
-                        <Input
-                          type="email"
-                          placeholder="Email"
-                          {...modalForm.register("email", { required: "Email không được để trống" })}
-                        />
-                        {modalForm.formState.errors.email && (
-                          <span className="text-sm text-red-500">{modalForm.formState.errors.email.message}</span>
-                        )}
-                      </div>
-                      <div>
-                        <label className="block mb-1 font-medium">Mật khẩu</label>
-                        <Input
-                          type="password"
-                          placeholder="Mật khẩu"
-                          {...modalForm.register("password", { required: "Mật khẩu không được để trống" })}
-                        />
-                        {modalForm.formState.errors.password && (
-                          <span className="text-sm text-red-500">{modalForm.formState.errors.password.message}</span>
-                        )}
-                      </div>
-                      <Button
-                        type="submit"
-                        className="w-full"
-                        disabled={modalForm.formState.isSubmitting}
-                      >
-                        {modalForm.formState.isSubmitting ? "Đang tạo..." : "Tạo"}
-                      </Button>
-                    </form>
-                  </div> */}
                 </Modal>
 
                 {/* ...existing form... */}
@@ -267,7 +265,7 @@ export default function ClientEditPatientPage({ params }: { params: { id: string
                         name="full_name"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Họ và tên</FormLabel>
+                            <FormLabel>Họ và tên<span className="text-error-500">*</span></FormLabel>
                             <FormControl>
                               <Input placeholder="Nguyễn Văn A" {...field} />
                             </FormControl>
@@ -281,7 +279,7 @@ export default function ClientEditPatientPage({ params }: { params: { id: string
                         name="phone_number"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Số điện thoại</FormLabel>
+                            <FormLabel>Số điện thoại<span className="text-error-500">*</span></FormLabel>
                             <FormControl>
                               <Input placeholder="0901234567" {...field} value={field.value as string} />
                             </FormControl>
@@ -292,7 +290,7 @@ export default function ClientEditPatientPage({ params }: { params: { id: string
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <FormField
+                      {/* <FormField
                         control={form.control}
                         name="email"
                         render={({ field }) => (
@@ -304,6 +302,38 @@ export default function ClientEditPatientPage({ params }: { params: { id: string
                             <FormMessage />
                           </FormItem>
                         )}
+                      /> */}
+
+                      <FormField
+                        control={form.control}
+                        name="gender"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Giới tính<span className="text-error-500">*</span></FormLabel>
+                            <FormControl>
+                              <RadioGroup
+                                onValueChange={field.onChange}
+                                value={field.value}
+                                defaultValue={field.value}
+                                className="flex flex-row space-x-4"
+                              >
+                                <div className="flex items-center space-x-2">
+                                  <RadioGroupItem value="MALE" id="male" />
+                                  <label htmlFor="male" className="cursor-pointer font-normal">
+                                    Nam
+                                  </label>
+                                </div>
+                                <div className="flex items-center space-x-2">
+                                  <RadioGroupItem value="FEMALE" id="female" />
+                                  <label htmlFor="female" className="cursor-pointer font-normal">
+                                    Nữ
+                                  </label>
+                                </div>
+                              </RadioGroup>
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
                       />
 
                       <FormField
@@ -311,7 +341,7 @@ export default function ClientEditPatientPage({ params }: { params: { id: string
                         name="dob"
                         render={({ field }) => (
                           <FormItem className="flex flex-col">
-                            <FormLabel>Ngày sinh</FormLabel>
+                            <FormLabel>Ngày sinh<span className="text-error-500">*</span></FormLabel>
                             <Popover>
                               <PopoverTrigger asChild>
                                 <FormControl>
@@ -354,39 +384,7 @@ export default function ClientEditPatientPage({ params }: { params: { id: string
                       />
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <FormField
-                        control={form.control}
-                        name="gender"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Giới tính</FormLabel>
-                            <FormControl>
-                              <RadioGroup
-                                onValueChange={field.onChange}
-                                value={field.value}
-                                defaultValue={field.value}
-                                className="flex flex-row space-x-4"
-                              >
-                                <div className="flex items-center space-x-2">
-                                  <RadioGroupItem value="MALE" id="male" />
-                                  <label htmlFor="male" className="cursor-pointer font-normal">
-                                    Nam
-                                  </label>
-                                </div>
-                                <div className="flex items-center space-x-2">
-                                  <RadioGroupItem value="FEMALE" id="female" />
-                                  <label htmlFor="female" className="cursor-pointer font-normal">
-                                    Nữ
-                                  </label>
-                                </div>
-                              </RadioGroup>
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-
+                    <div className="grid grid-cols-1 gap-4">
                       <FormField
                         control={form.control}
                         name="address"
@@ -434,15 +432,17 @@ export default function ClientEditPatientPage({ params }: { params: { id: string
                       />
                     </div>
 
-                    <Button
-                      type="submit"
-                      className="w-full md:w-auto md:min-w-48"
-                      size="lg"
-                      disabled={form.formState.isSubmitting}
-                      variant="primary"
-                    >
-                      {form.formState.isSubmitting ? "Đang cập nhật..." : "Cập nhật bệnh nhân"}
-                    </Button>
+                    <div className="flex justify-end">
+                        <Button
+                          type="submit"
+                          className="w-full md:w-auto md:min-w-48"
+                          size="lg"
+                          disabled={form.formState.isSubmitting}
+                          variant="primary"
+                        >
+                          {form.formState.isSubmitting ? "Đang lưu..." : "Lưu"}
+                        </Button>
+                    </div>                    
                   </form>
                 </Form>
               </>

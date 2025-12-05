@@ -12,7 +12,7 @@ import Badge from '@/components/ui/badge/Badge';
 import Button from '@/components/ui/button/Button';
 import Link from 'next/link';
 import { MedicalRecordDataType } from '@/schemaValidations/medicalRecord.schema';
-import { formatDateTime, getPrefixedPath } from '@/lib/utils';
+import { formatDateTime, getPrefixedPath, MR_STATUS_LABEL_MAP } from '@/lib/utils';
 import CenteredSpinner from '../ui/spinner/CenteredSpinner';
 import PaginationControls from '../ui/pagination/PaginationControls';
 import { MoreHorizontal, Eye } from "lucide-react";
@@ -50,6 +50,11 @@ export default function MedicalRecordTable({ medical_records, isLoading, page=0,
       case 'PAID':
         return 'primary';
     }
+  };  
+  
+  const getStatusLabel = (status: MedicalRecordDataType['status'] | null | undefined): string => {
+    if (!status) return 'Không xác định';
+    return MR_STATUS_LABEL_MAP[status] || status;
   };
 
   return (
@@ -111,7 +116,7 @@ export default function MedicalRecordTable({ medical_records, isLoading, page=0,
                     {medical_record.doctor.full_name}
                   </TableCell>
                   <TableCell className="px-5 py-4 text-start text-theme-sm text-gray-800 dark:text-white/90">
-                    <Badge size="sm" color={getStatusColor(medical_record.status)}>{medical_record.status}</Badge>
+                    <Badge size="sm" color={getStatusColor(medical_record.status)}>{getStatusLabel(medical_record.status)}</Badge>
                   </TableCell>
                   <TableCell className="px-5 py-4 text-start text-theme-xs text-gray-500 dark:text-gray-400">
                     <div className="flex gap-2">
