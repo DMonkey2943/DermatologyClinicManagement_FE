@@ -81,11 +81,17 @@ export default function MedicalRecordTable({ medical_records, isLoading, page=0,
                 >
                   Bệnh nhân
                 </TableCell>
-                <TableCell
+                {/* <TableCell
                   //isHeader
                   className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
                 >
                   Bác sĩ
+                </TableCell> */}
+                <TableCell
+                  //isHeader
+                  className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
+                >
+                  Chẩn đoán
                 </TableCell>
                 <TableCell
                   //isHeader
@@ -110,10 +116,22 @@ export default function MedicalRecordTable({ medical_records, isLoading, page=0,
                     {formatDateTime(medical_record.created_at)}
                   </TableCell>
                   <TableCell className="px-5 py-4 text-start text-theme-sm text-gray-800 dark:text-white/90">
-                    {medical_record.patient.full_name}
+                    <div className="flex items-center gap-3">
+                      <div>
+                        <span className="block font-medium text-gray-800 text-theme-sm dark:text-white/90">
+                          {medical_record.patient.full_name}
+                        </span>
+                        <span className="block text-gray-500 text-theme-xs dark:text-gray-400">
+                          {medical_record.patient.phone_number}
+                        </span>
+                      </div>
+                    </div>
                   </TableCell>
-                  <TableCell className="px-5 py-4 text-start text-theme-sm text-gray-800 dark:text-white/90">
+                  {/* <TableCell className="px-5 py-4 text-start text-theme-sm text-gray-800 dark:text-white/90">
                     {medical_record.doctor.full_name}
+                  </TableCell> */}
+                  <TableCell className="px-5 py-4 text-start text-theme-sm text-gray-800 dark:text-white/90">
+                    {medical_record.diagnosis || 'Chưa có chẩn đoán'}
                   </TableCell>
                   <TableCell className="px-5 py-4 text-start text-theme-sm text-gray-800 dark:text-white/90">
                     <Badge size="sm" color={getStatusColor(medical_record.status)}>{getStatusLabel(medical_record.status)}</Badge>

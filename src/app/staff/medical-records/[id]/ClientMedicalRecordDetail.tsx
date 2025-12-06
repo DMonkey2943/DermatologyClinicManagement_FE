@@ -92,6 +92,8 @@ export default function ClientMedicalRecordDetail({ params }: { params: { id: st
                     <ComponentCard title="Đơn thuốc">           
                         <PrescriptionCard
                             medicalRecordId={id}
+                            medicalRecordData={medicalRecord}
+                            patientData={patient}
                         />
                     </ComponentCard>
                     <ComponentCard title="Phiếu chỉ định dịch vụ">           

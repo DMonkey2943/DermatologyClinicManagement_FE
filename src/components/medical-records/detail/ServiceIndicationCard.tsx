@@ -43,14 +43,14 @@ export default function ServiceIndicationCard({
         </h3> */}
         
         {(!serviceIndication || !serviceIndication.services) ? (
-          <div className="text-center py-8 text-gray-500 bg-gray-50 rounded-lg">
+          <div className="text-center py-2 text-muted-foreground">
             Không có phiếu chỉ định dịch vụ
           </div>
         ) : (
           <div className="border rounded-lg overflow-hidden">
             <Table>
               <TableHeader>
-                <TableRow className="bg-gray-100">
+                <TableRow className="bg-muted hover:bg-muted">
                   <TableHead className="w-12">STT</TableHead>
                   <TableHead>Tên dịch vụ</TableHead>
                   <TableHead className="w-24 text-center">Số lượng</TableHead>

@@ -58,7 +58,7 @@ export default function ClientMedicalRecordDetail({ params }: { params: { id: st
 
     return (    
         <div>
-            <PageBreadcrumb pageTitle="Phiếu khám bệnh" />
+            <PageBreadcrumb pageTitle="Phiên khám" />
             <div className="grid grid-cols-12 gap-4 md:gap-6">
                 <div className="col-span-12 xl:col-span-3">
                     <ComponentCard title="Thông tin bệnh nhân">
@@ -78,13 +78,13 @@ export default function ClientMedicalRecordDetail({ params }: { params: { id: st
                             <h6 className='font-medium'>Thông tin y tế</h6>                            
                             <p className='py-1 text-theme-sm text-gray-800 dark:text-white/90'>Tiền sử bệnh lý: {patient?.medical_history ?? '---'}</p>
                             <p className='py-1 text-theme-sm text-gray-800 dark:text-white/90'>Dị ứng: {patient?.allergies ?? '---'}</p>
-                            <p className='py-1 text-theme-sm text-gray-800 dark:text-white/90'>Thuốc đang dùng: {patient?.current_medications ?? '---'}</p>
-                            <p className='py-1 text-theme-sm text-gray-800 dark:text-white/90'>Tình trạng ban đầu: {patient?.current_condition ?? '---'}</p>
+                            {/* <p className='py-1 text-theme-sm text-gray-800 dark:text-white/90'>Thuốc đang dùng: {patient?.current_medications ?? '---'}</p>
+                            <p className='py-1 text-theme-sm text-gray-800 dark:text-white/90'>Tình trạng ban đầu: {patient?.current_condition ?? '---'}</p> */}
                         </div>
                     </ComponentCard>
                 </div>
                 <div className="col-span-12 space-y-6 xl:col-span-9">
-                    <ComponentCard title="Phiếu khám bệnh">                        
+                    <ComponentCard title={"Phiếu khám bệnh"}>                        
                         <MedicalRecordCard
                             medicalRecordData={medicalRecord}
                         />
@@ -92,6 +92,8 @@ export default function ClientMedicalRecordDetail({ params }: { params: { id: st
                     <ComponentCard title="Đơn thuốc">           
                         <PrescriptionCard
                             medicalRecordId={id}
+                            medicalRecordData={medicalRecord}
+                            patientData={patient}
                         />
                     </ComponentCard>
                     <ComponentCard title="Phiếu chỉ định dịch vụ">           
