@@ -34,6 +34,12 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { Button as ButtonUI } from "@/components/ui/button";
 import { formatCurrency } from '@/lib/utils';
 
@@ -91,7 +97,27 @@ export default function ServiceTable({ services, onEdit, onDelete, isLoading, pa
               {services.map((service) => (
                 <TableRow key={service.id}>
                   <TableCell className="px-5 py-4 text-start text-theme-sm text-gray-800 dark:text-white/90">
-                    {service.name}
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <span className="font-medium text-gray-800 dark:text-white/90 break-words hyphens-auto transition-colors">
+                            {service.name}
+                          </span>
+                        </TooltipTrigger>
+                          {service.description ? (
+                            <TooltipContent 
+                              side="top" 
+                              align="start"
+                              className="max-w-xs break-words p-3 text-sm shadow-lg"
+                              sideOffset={5}
+                            >
+                              <p className="text-white/90 dark:text-gray-800 leading-relaxed">
+                                {service.description}
+                              </p>
+                            </TooltipContent>
+                          ) : null}
+                      </Tooltip>
+                    </TooltipProvider>
                   </TableCell>
                   <TableCell className="px-5 py-4 text-start text-theme-sm text-gray-800 dark:text-white/90">
                     {formatCurrency(service.price)}

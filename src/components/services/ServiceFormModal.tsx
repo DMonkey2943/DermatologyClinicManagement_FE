@@ -8,6 +8,7 @@ import { ServiceDataType } from '@/schemaValidations/service.schema';
 import serviceApiRequest from '@/apiRequests/service';
 import { EntityError } from '@/lib/axios';
 import { toast } from "sonner";
+import TextArea from '@/components/form/input/TextArea';
 
 interface ServiceFormModalProps {
   isOpen: boolean;
@@ -174,14 +175,16 @@ export default function ServiceFormModal({
               disabled={isSubmitting}
               error={!!errors.price}
               hint={errors.price}
+              step={10000}
             />
           </div>
           <div className="col-span-1 sm:col-span-2">
             <Label>Mô tả</Label>
-            <Input
-              type="text"
-              defaultValue={formData.description}
-              onChange={(e) => handleInputChange('description', e.target.value)}
+            <TextArea
+              placeholder="Nhập mô tả về dịch vụ..."
+              rows={2}
+              value={formData.description || ''}
+              onChange={(value) => handleInputChange('description', value)}
               disabled={isSubmitting}
               error={!!errors.description}
               hint={errors.description}
