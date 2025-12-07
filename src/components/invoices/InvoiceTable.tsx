@@ -57,7 +57,7 @@ export default function InvoiceTable({ invoices, isLoading, page=0, pageSize=10,
                   //isHeader
                   className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
                 >
-                  Ngày giờ
+                  Thời gian tạo
                 </TableCell>
                 <TableCell
                   //isHeader
@@ -65,12 +65,12 @@ export default function InvoiceTable({ invoices, isLoading, page=0, pageSize=10,
                 >
                   Bệnh nhân
                 </TableCell>
-                <TableCell
+                {/* <TableCell
                   //isHeader
                   className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
                 >
                   Bác sĩ
-                </TableCell>
+                </TableCell> */}
                 <TableCell
                   //isHeader
                   className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
@@ -94,11 +94,20 @@ export default function InvoiceTable({ invoices, isLoading, page=0, pageSize=10,
                     {formatDateTime(invoice.created_at)}
                   </TableCell>
                   <TableCell className="px-5 py-4 text-start text-theme-sm text-gray-800 dark:text-white/90">
-                    {invoice.patient.full_name}
+                    <div className="flex items-center gap-3">
+                      <div>
+                        <span className="block font-medium text-gray-800 text-theme-sm dark:text-white/90">
+                          {invoice.patient.full_name}
+                        </span>
+                        <span className="block text-gray-500 text-theme-xs dark:text-gray-400">
+                          {invoice.patient.phone_number}
+                        </span>
+                      </div>
+                    </div>
                   </TableCell>
-                  <TableCell className="px-5 py-4 text-start text-theme-sm text-gray-800 dark:text-white/90">
+                  {/* <TableCell className="px-5 py-4 text-start text-theme-sm text-gray-800 dark:text-white/90">
                     {invoice.doctor.full_name}
-                  </TableCell>
+                  </TableCell> */}
                   <TableCell className="px-5 py-4 text-start text-theme-sm text-gray-800 dark:text-white/90">
                     {formatCurrency(invoice.final_amount!)}
                   </TableCell>

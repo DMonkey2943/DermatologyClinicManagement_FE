@@ -38,10 +38,13 @@ import { PrescriptionDetailDataType, PrescriptionItemType } from '@/schemaValida
 import serviceIndicationApiRequest from '@/apiRequests/serviceIndication';
 import prescriptionApiRequest from '@/apiRequests/prescription';
 import { ClipboardList, Pill, Stethoscope, Images } from "lucide-react";
+import { getPrefixedPath } from '@/lib/utils';
+import { useAuth } from '@/context/AuthContext';
 
 export default function ClientAddMedicalRecordPage({ params }: { params: { appointment_id: string } }) {
   const { appointment_id } = params;
   const router = useRouter();
+  const { user } = useAuth();
   const initialized = useRef(false); // Thêm ref
 
   const [loading, setLoading] = useState(true);
@@ -100,7 +103,8 @@ export default function ClientAddMedicalRecordPage({ params }: { params: { appoi
         // console.log(apt.message);
         if (apt.data.status !== 'WAITING') {
           toast.error("Lịch hẹn không hợp lệ");
-          router.push('/admin/appointments');
+          const path = getPrefixedPath(`/appointments`, user?.role);
+          router.push(path);
           return;
         }
 

@@ -16,6 +16,7 @@ import InvoiceDetailTable from '@/components/invoices/preview/InvoiceDetailTable
 import invoiceApiRequest from '@/apiRequests/invoice';
 import { useAuth } from "@/context/AuthContext";
 import { toast } from 'sonner';
+import { getPrefixedPath } from '@/lib/utils';
 
 interface InvoiceDetailDataType {
     serviceSubtotal: number;
@@ -60,13 +61,15 @@ export default function ClientInvoicePreviewPage({ params }: { params: { medical
             const data = payload.data;
             // console.log(data);
 
-            if(data.status === 'IN_PROGRESS') {
+            if (data.status === 'IN_PROGRESS') {
+                const path = getPrefixedPath(`/medical-records`, user?.role);
                 toast.error("Chỉ có thể tạo hóa đơn khi phiên khám đã hoàn thành!");
-                router.push('/staff/medical-records');
+                router.push(path);
                 return;
             } else if(data.status === 'PAID') {
+                const path = getPrefixedPath(`/invoices`, user?.role);
                 toast.error("Đã tồn tại hóa đơn cho phiên khám này!");
-                router.push('/staff/invoices');
+                router.push(path);
                 return;
             }
             
@@ -143,7 +146,7 @@ export default function ClientInvoicePreviewPage({ params }: { params: { medical
             const { payload } = await invoiceApiRequest.create(newInvoice);
             const invoice_id = payload.data.id;
             toast.success("Tạo hóa đơn thanh toán thành công");
-            router.push(`/staff/invoices/${invoice_id}`);
+            router.push(`/admin/invoices/${invoice_id}`);
             router.refresh();
         } catch (err) {
             console.log("Error submitting invoice: ", err);
