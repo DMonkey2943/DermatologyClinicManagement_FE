@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import Button from '@/components/ui/button/Button';
 import Label from '@/components/form/Label';
 import Input from '@/components/form/input/InputField';
+import TextArea from '@/components/form/input/TextArea';
 import { Modal } from '@/components/ui/modal/index';
 import { MedicationDataType } from '@/schemaValidations/medication.schema';
 import medicationApiRequest from '@/apiRequests/medication';
@@ -192,10 +193,11 @@ export default function MedicationFormModal({
           </div>
           <div className="col-span-1 sm:col-span-2">
             <Label>Mô tả</Label>
-            <Input
-              type="text"
-              defaultValue={formData.description}
-              onChange={(e) => handleInputChange('description', e.target.value)}
+            <TextArea
+              placeholder="Nhập mô tả về thuốc..."
+              rows={2}
+              value={formData.description || ''}
+              onChange={(value) => handleInputChange('description', value)}
               disabled={isSubmitting}
               error={!!errors.description}
               hint={errors.description}
@@ -210,6 +212,7 @@ export default function MedicationFormModal({
               disabled={isSubmitting}
               error={!!errors.price}
               hint={errors.price}
+              step={1000}
             />
           </div>
           <div className="col-span-1">

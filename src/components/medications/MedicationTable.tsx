@@ -34,6 +34,12 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { Button as ButtonUI } from "@/components/ui/button";
 import { formatCurrency } from '@/lib/utils';
 
@@ -104,7 +110,27 @@ export default function MedicationTable({ medications, onEdit, onDelete, isLoadi
               {medications.map((medication) => (
                 <TableRow key={medication.id}>
                   <TableCell className="px-5 py-4 text-start text-theme-sm text-gray-800 dark:text-white/90">
-                    {medication.name}
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <span className="font-medium text-gray-800 dark:text-white/90 break-words hyphens-auto transition-colors">
+                            {medication.name}
+                          </span>
+                        </TooltipTrigger>
+                          {medication.description ? (
+                            <TooltipContent 
+                              side="top" 
+                              align="start"
+                              className="max-w-xs break-words p-3 text-sm shadow-lg"
+                              sideOffset={5}
+                            >
+                              <p className="text-white/90 dark:text-gray-800 leading-relaxed">
+                                {medication.description}
+                              </p>
+                            </TooltipContent>
+                          ) : null}
+                      </Tooltip>
+                    </TooltipProvider>
                   </TableCell>
                   <TableCell className="px-5 py-4 text-start text-theme-sm text-gray-800 dark:text-white/90">
                     {medication.dosage_form}
@@ -116,10 +142,6 @@ export default function MedicationTable({ medications, onEdit, onDelete, isLoadi
                     {medication.stock_quantity}
                   </TableCell>
                   <TableCell className="px-5 py-4 text-start text-theme-xs text-gray-500 dark:text-gray-400">
-                    {/* <div className="flex gap-2">
-                      <Button size="sm" onClick={() => onEdit(medication)}>Sửa</Button>
-                      <Button size="sm" variant="destructive" onClick={() => onDelete(medication.id)}>Xóa</Button>
-                    </div> */}
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
                         <ButtonUI variant="ghost" size="icon" className="h-8 w-8 p-0">
