@@ -113,6 +113,15 @@ export default function AppointmentTable({ appointments, onEdit, isLoading, page
 
   }
 
+  const handleEdit = (appointment: AppointmentDataType) => {
+    if (appointment.status === 'COMPLETED') {
+      toast.error("Không thể chỉnh sửa lịch hẹn đã hoàn thành");
+      return
+    }; // guard: không cho edit appointment đã COMPLETED
+    onEdit(appointment);
+    return;
+  }
+
   return (
     isLoading
       ?
@@ -159,7 +168,7 @@ export default function AppointmentTable({ appointments, onEdit, isLoading, page
                   //isHeader
                   className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
                 >
-                  Tùy chọn
+                  {/* Tùy chọn */}
                 </TableCell>
               </TableRow>
             </TableHeader>
@@ -242,7 +251,7 @@ export default function AppointmentTable({ appointments, onEdit, isLoading, page
 
                           <DropdownMenuContent align="end" className="w-40">
                             <DropdownMenuItem
-                              onClick={() => onEdit(appointment)}
+                              onClick={() => handleEdit(appointment)}
                               className="flex items-center gap-2"
                             >
                               <Edit className="h-4 w-4" />

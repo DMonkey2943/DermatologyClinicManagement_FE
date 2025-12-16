@@ -170,7 +170,7 @@ export default function MedicationFormModal({
 
         <div className="grid grid-cols-1 gap-x-6 gap-y-5 sm:grid-cols-2">
           <div className="col-span-1 sm:col-span-2">
-            <Label>Tên thuốc</Label>
+            <Label>Tên thuốc<span className="text-error-500">*</span></Label>
             <Input
               type="text"
               defaultValue={formData.name}
@@ -181,7 +181,7 @@ export default function MedicationFormModal({
             />
           </div>
           <div className="col-span-1 sm:col-span-2">
-            <Label>Dạng thuốc</Label>
+            <Label>Dạng thuốc<span className="text-error-500">*</span></Label>
             <Input
               type="text"
               defaultValue={formData.dosage_form}
@@ -204,7 +204,7 @@ export default function MedicationFormModal({
             />
           </div>
           <div className="col-span-1">
-            <Label>Giá bán</Label>
+            <Label>Giá bán<span className="text-error-500">*</span></Label>
             <Input
               type="number"
               value={formData.price}
@@ -216,7 +216,7 @@ export default function MedicationFormModal({
             />
           </div>
           <div className="col-span-1">
-            <Label>Số lượng tồn kho</Label>
+            <Label>Số lượng tồn kho<span className="text-error-500">*</span></Label>
             <Input
               type="number"
               value={formData.stock_quantity}

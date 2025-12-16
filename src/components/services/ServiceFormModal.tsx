@@ -156,7 +156,7 @@ export default function ServiceFormModal({
 
         <div className="grid grid-cols-1 gap-x-6 gap-y-5 sm:grid-cols-2">
           <div className="col-span-1 sm:col-span-2">
-            <Label>Tên dịch vụ</Label>
+            <Label>Tên dịch vụ<span className="text-error-500">*</span></Label>
             <Input
               type="text"
               defaultValue={formData.name}
@@ -167,7 +167,7 @@ export default function ServiceFormModal({
             />
           </div>
           <div className="col-span-1 sm:col-span-2">
-            <Label>Giá</Label>
+            <Label>Giá<span className="text-error-500">*</span></Label>
             <Input
               type="number"
               value={formData.price}

@@ -201,7 +201,7 @@ export default function ClientEditUserPage({ params }: { params: { id: string } 
                       name="full_name"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Họ và tên</FormLabel>
+                          <FormLabel>Họ tên<span className="text-error-500">*</span></FormLabel>
                           <FormControl>
                             <Input placeholder="Nguyễn Văn A" {...field} />
                           </FormControl>
@@ -215,7 +215,7 @@ export default function ClientEditUserPage({ params }: { params: { id: string } 
                       name="email"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Email</FormLabel>
+                          <FormLabel>Email<span className="text-error-500">*</span></FormLabel>
                           <FormControl>
                             <Input type="email" placeholder="user@example.com" {...field} />
                           </FormControl>
@@ -231,7 +231,7 @@ export default function ClientEditUserPage({ params }: { params: { id: string } 
                       name="phone_number"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Số điện thoại</FormLabel>
+                          <FormLabel>Số điện thoại<span className="text-error-500">*</span></FormLabel>
                           <FormControl>
                             <Input placeholder="0901234567" {...field} />
                           </FormControl>
@@ -245,7 +245,7 @@ export default function ClientEditUserPage({ params }: { params: { id: string } 
                       name="dob"
                       render={({ field }) => (
                         <FormItem className="flex flex-col">
-                          <FormLabel>Ngày sinh</FormLabel>
+                          <FormLabel>Ngày sinh<span className="text-error-500">*</span></FormLabel>
                           <Popover>
                             <PopoverTrigger asChild>
                               <FormControl>
@@ -295,7 +295,7 @@ export default function ClientEditUserPage({ params }: { params: { id: string } 
                       name="gender"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Giới tính</FormLabel>
+                          <FormLabel>Giới tính<span className="text-error-500">*</span></FormLabel>
                           <FormControl>
                             <RadioGroup
                               onValueChange={field.onChange}
@@ -327,7 +327,7 @@ export default function ClientEditUserPage({ params }: { params: { id: string } 
                       name="role"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Vai trò</FormLabel>
+                          <FormLabel>Vai trò<span className="text-error-500">*</span></FormLabel>
                           <Select onValueChange={field.onChange} value={field.value}>
                             <FormControl>
                               <SelectTrigger>
@@ -353,7 +353,7 @@ export default function ClientEditUserPage({ params }: { params: { id: string } 
                       name="username"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Tên đăng nhập</FormLabel>
+                          <FormLabel>Tên đăng nhập<span className="text-error-500">*</span></FormLabel>
                           <FormControl>
                             <Input placeholder="username123" {...field} />
                           </FormControl>
@@ -421,7 +421,7 @@ export default function ClientEditUserPage({ params }: { params: { id: string } 
                     disabled={form.formState.isSubmitting}
                     variant="primary"
                   >
-                    {form.formState.isSubmitting ? "Đang cập nhật..." : "Cập nhật người dùng"}
+                    {form.formState.isSubmitting ? "Đang lưu..." : "Lưu"}
                   </Button>
                 </form>
               </Form>

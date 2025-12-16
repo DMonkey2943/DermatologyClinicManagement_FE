@@ -94,7 +94,7 @@ export default function SignInForm() {
               Đăng nhập
             </h1>
             <p className="text-sm text-gray-500 dark:text-gray-400">
-              Nhập username và mật khẩu để đăng nhập vào hệ thống!
+              Nhập tên đăng nhập và mật khẩu để đăng nhập vào hệ thống!
             </p>
             {unauthorizedErrors && (
               <p
@@ -108,7 +108,7 @@ export default function SignInForm() {
             <div className="space-y-6">
               <div>
                 <Label>
-                  Username <span className="text-error-500">*</span>
+                  Tên đăng nhập <span className="text-error-500">*</span>
                 </Label>
                 <Input
                   placeholder="Nhập username"

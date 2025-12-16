@@ -218,7 +218,7 @@ export default function AppointmentFormModal({
     >
       <div className="p-6 space-y-4">
         <h2 className="text-xl font-bold">
-          {modalType === 'add' ? 'Thêm lịch hẹn mới' : 'Chỉnh sửa lịch hẹn'}
+          {modalType === 'add' ? 'Đặt lịch hẹn' : 'Chỉnh sửa lịch hẹn'}
         </h2>
         <div className="grid grid-cols-1 gap-x-6 gap-y-5 sm:grid-cols-2">
           {/* <div className="col-span-1">

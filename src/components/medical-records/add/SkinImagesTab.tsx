@@ -237,7 +237,7 @@ export default function SkinImagesTab({ medicalRecordId, images, onImagesChange 
       </CardHeader>
       <CardContent className="space-y-6">
         <div>
-          <Label className="text-sm font-medium mb-4 block">Chọn ảnh để tải lên</Label>
+          <Label className="text-sm font-medium mb-4 block">Chọn ảnh</Label>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             {positionOrder.map((position) => {
               const pending = pendingImages[position]
@@ -324,19 +324,19 @@ export default function SkinImagesTab({ medicalRecordId, images, onImagesChange 
             {isUploading ? (
               <>
                 <Loader2 className="h-4 w-4 animate-spin" />
-                Đang upload...
+                Đang lưu...
               </>
             ) : (
               <>
                 <Upload className="h-4 w-4" />
-                Upload ảnh
+                Lưu ảnh
               </>
             )}
           </Button>
         </div>
 
         <div className="space-y-4 pt-6 border-t border-gray-200">
-          <Label className="text-sm font-medium">Ảnh đã upload</Label>
+          <Label className="text-sm font-medium">Ảnh đã ghi nhận</Label>
           {images.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-8 text-gray-500 bg-gray-50 rounded-lg">
               <ImageIcon className="h-10 w-10 mb-2" />

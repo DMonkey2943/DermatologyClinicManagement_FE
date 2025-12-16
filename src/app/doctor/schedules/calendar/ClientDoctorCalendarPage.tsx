@@ -5,9 +5,9 @@ import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import timeGridPlugin from "@fullcalendar/timegrid";
 import interactionPlugin from "@fullcalendar/interaction";
-import { format, parseISO } from "date-fns";
+import { format, parseISO, isBefore, startOfDay } from "date-fns";
 import { Calendar, Clock, User, History, Stethoscope, FileText, ExternalLink } from "lucide-react";
-
+import { vi } from "date-fns/locale/vi";
 import {
   Sheet,
   SheetContent,
@@ -22,7 +22,7 @@ import Link from "next/link";
 import { AppointmentDataType } from "@/schemaValidations/appointment.schema";
 import appointmentApiRequest from "@/apiRequests/appointment";
 import medicalRecordApiRequest from "@/apiRequests/medicalRecord";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { Tooltip, TooltipProvider, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
 import { MedicalRecordDataType } from "@/schemaValidations/medicalRecord.schema";
 import { formatDateTime } from "@/lib/utils";
 
@@ -33,6 +33,8 @@ export default function DoctorCalendarPage() {
   const [sheetOpen, setSheetOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const [recordLoading, setRecordLoading] = useState(false);
+
+  const today = startOfDay(new Date()); // Ngày hôm nay (00:00:00)
 
   const fetchAppointments = async () => {
     try {
@@ -53,12 +55,14 @@ export default function DoctorCalendarPage() {
           const colorMap: Record<string, string> = {
             WAITING: "#f59e0b",
             SCHEDULED: "#3b82f6",
-            // IN_PROGRESS: "#3b82f6",
             COMPLETED: "#10b981",
             CANCELLED: "#ef4444",
           };
 
           const patientName = apt.patient.full_name;
+
+          // Kiểm tra xem lịch hẹn có trước ngày hôm nay không
+          const isPast = isBefore(startDate, today);
 
           return {
             id: apt.id,
@@ -71,7 +75,10 @@ export default function DoctorCalendarPage() {
             extendedProps: {
               ...apt,
               patientName,
+              isPast, // thêm để dùng nếu cần
             },
+            // Thêm class để style riêng cho lịch cũ
+            classNames: isPast ? ["past-event"] : [],
           };
         });
         setEvents(formattedEvents);
@@ -109,6 +116,13 @@ export default function DoctorCalendarPage() {
 
   const handleEventClick = (clickInfo: any) => {
     const apt = clickInfo.event.extendedProps as AppointmentDataType;
+    const startDate = clickInfo.event.start;
+
+    // Ngăn mở Sheet nếu là lịch cũ
+    if (isBefore(startDate, today)) {
+      return; // Không làm gì cả
+    }
+
     setSelectedAppointment(apt);
     setRecentRecord(null);
     fetchRecentMedicalRecord(apt.patient_id);
@@ -119,7 +133,6 @@ export default function DoctorCalendarPage() {
     const map = {
       WAITING: { label: "Chờ khám", color: "bg-yellow-500" },
       SCHEDULED: { label: "Đã đặt lịch", color: "bg-blue-500" },
-    //   IN_PROGRESS: { label: "Đang khám", color: "bg-indigo-500" },
       COMPLETED: { label: "Đã hoàn thành", color: "bg-green-500" },
       CANCELLED: { label: "Đã hủy", color: "bg-red-500" },
     };
@@ -127,25 +140,37 @@ export default function DoctorCalendarPage() {
     return <Badge className={`${item.color} text-white`}>{item.label}</Badge>;
   };
 
-  // Custom render event để truncate tên dài + tooltip
+  // Custom render event với strikethrough cho lịch cũ
   const eventContent = (eventInfo: any) => {
+    const isPast = eventInfo.event.classNames.includes("past-event");
+
     return (
       <TooltipProvider>
         <Tooltip>
           <TooltipTrigger asChild>
-            <div className="px-1.5 py-0.5 text-xs font-medium truncate cursor-pointer">
+            <div
+              className={`px-1.5 py-0.5 text-xs font-medium truncate cursor-pointer ${
+                isPast
+                  ? "line-through opacity-60 pointer-events-none"
+                  : ""
+              }`}
+            >
               {eventInfo.timeText && (
                 <span className="font-bold">{eventInfo.timeText} </span>
               )}
-              {eventInfo.event.title}
+              <span className={isPast ? "select-none" : ""}>
+                {eventInfo.event.title}
+              </span>
             </div>
           </TooltipTrigger>
-          <TooltipContent>
-            <p className="font-medium">{eventInfo.event.title}</p>
-            <p className="text-xs text-muted-foreground">
-              {format(eventInfo.event.start!, "HH:mm")} - {eventInfo.event.extendedProps.time_slot || "30 phút"}
-            </p>
-          </TooltipContent>
+          {!isPast && (
+            <TooltipContent>
+              <p className="font-medium">{eventInfo.event.title}</p>
+              <p className="text-xs text-muted-foreground">
+                {format(eventInfo.event.start!, "HH:mm")} - {eventInfo.event.extendedProps.time_slot || "30 phút"}
+              </p>
+            </TooltipContent>
+          )}
         </Tooltip>
       </TooltipProvider>
     );
@@ -153,15 +178,17 @@ export default function DoctorCalendarPage() {
 
   return (
     <>
-      <div className="container mx-auto p-4 lg:p-8">
-        {/* <div className="mb-8">
-          <h1 className="text-3xl font-bold flex items-center gap-3">
-            <Calendar className="w-9 h-9" />
-            Lịch khám của tôi
-          </h1>
-          <p className="text-muted-foreground mt-2">Xem và quản lý lịch hẹn với bệnh nhân</p>
-        </div> */}
+      {/* Thêm style toàn cục cho past-event (tùy chọn, hoặc dùng inline như trên) */}
+      <style jsx global>{`
+        .past-event {
+          opacity: 0.7 !important;
+        }
+        .past-event .fc-event-title {
+          text-decoration: line-through;
+        }
+      `}</style>
 
+      <div className="container mx-auto p-4 lg:p-8">
         <Card className="overflow-hidden border shadow-xl">
           {loading ? (
             <div className="h-96 flex items-center justify-center">
@@ -178,35 +205,20 @@ export default function DoctorCalendarPage() {
               }}
               events={events}
               eventClick={handleEventClick}
-              eventContent={eventContent} // Quan trọng: truncate + tooltip
-              eventDisplay="block" // <-- Thêm dòng này để backgroundColor/borderColor hoạt động ở view tháng
+              eventContent={eventContent}
+              eventDisplay="block"
               slotMinTime="11:00:00"
               slotMaxTime="22:00:00"
               slotDuration="00:30:00"
               slotLabelInterval="00:30"
               height="auto"
-              dayMaxEvents={false} // Không giới hạn số event → cho phép scroll
+              dayMaxEvents={false}
               dayMaxEventRows={false}
               moreLinkClick="popover"
               nowIndicator={true}
               editable={false}
               selectable={false}
               locale="vi"
-              titleRangeSeparator=" - "
-              views={{
-                dayGridMonth: {
-                  // Hiển thị MM/YYYY cho view tháng, ví dụ: 07/2025
-                  titleFormat: { month: "2-digit", year: "numeric" },
-                },
-                timeGridWeek: {
-                  // Hiển thị khoảng ngày dưới dạng DD/MM/YYYY - DD/MM/YYYY
-                  titleFormat: { day: "2-digit", month: "2-digit", year: "numeric" },
-                },
-                timeGridDay: {
-                  // Hiển thị ngày dưới dạng DD/MM/YYYY
-                  titleFormat: { day: "2-digit", month: "2-digit", year: "numeric" },
-                },
-              }}
               buttonText={{
                 today: "Hôm nay",
                 month: "Tháng",
@@ -216,60 +228,99 @@ export default function DoctorCalendarPage() {
               dayHeaderFormat={{ weekday: "long" }}
               eventTimeFormat={{ hour: "2-digit", minute: "2-digit" }}
               slotLabelFormat={{ hour: "2-digit", minute: "2-digit" }}
-              // Responsive & Dark mode
               themeSystem="standard"
               contentHeight="auto"
               handleWindowResize={true}
+              views={{
+                dayGridMonth: {
+                  titleFormat: { month: "2-digit", year: "numeric" },
+                },
+                timeGridWeek: {
+                  titleFormat: { day: "2-digit", month: "2-digit", year: "numeric" },
+                },
+                timeGridDay: {
+                  titleFormat: { day: "2-digit", month: "2-digit", year: "numeric" },
+                },
+              }}
+              // Tắt interaction cho các event có class past-event
+              eventClassNames={(arg) => {
+                const isPast = arg.event.classNames.includes("past-event");
+                return isPast ? "cursor-not-allowed" : "cursor-pointer";
+              }}
             />
           )}
         </Card>
 
-        {/* Sheet chi tiết */}
+        {/* Sheet chi tiết - giữ nguyên */}
         <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
           <SheetContent className="w-full sm:max-w-lg overflow-y-auto">
             {selectedAppointment && (
               <>
-                <SheetHeader>
+                <SheetHeader className="mt-2 pb-4 border-b">
                   <SheetTitle className="text-2xl flex items-center gap-3">
-                    <User className="w-8 h-8" />
+                    <User className="w-8 h-8 text-primary" />
                     {selectedAppointment.patient.full_name}
                   </SheetTitle>
-                  <SheetDescription>
+                  <SheetDescription className="mt-2">
                     {getStatusBadge(selectedAppointment.status)}
                   </SheetDescription>
                 </SheetHeader>
 
-                <div className="mt-8 space-y-6 px-4">
-                  <div className="space-y-4">
+                <div className="space-y-6 px-2 sm:px-4">
+                  {/* Phần thông tin cơ bản */}
+                  <div className="space-y-2 bg-muted/30 p-2 rounded-lg">
                     <div className="flex items-center gap-3">
                       <Calendar className="w-5 h-5 text-muted-foreground" />
-                      <span className="font-medium">
-                        {format(parseISO(selectedAppointment.appointment_date), "EEEE, dd/MM/yyyy")}
+                      <span className="font-medium text-base">
+                        {format(parseISO(selectedAppointment.appointment_date), "EEEE, dd/MM/yyyy", { locale: vi })}
                       </span>
                     </div>
                     <div className="flex items-center gap-3">
                       <Clock className="w-5 h-5 text-muted-foreground" />
-                      <span className="font-medium">
+                      <span className="font-medium text-base">
                         {selectedAppointment.appointment_time.slice(0, 5)} • {selectedAppointment.time_slot}
                       </span>
                     </div>
                   </div>
 
-                  {/* Lịch sử khám gần nhất */}
-                  <div className="border-t pt-6">
-                    <h4 className="font-semibold mb-4 flex items-center gap-2">
-                      <History className="w-5 h-5" />
+                  {/* Phần lịch sử khám gần nhất */}
+                  <div className="space-y-2 border-t pt-4">
+                    <h4 className="font-semibold text-lg flex items-center gap-2">
+                      <History className="w-5 h-5 text-primary" />
                       Lịch sử khám gần nhất
                     </h4>
 
                     {recordLoading ? (
                       <p className="text-sm text-muted-foreground">Đang tải...</p>
                     ) : recentRecord ? (
-                      <Card className="p-4 bg-muted/50">
-                        <div className="space-y-3 text-sm">
-                          <div>
-                            <span className="font-medium">{formatDateTime(recentRecord.created_at)}</span>    
+                      <Card className="p-5 bg-background border border-border shadow-sm rounded-lg">
+                        <div className="space-y-2 text-sm">
+                          <div className="flex justify-between">
+                            {/* <span className="font-medium">Ngày khám:</span> */}
+                            <span className="text-muted-foreground">
+                              {formatDateTime(recentRecord.created_at)}
+                            </span>
                           </div>
+                          {/* <div className="flex justify-between">
+                            <span className="font-medium">Triệu chứng:</span>
+                            <span className="text-muted-foreground text-right">
+                              {recentRecord.symptoms || "Không ghi nhận"}
+                            </span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span className="font-medium">Chẩn đoán:</span>
+                            <span className="text-muted-foreground text-right">
+                              {recentRecord.diagnosis || "Chưa có"}
+                            </span>
+                          </div>
+                          {recentRecord.notes && (
+                            <div className="flex justify-between">
+                              <span className="font-medium">Ghi chú:</span>
+                              <span className="text-muted-foreground italic text-right">
+                                {recentRecord.notes}
+                              </span>
+                            </div>
+                          )} */}
                           <div>
                             <span className="font-medium">Triệu chứng:</span>{" "}
                             <span className="text-muted-foreground">
@@ -278,7 +329,7 @@ export default function DoctorCalendarPage() {
                           </div>
                           <div>
                             <span className="font-medium">Chẩn đoán:</span>{" "}
-                            <span className="text-muted-foreground">
+                            <span className="font-medium text-muted-foreground">
                               {recentRecord.diagnosis || "Chưa có"}
                             </span>
                           </div>
@@ -290,24 +341,34 @@ export default function DoctorCalendarPage() {
                               </span>
                             </div>
                           )}
-                          <div className="pt-2">
-                            <Button size="sm" variant="outline" asChild>
+                          <div className="pt-1 flex justify-end">
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              className="hover:bg-accent hover:text-accent-foreground"
+                              asChild
+                            >
                               <Link href={`/doctor/medical-records/${recentRecord.id}`}>
-                                Xem chi tiết phiên khám <ExternalLink className="ml-1 w-3 h-3" />
+                                Xem chi tiết <ExternalLink className="ml-1 w-3 h-3" />
                               </Link>
                             </Button>
                           </div>
                         </div>
                       </Card>
                     ) : (
-                      <p className="text-sm text-muted-foreground">
+                      <p className="text-sm text-muted-foreground italic">
                         Chưa có phiên khám nào trước đây
                       </p>
                     )}
                   </div>
 
-                  <div className="flex flex-col gap-3 pt-4 border-t">
-                    <Button asChild size="lg" className="w-full">
+                  {/* Phần nút hành động */}
+                  <div className="flex flex-col gap-4 pt-4 border-t">
+                    <Button
+                      asChild
+                      size="lg"
+                      className="w-full bg-blue-100 text-blue-700 hover:bg-blue-200 border-blue-200"
+                    >
                       <Link href={`/doctor/patients/${selectedAppointment.patient_id}`}>
                         <User className="mr-2 h-5 w-5" />
                         Xem hồ sơ bệnh nhân
@@ -315,7 +376,11 @@ export default function DoctorCalendarPage() {
                     </Button>
 
                     {selectedAppointment.status === "WAITING" && (
-                      <Button size="lg" className="w-full" asChild>
+                      <Button
+                        size="lg"
+                        className="w-full bg-green-100 text-green-700 hover:bg-green-200 border-green-200"
+                        asChild
+                      >
                         <Link href={`/doctor/medical-records/add/${selectedAppointment.id}`}>
                           <Stethoscope className="mr-2 h-5 w-5" />
                           Tạo phiên khám
@@ -324,7 +389,11 @@ export default function DoctorCalendarPage() {
                     )}
 
                     {selectedAppointment.status === "COMPLETED" && (
-                      <Button size="lg" variant="outline" className="w-full" asChild>
+                      <Button
+                        size="lg"
+                        className="w-full bg-gray-100 text-gray-700 hover:bg-gray-200 border-gray-200"
+                        asChild
+                      >
                         <Link href={`/doctor/medical-records/${selectedAppointment.id}`}>
                           <FileText className="mr-2 h-5 w-5" />
                           Xem phiên khám

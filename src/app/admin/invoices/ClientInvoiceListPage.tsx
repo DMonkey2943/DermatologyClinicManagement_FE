@@ -22,7 +22,7 @@ export default function ClientInvoiceListPage() {
   const fetchInvoices = async () => {
     setIsLoading(true);
     try {
-      const {payload} = await invoiceApiRequest.getList();
+      const {payload} = await invoiceApiRequest.getList({ skip: page * pageSize, limit: pageSize });
       const data = payload.data;
       console.log(data);
       setInvoices(data);

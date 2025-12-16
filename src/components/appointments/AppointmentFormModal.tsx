@@ -247,6 +247,7 @@ export default function AppointmentFormModal({
               defaultValue={formData.patient_id}
               error={!!errors.patient_id}
               hint={errors.patient_id}
+              disabled={modalType === 'edit'}
             />
           </div>
 

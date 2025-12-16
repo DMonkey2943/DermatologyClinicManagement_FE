@@ -159,7 +159,7 @@ export default function ClientCreateUserPage() {
                     name="full_name"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Họ và tên</FormLabel>
+                        <FormLabel>Họ tên<span className="text-error-500">*</span></FormLabel>
                         <FormControl>
                           <Input placeholder="Nguyễn Văn A" {...field} />
                         </FormControl>
@@ -173,7 +173,7 @@ export default function ClientCreateUserPage() {
                     name="email"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Email</FormLabel>
+                        <FormLabel>Email<span className="text-error-500">*</span></FormLabel>
                         <FormControl>
                           <Input type="email" placeholder="user@example.com" {...field} />
                         </FormControl>
@@ -189,7 +189,7 @@ export default function ClientCreateUserPage() {
                     name="phone_number"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Số điện thoại</FormLabel>
+                        <FormLabel>Số điện thoại<span className="text-error-500">*</span></FormLabel>
                         <FormControl>
                           <Input placeholder="0901234567" {...field} />
                         </FormControl>
@@ -203,7 +203,7 @@ export default function ClientCreateUserPage() {
                     name="dob"
                     render={({ field }) => (
                       <FormItem className="flex flex-col">
-                        <FormLabel>Ngày sinh</FormLabel>
+                        <FormLabel>Ngày sinh<span className="text-error-500">*</span></FormLabel>
                         <Popover>
                           <PopoverTrigger asChild>
                             <FormControl>
@@ -286,7 +286,7 @@ export default function ClientCreateUserPage() {
                     name="role"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Vai trò</FormLabel>
+                        <FormLabel>Vai trò<span className="text-error-500">*</span></FormLabel>
                         <Select onValueChange={field.onChange} defaultValue={field.value}>
                           <FormControl>
                             <SelectTrigger>
@@ -312,7 +312,7 @@ export default function ClientCreateUserPage() {
                     name="username"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Tên đăng nhập</FormLabel>
+                        <FormLabel>Tên đăng nhập<span className="text-error-500">*</span></FormLabel>
                         <FormControl>
                           <Input placeholder="username123" {...field} />
                         </FormControl>
@@ -326,7 +326,7 @@ export default function ClientCreateUserPage() {
                     name="password"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Mật khẩu</FormLabel>
+                        <FormLabel>Mật khẩu<span className="text-error-500">*</span></FormLabel>
                         <FormControl>
                           <Input type="password" placeholder="••••••••" {...field} />
                         </FormControl>
@@ -338,7 +338,7 @@ export default function ClientCreateUserPage() {
 
                   {/* === Avatar Upload === */}
                 <div className="space-y-2">
-                  <FormLabel>Ảnh đại diện (tùy chọn)</FormLabel>
+                  <FormLabel>Ảnh đại diện</FormLabel>
                   <div className="flex items-center gap-4">
                     {/* Preview */}
                     {previewUrl ? (
@@ -394,7 +394,7 @@ export default function ClientCreateUserPage() {
                   disabled={form.formState.isSubmitting}
                   variant="primary"
                 >
-                  {form.formState.isSubmitting ? "Đang tạo..." : "Tạo người dùng"}
+                  {form.formState.isSubmitting ? "Đang lưu..." : "Lưu"}
                 </Button>
               </form>
             </Form>
