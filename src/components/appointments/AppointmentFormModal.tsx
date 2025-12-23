@@ -97,7 +97,7 @@ export default function AppointmentFormModal({
         } else if (modalType === 'add') {
           setFormData({
             patient_id:'',
-            doctor_id: '',
+            doctor_id: "9ab38764-c359-436e-9d00-5bb0c1a4b8b3",
             // created_by: editingAppointment.created_by || '',
             appointment_date: null,
             appointment_time: '11:00',
@@ -257,9 +257,10 @@ export default function AppointmentFormModal({
               options={doctorOptions}
               placeholder="Chọn bác sĩ..."
               onChange={(value) => handleInputChange('doctor_id', value)}
-              defaultValue={formData.doctor_id}
+              defaultValue={"9ab38764-c359-436e-9d00-5bb0c1a4b8b3"}
               error={!!errors.doctor_id}
               hint={errors.doctor_id}
+              disabled={true}
             />
           </div>
           <div className="col-span-1">

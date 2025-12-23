@@ -15,6 +15,8 @@ const buttonVariants = cva(
           "bg-destructive text-white hover:bg-destructive/90 focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40 dark:bg-destructive/60",
         outline:
           "border bg-background shadow-xs hover:bg-accent hover:text-accent-foreground dark:bg-input/30 dark:border-input dark:hover:bg-input/50",
+        outlineDestructive:
+          "border border-destructive text-destructive hover:bg-destructive/10 focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40",
         secondary:
           "bg-secondary text-secondary-foreground hover:bg-secondary/80",
         ghost:
@@ -30,7 +32,7 @@ const buttonVariants = cva(
 
         // INFO - Xanh nhạt cyan (hiện đại, dịu mắt)
         info:
-          "bg-cyan-600 text-white hover:bg-cyan-700 focus-visible:ring-cyan-500/30 shadow-theme-xs dark:bg-cyan-500 dark:hover:bg-cyan-400 dark:text-white",
+          "bg-cyan-600 text-white hover:bg-cyan-700 focus-visible:ring-cyan-500/30 shadow-theme-xs dark:bg-cyan-500 dark:hover:bg-cyan-400 dark:text-white",        
       },
       size: {
         default: "h-9 px-4 py-2 has-[>svg]:px-3",

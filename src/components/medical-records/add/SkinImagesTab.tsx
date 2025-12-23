@@ -211,10 +211,10 @@ export default function SkinImagesTab({ medicalRecordId, images, onImagesChange 
           ...prev,
           [position]: data.severity_display
         }));
-        toast.success(`AI: ${data.severity_display}`);
+        toast.success(`AI đã đánh giá mức độ nghiêm trọng của mụn trứng cá thành công`);
       } else {
-        setAiResults(prev => ({ ...prev, [position]: "Lỗi phân tích" }));
-        toast.error("AI không thể phân tích ảnh này");
+        setAiResults(prev => ({ ...prev, [position]: "Lỗi đánh giá" }));
+        toast.error("AI không thể đánh giá ảnh này");
       }
     } catch (err) {
       setAiResults(prev => ({ ...prev, [position]: "Không xác định" }));
@@ -340,7 +340,7 @@ export default function SkinImagesTab({ medicalRecordId, images, onImagesChange 
           {images.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-8 text-gray-500 bg-gray-50 rounded-lg">
               <ImageIcon className="h-10 w-10 mb-2" />
-              <p>Chưa có ảnh nào được upload</p>
+              <p>Chưa có ảnh nào được ghi nhận</p>
             </div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
@@ -376,7 +376,7 @@ export default function SkinImagesTab({ medicalRecordId, images, onImagesChange 
 
                       {/* Hiển thị kết quả AI theo position */}
                       {aiLoading.has(position) ? (
-                        <span className="text-xs text-blue-600 animate-pulse">Đang phân tích...</span>
+                        <span className="text-xs text-blue-600 animate-pulse">Đang đánh giá...</span>
                       ) : aiResults[position] ? (
                         <span className={`text-xs font-semibold px-2 py-1 rounded ${
                           aiResults[position].toLowerCase().includes('nặng') ? 'bg-red-100 text-red-800' :
@@ -393,7 +393,7 @@ export default function SkinImagesTab({ medicalRecordId, images, onImagesChange 
                           onClick={() => image && analyzeWithAI(image)}
                           className="text-xs h-7"
                         >
-                          AI phân tích
+                          AI đánh giá
                         </Button>
                       )}
                     </div>

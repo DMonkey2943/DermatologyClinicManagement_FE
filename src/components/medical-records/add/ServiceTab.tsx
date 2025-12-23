@@ -141,7 +141,7 @@ export default function ServiceTab({ medicalRecordId, serviceIndicationId, items
           </PopoverContent>
         </Popover>
         <Input placeholder="SL" type="number" value={quantity} onChange={e => setQuantity(e.target.value)} className="w-20" />
-        <Button onClick={handleAdd} size="icon"><Plus /></Button>
+        <Button onClick={handleAdd} size="icon" variant="primary"><Plus /></Button>
       </div>
 
       <Table>

@@ -200,7 +200,7 @@ export default function PrescriptionTab({ medicalRecordId, prescriptionId, items
           className="w-20"
         />
         <Textarea placeholder="Cách dùng" value={dosage} onChange={e => setDosage(e.target.value)} className="flex-1" rows={1} />
-        <Button onClick={handleAdd} size="icon"><Plus /></Button>
+        <Button onClick={handleAdd} size="icon" variant="primary"><Plus /></Button>
       </div>
       {error && <p className="text-sm text-red-500">{error}</p>}
 

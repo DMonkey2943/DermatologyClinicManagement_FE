@@ -367,7 +367,10 @@ export default function ClientEditPatientPage({ params }: { params: { id: string
                                   selected={field.value ? new Date(field.value) : undefined}
                                   onSelect={(date) => {
                                     if (date) {
-                                      field.onChange(date.toISOString().split("T")[0]);
+                                      const yyyy = date.getFullYear();
+                                      const mm = String(date.getMonth() + 1).padStart(2, '0');
+                                      const dd = String(date.getDate()).padStart(2, '0');
+                                      field.onChange(`${yyyy}-${mm}-${dd}`);
                                     }
                                   }}
                                   disabled={(date) =>
@@ -421,7 +424,7 @@ export default function ClientEditPatientPage({ params }: { params: { id: string
                         name="allergies"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Di ứng</FormLabel>
+                            <FormLabel>Dị ứng</FormLabel>
                             <FormControl>
                               {/* changed: use Textarea instead of Input */}
                               <Textarea {...field} value={field.value as string} />

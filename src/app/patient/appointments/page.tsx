@@ -9,6 +9,7 @@ import { useEffect, useState } from 'react'
 import { AppointmentDataType } from '@/schemaValidations/appointment.schema'
 import patientAppointmentApiRequest from '@/apiRequests/patient/appointment'
 import AppointmentFormModal from '@/components/appointments/patient/AppointmentFormModal'
+import { toast } from 'sonner'
 // import Link from 'next/link'
 
 
@@ -80,6 +81,18 @@ export default function AppointmentsPage() {
     await fetchAppointments(); // Sử dụng currentTab để fetch đúng tab
   };
 
+  const handleCancelAppointment = async (appointmentId: string) => {
+    try {
+      await patientAppointmentApiRequest.cancel(appointmentId); 
+      toast.success("Hủy lịch hẹn thành công");
+      // Cập nhật lại danh sách lịch hẹn sau khi hủy
+      await fetchAppointments();
+    } catch (error) {
+      console.error("Failed to cancel appointment:", error);
+      toast.error("Hủy lịch hẹn thất bại, vui lòng thử lại");
+    }
+  };
+
   return (
     <div className="min-h-screen bg-background">
       <AppointmentFormModal
@@ -97,7 +110,7 @@ export default function AppointmentsPage() {
             <h1 className="text-3xl font-bold text-foreground mb-2">Lịch hẹn</h1>
             <p className="text-muted-foreground">Quản lý tất cả cuộc hẹn khám chữa bệnh của bạn</p>
           </div>
-          <Button onClick={openAddModal} className="gap-2 w-full md:w-auto">
+          <Button variant="success" onClick={openAddModal} className="gap-2 w-full md:w-auto">
             <Plus size={18} />
             Đặt lịch hẹn mới
           </Button>
@@ -166,7 +179,7 @@ export default function AppointmentsPage() {
                         {getStatusLabel(appointment.status)}
                       </Badge>
                       {appointment.status === 'SCHEDULED' && (
-                        <Button variant="outline" size="sm">Hủy lịch</Button>
+                        <Button variant="outlineDestructive" size="sm" onClick={() => handleCancelAppointment(appointment.id)}>Hủy lịch</Button>
                       )}
                     </div>
                   </div>
@@ -177,7 +190,7 @@ export default function AppointmentsPage() {
             <Card>
               <CardContent className="text-center py-12">
                 <p className="text-muted-foreground mb-4">Không tìm thấy lịch hẹn phù hợp</p>
-                <Button className="gap-2">
+                <Button variant="success" className="gap-2">
                   <Plus size={18} />
                   Đặt lịch hẹn mới
                 </Button>

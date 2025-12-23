@@ -97,7 +97,7 @@ export default function PrescriptionCard({
             </div>
 
             {/* Nút in - chỉ hiển thị trên web */}
-            {["ADMIN", "DOCTOR"].includes(user?.role ?? "") && medicalRecordData?.status === 'COMPLETED' &&
+            {["ADMIN", "DOCTOR"].includes(user?.role ?? "") && (medicalRecordData?.status === 'COMPLETED' || medicalRecordData?.status === 'PAID') &&
               <div className="mt-4 text-right">
                 <button
                   onClick={handlePrint}

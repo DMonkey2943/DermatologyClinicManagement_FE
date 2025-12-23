@@ -15,6 +15,7 @@ const patientAppointmentApiRequest = {
     ) => http.get<AppointmentListResType>(`/${prefix}/`, { params }),
 
     create: (body: PatientCreateAppointmentBodyType) => http.post<AppointmentResType>(`/${prefix}/`, body),
+    cancel: (appointmentId: string) => http.put<AppointmentResType>(`/${prefix}/${appointmentId}/cancel`, {}),
 };
 
 export default patientAppointmentApiRequest;

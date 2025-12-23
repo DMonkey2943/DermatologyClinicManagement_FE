@@ -181,7 +181,7 @@ export default function ClientAppointmentListPage() {
           <div className="space-y-4">
             <div className="flex flex-wrap gap-4">
               {/* Lọc theo bác sĩ */}
-              <div className="w-48">                  
+              {/* <div className="w-48">                  
                 <Combobox
                   options={doctors.map(doctor => ({
                     value: doctor.id,
@@ -191,7 +191,7 @@ export default function ClientAppointmentListPage() {
                   onChange={setDoctorId}
                   defaultValue={doctorId}
                 />
-              </div>
+              </div> */}
 
               {/* Lọc theo bệnh nhân */}
               <div className="w-48">
